@@ -43,9 +43,11 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
 
         // add role
         $supplier_id = $supplier_model->addSupplier($request->post);
+        
+        $suplier = $supplier_model->getSupplier($supplier_id);
 
         header('Content-Type: application/json');
-        echo json_encode(array('msg' => trans('text_successful_created'), 'id' => $supplier_id));
+        echo json_encode(array('msg' => trans('text_successful_created'), 'supplier' => $suplier));
         exit();
 
     } catch (Exception $e) {
@@ -105,13 +107,13 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         if (empty($request->post['delete_action'])) {
             throw new Exception(trans('error_delete_action'));
         }
-        if ($request->post['delete_action'] == 'insert_to' && empty($request->post['new_group_id'])) {
+        if ($request->post['delete_action'] == 'insert_to' && empty($request->post['new_s_id'])) {
             throw new Exception(trans('error_new_supplier_name'));
         }
-        // if ($request->post['delete_action'] == 'insert_to') {
-        //     $statement = db()->prepare("UPDATE `users` SET `group_id` = ? WHERE `group_id` = ?");
-        //     $statement->execute(array($request->post['new_group_id'], $id));
-        // }
+        if ($request->post['delete_action'] == 'insert_to') {
+            $statement = db()->prepare("UPDATE `product` SET `s_id` = ? WHERE `s_id` = ?");
+            $statement->execute(array($request->post['new_s_id'], $id));
+        }
         $supplier = $supplier_model->deleteSupplier($id);
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans('text_delete_success'), 'id' => $id));

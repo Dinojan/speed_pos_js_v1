@@ -19,9 +19,10 @@
             </label>
             <select name="p_id" id="p_id" class="form-control select2 w-100" required>
                 <option value=""><?= trans('label_select_one'); ?></option>
-                <?php foreach (get_all_categories(1) as $cat): ?>
-                    <option value="<?= $cat['id'] ?>"><?= $cat['c_name']; ?></option>
-                <?php endforeach; ?>
+                <?= set_category_tree_to_select(get_category_tree()); ?>
+                <?php //foreach (get_all_categories(1) as $cat): ?>
+                    <!-- <option value="<?= $cat['id'] ?>"><?= $cat['c_name']; ?></option> -->
+                <?php //endforeach; ?>
             </select>
         </div>
     </div>

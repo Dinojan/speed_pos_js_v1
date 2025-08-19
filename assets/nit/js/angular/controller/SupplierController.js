@@ -66,6 +66,21 @@ angularApp.controller("SupplierController", [
                 SupplierEditModal($scope);
             }
         });
+          $(document).delegate("#delete-supplier", "click", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+           var table = dt.DataTable();
+            var $row = $(this).closest("tr");
+            var d = table.row($row).data();
+            if (!d) {
+                d = table.row($row.prev()).data();
+            }
+            if (d) {
+            $scope.supplier = d;
+            SupplierDeleteModal($scope);
+            }
+        });
+
         // $(document).delegate("#delete-supplier", "click", function (e) {
         //     e.stopPropagation();
         //     e.preventDefault();

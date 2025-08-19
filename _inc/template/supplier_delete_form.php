@@ -19,7 +19,7 @@
       </label>
     </div>
 
-    <select name="new_c_id" class="form-control select2" aria-label="Select new supplier">
+    <select name="new_s_id" class="form-control select2" aria-label="Select new supplier">
       <option value=""><?= trans('text_select'); ?></option>
       <?php foreach (get_suppliers() as $s) : ?>
         <?php if ($s['id'] == $supplier['id']) continue; ?>

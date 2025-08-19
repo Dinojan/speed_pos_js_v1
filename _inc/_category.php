@@ -105,10 +105,13 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         if ($request->post['delete_action'] == 'insert_to' && empty($request->post['new_c_id'])) {
             throw new Exception(trans('error_new_category_name'));
         }
-        // if ($request->post['delete_action'] == 'insert_to') {
-        //     $statement = db()->prepare("UPDATE `users` SET `group_id` = ? WHERE `group_id` = ?");
-        //     $statement->execute(array($request->post['new_group_id'], $id));
-        // }
+        if ($request->post['delete_action'] == 'insert_to') {
+            $statement = db()->prepare("UPDATE `category` SET `p_id` = ? WHERE `p_id` = ?");
+            $statement->execute(array($request->post['new_c_id'], $id));
+
+            $statement = db()->prepare("UPDATE `product` SET `c_id` = ? WHERE `c_id` = ?");
+            $statement->execute(array($request->post['new_c_id'], $id));
+        }
         $user_group = $category_model->deleteCategory($id);
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans('text_delete_success'), 'id' => $id));

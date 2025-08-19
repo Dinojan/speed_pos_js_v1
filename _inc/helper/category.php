@@ -14,9 +14,12 @@ function get_the_category($id){
     return $modal->getCategory($id);
 }
 
-function set_category_tree_to_select($categories, $prefix = '', $selected = null) {
+function set_category_tree_to_select($categories, $prefix = '', $selected = null,$for = 'edit') {
     $html = '';
     foreach ($categories as $category) {
+        if($for == 'delete'){
+            if($category['id'] == $selected) continue;
+        }
         $isSelected = ($selected == $category['id']) ? 'selected' : '';
         // Show sl + category name
         $html .= '<option value="' . $category['id'] . '" ' . $isSelected . '>' 
@@ -25,7 +28,7 @@ function set_category_tree_to_select($categories, $prefix = '', $selected = null
 
         // If children exist, call recursively with more indentation
         if (!empty($category['children'])) {
-            $html .= set_category_tree_to_select($category['children'], $prefix . '-- ', $selected);
+            $html .= set_category_tree_to_select($category['children'], $prefix . '-- ', $selected,$for);
         }
     }
     return $html;

@@ -21,12 +21,13 @@
 
     <select name="new_c_id" class="form-control select2" aria-label="Select new Category">
       <option value=""><?= trans('text_select'); ?></option>
-      <?php foreach (get_all_categories(1) as $c) : ?>
-        <?php if ($c['id'] == $category['id']) continue; ?>
-        <option value="<?php echo $c['id']; ?>">
-          <?php echo $c['c_name']; ?>
-        </option>
-      <?php endforeach; ?>
+      <?= set_category_tree_to_select(get_category_tree(),'',$category['id'],'delete'); ?>
+      <?php //foreach (get_all_categories(1) as $c) : ?>
+        <?php //if ($c['id'] == $category['id']) continue; ?>
+        <!-- <option value="<?php //echo $c['id']; ?>"> -->
+          <?php //echo $c['c_name']; ?>
+        <!-- </option> -->
+      <?php //endforeach; ?>
     </select>
   </div>
 

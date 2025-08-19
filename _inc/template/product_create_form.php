@@ -27,6 +27,7 @@
             <option value="<?= $sup['id']?>"><?= $sup['s_name']?> (<?= $sup['s_mobile']?>)</option>
             <?php }?>
         </select>
+        <!-- <button ng-click="suplierAddModal()" class="btn btn-outline-primary">Add</button> -->
     </div>
     <div class="form-group">
         <label for="wgt"><?= trans('label_weight'); ?> <i class="text-danger">*</i></label>

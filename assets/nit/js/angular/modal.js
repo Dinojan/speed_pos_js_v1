@@ -716,8 +716,13 @@ angularApp.factory("SupplierAddModal", [
                     function (response) {
                         var alertMsg = response.data.msg;
                         Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('.table').DataTable().ajax.reload(null, false);
+                        // if(window.current_nav == 'product'){
+                        //     // add #s_id option
+                        // }else{
+                             $('.table').DataTable().ajax.reload(null, false);
 
+                       // }
+                       
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
                         }
@@ -903,6 +908,7 @@ angularApp.factory("ProductAddModal", [
     "$rootScope",
     "$compile",
     "$timeout",
+    "SupplierAddModal",
     function (
         API_URL,
         window,
@@ -911,7 +917,7 @@ angularApp.factory("ProductAddModal", [
         $sce,
         $rootScope,
         $compile,
-        $timeout
+        $timeout,SupplierAddModal
     ) {
         return function ($scope) {
             const modalId = "ProductAddModal";
@@ -939,6 +945,9 @@ angularApp.factory("ProductAddModal", [
 
 
             });
+            $rootScope.suplierAddModal = function(){
+                SupplierAddModal($scope);
+            }
             $(document).off("click", "#create_product_submit").on("click", "#create_product_submit", function (e) {
                 e.preventDefault();
 
