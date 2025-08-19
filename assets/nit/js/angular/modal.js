@@ -893,4 +893,164 @@ angularApp.factory("SupplierDeleteModal", [
         };
     }
 ]);
-// 
+// ProductAddModal
+angularApp.factory("ProductAddModal", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (
+        API_URL,
+        window,
+        $,
+        $http,
+        $sce,
+        $rootScope,
+        $compile,
+        $timeout
+    ) {
+        return function ($scope) {
+            const modalId = "ProductAddModal";
+            // Step 1: Load modal form from server
+            $http.get(window.baseUrl + "/_inc/_product.php?action_type=CREATE").then(function (response) {
+                const formHtml = response.data;
+
+                $(`#${modalId}`).remove();
+                $scope.modalTitle = "Add Product";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-md";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+
+
+
+            });
+            $(document).off("click", "#create_product_submit").on("click", "#create_product_submit", function (e) {
+                e.preventDefault();
+
+                var $tag = $(this);
+
+                $http({
+                    url: window.baseUrl + "/_inc/_product.php",
+                    method: "POST",
+                    data: $('#create-product-form').serialize(),
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json"
+                }).then(
+                    function (response) {
+                        var alertMsg = response.data.msg;
+                        Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
+                        $('.table').DataTable().ajax.reload(null, false);
+
+                        if ($scope.modalInstance) {
+                            $scope.modalInstance.hide();
+                        }
+
+                    }, function (response) {
+                        var alertMsg = "";
+                        window.angular.forEach(response.data, function (value) {
+                            alertMsg += value + " ";
+                        });
+                        ;
+                        //window.toastr.warning(alertMsg, "Warning!");
+                        Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                    });
+            });
+        };
+    }
+]);
+//ProductEditModel
+angularApp.factory("ProductEditModal", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (
+        API_URL,
+        window,
+        $,
+        $http,
+        $sce,
+        $rootScope,
+        $compile,
+        $timeout
+    ) {
+        return function ($scope) {
+            const modalId = "ProductEditModal";
+            // Step 1: Load modal form from server
+            $http.get(window.baseUrl + "/_inc/_product.php?action_type=EDIT&id=" + $scope.product.id).then(function (response) {
+                const formHtml = response.data;
+                $(`#${modalId}`).remove();
+                $scope.modalTitle = "Edit product";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-md";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+            });
+            $(document).off("click", "#update_product_submit").on("click", "#update_product_submit", function (e) {
+
+                e.preventDefault();
+
+                var $tag = $(this);
+
+                $http({
+                    url: window.baseUrl + "/_inc/_product.php",
+                    method: "POST",
+                    data: $('#update-product-form').serialize(),
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json"
+                }).then(
+                    function (response) {
+                        var alertMsg = response.data.msg;
+                        Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
+                        $('.table').DataTable().ajax.reload(null, false);
+
+                        if ($scope.modalInstance) {
+                            $scope.modalInstance.hide();
+                        }
+
+                    }, function (response) {
+                        var alertMsg = "";
+                        window.angular.forEach(response.data, function (value) {
+                            alertMsg += value + " ";
+                        });
+                        ;
+                        //window.toastr.warning(alertMsg, "Warning!");
+                        Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                    });
+            });
+        };
+    }
+]);

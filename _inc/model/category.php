@@ -43,5 +43,37 @@ class ModelCategory extends Model
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
+	public function categoryTree() {
+    function getCategoryTree($parentId = 0, $prefix = '') {
+        $stmt = db()->prepare("SELECT * FROM category WHERE p_id = ? ORDER BY c_name ASC");
+        $stmt->execute([$parentId]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $tree = [];
+        $counter = 1;
+
+        foreach ($rows as $row) {
+            // Generate hierarchical number
+            $rowNumber = ($prefix === '') ? (string)$counter : $prefix . '.' . $counter;
+            $row['sl'] = $rowNumber;   // ✅ set sl for both parent and children
+            $row['wgt'] = 0;
+            $row['pcs'] = 0;
+
+            // Recursively get children
+            $children = getCategoryTree($row['id'], $rowNumber);
+            if (!empty($children)) {
+                $row['children'] = $children;
+            }
+
+            $tree[] = $row;
+            $counter++;
+        }
+
+        return $tree;
+    }
+
+    return getCategoryTree(0);
+}
+
 
 }
