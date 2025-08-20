@@ -17,6 +17,12 @@ class ModelProduct extends Model
     	return $id;
 	}
 
+    public function updateProductStatus($id,$sts){
+        $statement = $this->db->prepare("UPDATE product SET `status` = ? WHERE id =?");
+        $statement->execute([$sts,$id]);
+        return $id;
+    }
+
 	public function deleteproduct($id) 
 	{    	
     	$statement = $this->db->prepare("DELETE FROM `product` WHERE `id` = ? LIMIT 1");

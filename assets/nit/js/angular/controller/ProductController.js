@@ -10,6 +10,7 @@ angularApp.controller("ProductController", [
                 hideColumsArray.push(parseInt(hideColums[i]));
             }
         }
+        var isdeleted = window.getParameterByName('isdeleted');
         dt.DataTable({
             processing: true,
             responsive: true,
@@ -31,7 +32,7 @@ angularApp.controller("ProductController", [
             ajax: {
                 url: "../_inc/_product.php",
                 type: "GET",
-                data: { action_type: "GET_TABLE_DATA" },
+                data: { action_type: "GET_TABLE_DATA",isdeleted:isdeleted },
                 dataSrc: "data"
             },
             aoColumns: [
@@ -42,7 +43,7 @@ angularApp.controller("ProductController", [
                 { data: "supplier" },
                 { data: "wgt" },
                 { data: "cost" },
-                { data: "status" },
+                { data: "sts" },
                 { data: "view" },
                 { data: "edit" },
                 { data: "delete" }
@@ -71,66 +72,80 @@ angularApp.controller("ProductController", [
                 ProductEditModal($scope);
             }
         });
-        // $(document).delegate("#delete-Product", "click", function (e) {
-        //     e.stopPropagation();
-        //     e.preventDefault();
+        $(document).delegate("#delete-product", "click", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
 
-        //     var table = dt.DataTable();
-        //     var $row = $(this).closest("tr");
-        //     var d = table.row($row).data();
-        //     if (!d) {
-        //         d = table.row($row.prev()).data();
-        //     }
+            var table = dt.DataTable();
+            var $row = $(this).closest("tr");
+            var d = table.row($row).data();
+            if (!d) {
+                d = table.row($row.prev()).data();
+            }
 
-        //     if (d) {
-        //         $scope.Product = d;
+            if (d) {
+                $scope.Product = d;
 
-        //         Swal.fire({
-        //             title: "Are you sure?",
-        //             text: "You won't be able to revert this!",
-        //             icon: "warning",
-        //             showCancelButton: true,
-        //             confirmButtonColor: "#3085d6",
-        //             cancelButtonColor: "#d33",
-        //             confirmButtonText: "Yes, delete it!"
-        //         }).then((result) => {
-        //             if (result.isConfirmed) {
-        //                 var formData = new FormData();
-        //                 formData.append('action_type', 'DELETE');
-        //                 formData.append('id', $scope.Product.id);
+                var text;
+                var btnTxt;
+                //console.log($scope.Product.status );
+                if($scope.Product.status == 2){
+                    text = "You need to restore this product!";
+                    btnTxt = "Yes, Restore it!";
+                } else{
+                    text = "You won't be able to revert this!";
+                    btnTxt = "Yes, Delete it!";
+                }
 
-        //                 $http({
-        //                     url: window.baseUrl + "/_inc/_Product.php",
-        //                     method: "POST",
-        //                     data: formData,
-        //                     transformRequest: angular.identity,
-        //                     headers: { 'Content-Type': undefined }
-        //                 }).then(
-        //                     function (response) {
-        //                         var alertMsg = response.data.msg;
-        //                         Swal.fire({
-        //                             title: "Deleted!",
-        //                             text: alertMsg,
-        //                             icon: "success"
-        //                         });
-        //                         $('.table').DataTable().ajax.reload(null, false);
-        //                     },
-        //                     function (response) {
-        //                         var alertMsg = "";
-        //                         angular.forEach(response.data, function (value) {
-        //                             alertMsg += value + " ";
-        //                         });
-        //                         Swal.fire({
-        //                             title: "Oops!",
-        //                             text: alertMsg,
-        //                             icon: "error"
-        //                         });
-        //                     }
-        //                 );
-        //             }
-        //         });
-        //     }
-        // });
+
+
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: text,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: btnTxt,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var formData = new FormData();
+                        formData.append('action_type', 'DELETE');
+                        formData.append('id', $scope.Product.id);
+
+                        $http({
+                            url: window.baseUrl + "/_inc/_product.php",
+                            method: "POST",
+                            data: formData,
+                            transformRequest: angular.identity,
+                            headers: { 'Content-Type': undefined }
+                        }).then(
+                            function (response) {
+                                var alertMsg = response.data.msg;
+                                Swal.fire({
+                                    title:($scope.Product.status == 2)? "Restored!": "Deleted!",
+                                    text: alertMsg,
+                                    icon: "success"
+                                });
+                                $('.table').DataTable().ajax.reload(null, false);
+                            },
+                            function (response) {
+                                var alertMsg = "";
+                                angular.forEach(response.data, function (value) {
+                                    alertMsg += value + " ";
+                                });
+                                Swal.fire({
+                                    title: "Oops!",
+                                    text: alertMsg,
+                                    icon: "error"
+                                });
+                            }
+                        );
+                    }
+                });
+            }
+        });
 
 
 

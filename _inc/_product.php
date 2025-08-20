@@ -113,10 +113,20 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         if (empty($request->post['id'])) {
             throw new Exception(trans('error_product_id'));
         }
+        $id = $request->post['id'];
+        $checkProduct = $product_model->getproduct($id);
+        if($checkProduct['status'] == 2){
+            $sts = 1;
+          
+             $msg = 'text_restore_success';
+        }else{
+            $sts = 2; 
+              $msg = 'text_move_to_bin_success';
+        }
 
-        $product = $product_model->deleteproduct($id);
+        $product = $product_model->updateProductStatus($id,$sts);
         header('Content-Type: application/json');
-        echo json_encode(array('msg' => trans('text_delete_success'), 'id' => $id));
+        echo json_encode(array('msg' => trans($msg), 'id' => $id));
         exit();
 
     } catch (Exception $e) {
@@ -159,7 +169,15 @@ if (isset($request->get['action_type']) && $request->get['action_type'] == 'EDIT
 if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_TABLE_DATA") {
     try {
         $data = array();
-        $statement = db()->prepare("SELECT * FROM product");
+        $where = "WHERE 1=1";
+
+        if(isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2){
+            $where .= " AND status = 2";
+        }else {
+             $where .= " AND status != 2";
+        }
+
+        $statement = db()->prepare("SELECT * FROM product $where");
         $statement->execute();
         $data = $statement->fetchAll(PDO::FETCH_ASSOC);
         $i = 0;
@@ -170,13 +188,7 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $row['category'] = get_the_category($row['c_id'])['c_name'];
             $row['supplier'] = get_the_supplier($row['s_id'])['s_name']." (". get_the_supplier($row['s_id'])['s_mobile'].")";
 
-            if($row['status'] == 0){
-                $row['status'] = 'Active';
-
-            } else{
-                 $row['status'] = 'inActive';
-            }
-            
+          
             
             $row['view'] = '<button id="view-product" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-eye"></i></button>';
             //if ($row['id'] != 1) {
@@ -184,12 +196,24 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             // } else {
             //     $row['edit'] = '<button id="edit-product" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
             // }
-            //if ($row['id'] != 1) {
-                $row['delete'] = '<button id="delete-product" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
-            // } else {
+            if ($row['status'] == 2) {
+                $row['delete'] = '<button id="delete-product" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
+             } else {
+                 $row['delete'] = '<button id="delete-product" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+            
+             }
             //     $row['delete'] = '<button class="btn btn-outline-danger btn-sm delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
             // }
+               if($row['status'] == 0){
+                $row['sts'] = 'Active';
 
+            } else  if($row['status'] == 2){
+                $row['sts'] = 'Deleted';
+
+            }else {
+                 $row['sts'] = 'inActive';
+            }
+            
         }
         // Return data as JSON
         echo json_encode(array("data" => $data));
