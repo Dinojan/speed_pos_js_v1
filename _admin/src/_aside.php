@@ -262,7 +262,15 @@
                         </ul>
                     </li>
                 <?php endif; ?>
+                <li class="nav-item ">
+                    <a href="customer.php"
+                        class="nav-link <?php echo current_nav() == 'customer' || current_nav() == 'index' ? ' active' : null; ?>">
+                        <i class="nav-icon fas fa-users text-sm"></i>
+                        <p><?php echo trans('menu_customer') ?></p>
+                    </a>
+                </li>
             </ul>
+             
         </nav>
         <!-- /.sidebar-menu -->
     </div>
