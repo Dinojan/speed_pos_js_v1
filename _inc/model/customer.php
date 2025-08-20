@@ -38,9 +38,9 @@ class ModelCustomer extends Model
   		return $statement->fetch(PDO::FETCH_ASSOC);
 	}
 
-	public function getcustomers($data = array()) 
+	public function getcustomers($sts) 
 	{
-		$statement = $this->db->prepare("SELECT * FROM `customer`");
+		$statement = $this->db->prepare("SELECT * FROM `customer` WHERE status  = '$sts'");
 		$statement->execute();
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}

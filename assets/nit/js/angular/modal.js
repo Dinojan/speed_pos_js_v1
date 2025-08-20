@@ -297,7 +297,7 @@ angularApp.factory("userAddModal", [
 
 
             });
-           $(document).off("click", "#create_user_submit").on("click", "#create_user_submit", function (e) {
+            $(document).off("click", "#create_user_submit").on("click", "#create_user_submit", function (e) {
                 e.preventDefault();
 
                 var $tag = $(this);
@@ -719,10 +719,10 @@ angularApp.factory("SupplierAddModal", [
                         // if(window.current_nav == 'product'){
                         //     // add #s_id option
                         // }else{
-                             $('.table').DataTable().ajax.reload(null, false);
+                        $('.table').DataTable().ajax.reload(null, false);
 
-                       // }
-                       
+                        // }
+
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
                         }
@@ -917,7 +917,7 @@ angularApp.factory("ProductAddModal", [
         $sce,
         $rootScope,
         $compile,
-        $timeout,SupplierAddModal
+        $timeout, SupplierAddModal
     ) {
         return function ($scope) {
             const modalId = "ProductAddModal";
@@ -945,7 +945,7 @@ angularApp.factory("ProductAddModal", [
 
 
             });
-            $rootScope.suplierAddModal = function(){
+            $rootScope.suplierAddModal = function () {
                 SupplierAddModal($scope);
             }
             $(document).off("click", "#create_product_submit").on("click", "#create_product_submit", function (e) {
@@ -1109,7 +1109,7 @@ angularApp.factory("CustomerAddModal", [
 
 
             });
-            $rootScope.customerAddModal = function(){
+            $rootScope.customerAddModal = function () {
                 CustomerAddModal($scope);
             }
             $(document).off("click", "#create_customer_submit").on("click", "#create_customer_submit", function (e) {
@@ -1200,6 +1200,201 @@ angularApp.factory("CustomerEditModal", [
                     url: window.baseUrl + "/_inc/_customer.php",
                     method: "POST",
                     data: $('#update-customer-form').serialize(),
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json"
+                }).then(
+                    function (response) {
+                        var alertMsg = response.data.msg;
+                        Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
+                        $('.table').DataTable().ajax.reload(null, false);
+
+                        if ($scope.modalInstance) {
+                            $scope.modalInstance.hide();
+                        }
+
+                    }, function (response) {
+                        var alertMsg = "";
+                        window.angular.forEach(response.data, function (value) {
+                            alertMsg += value + " ";
+                        });
+                        ;
+                        //window.toastr.warning(alertMsg, "Warning!");
+                        Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                    });
+            });
+        };
+    }
+]);
+// OrderAddModel
+angularApp.factory("OrderAddModel", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (
+        API_URL,
+        window,
+        $,
+        $http,
+        $sce,
+        $rootScope,
+        $compile,
+        $timeout
+    ) {
+        return function ($scope) {
+            const modalId = "OrderAddModel";
+            // Step 1: Load modal form from server
+            $http.get(window.baseUrl + "/_inc/_order.php?action_type=CREATE").then(function (response) {
+                const formHtml = response.data;
+
+                $(`#${modalId}`).remove();
+                $scope.modalTitle = "Add Order";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-md";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+
+
+
+            });
+            $rootScope.orderAddModal = function () {
+                OrderAddModal($scope);
+            }
+            // c_id
+            $(document).off("change", "#c_id").on("change", "#c_id", function (e) {
+                e.preventDefault();
+                var c_id = $(this).val();
+                $http({
+                    url: window.baseUrl + "/_inc/_customer.php?action_type=GET_THE_CUSTOMER&c_id=" + c_id,
+                    method: "GET",
+                }).then(
+                    function (response) {
+                        $scope.customer = response.data.customer;
+                        if ($scope.customer != null) {
+                            $('#cus_name').val($scope.customer.c_name);
+                            $('#cus_mobile').val($scope.customer.c_mobile);
+                            $('#cus_address').val($scope.customer.c_address);
+                        } else {
+                            $('#cus_name').val('');
+                            $('#cus_mobile').val('');
+                            $('#cus_address').val('');
+                        }
+
+                    }, function (response) {
+                        var alertMsg = "";
+                        window.angular.forEach(response.data, function (value) {
+                            alertMsg += value + " ";
+                        });
+                        ;
+                        //window.toastr.warning(alertMsg, "Warning!");
+                        Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                    });
+
+            });
+            $(document).off("click", "#create_order_submit").on("click", "#create_order_submit", function (e) {
+                e.preventDefault();
+
+                var $tag = $(this);
+
+                $http({
+                    url: window.baseUrl + "/_inc/_order.php",
+                    method: "POST",
+                    data: $('#create-order-form').serialize(),
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json"
+                }).then(
+                    function (response) {
+                        var alertMsg = response.data.msg;
+                        Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
+                        $('.table').DataTable().ajax.reload(null, false);
+
+                        if ($scope.modalInstance) {
+                            $scope.modalInstance.hide();
+                        }
+
+                    }, function (response) {
+                        var alertMsg = "";
+                        window.angular.forEach(response.data, function (value) {
+                            alertMsg += value + " ";
+                        });
+                        ;
+                        //window.toastr.warning(alertMsg, "Warning!");
+                        Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                    });
+            });
+        };
+    }
+]);
+//OrderEditModel
+angularApp.factory("OrderEditModel", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (
+        API_URL,
+        window,
+        $,
+        $http,
+        $sce,
+        $rootScope,
+        $compile,
+        $timeout
+    ) {
+        return function ($scope) {
+            const modalId = "OrderEditModel";
+            // Step 1: Load modal form from server
+            $http.get(window.baseUrl + "/_inc/_order.php?action_type=EDIT&id=" + $scope.order.id).then(function (response) {
+                const formHtml = response.data;
+                $(`#${modalId}`).remove();
+                $scope.modalTitle = "Edit order";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-md";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+            });
+            $(document).off("click", "#update_order_submit").on("click", "#update_order_submit", function (e) {
+
+                e.preventDefault();
+
+                var $tag = $(this);
+
+                $http({
+                    url: window.baseUrl + "/_inc/_order.php",
+                    method: "POST",
+                    data: $('#update-order-form').serialize(),
                     cache: false,
                     processData: false,
                     contentType: false,

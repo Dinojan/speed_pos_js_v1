@@ -6,37 +6,68 @@ if (!is_loggedin()) {
     echo json_encode(array('errorMsg' => trans('error_login')));
     exit();
 }
-$customer_model = registry()->get('loader')->model('customer'); // call modal file
+$order_model = registry()->get('loader')->model('order'); // call modal file
 
 function validate_request_data($request)
 {
-    if (!validateString($request->post['c_name'])) {
-        throw new Exception(trans('error_customer_name'));
+    if (!validateString($request->post['cus_name'])) {
+        throw new Exception(trans('error_order_name'));
     }
-    if (!validateString($request->post['c_mobile'])) {
-        throw new Exception(trans('error_customer_mobile'));
+
+    if (!validateString($request->post['cus_mobile'])) {
+        throw new Exception(trans('error_order_mobile'));
     }
-    if (!validateString($request->post['c_address'])) {
-        throw new Exception(trans('error_customer_address'));
+
+    if (empty($request->post['cus_address'])) {
+        throw new Exception(trans('error_order_address'));
+    }
+
+    if (empty($request->post['order_details'])) {
+        throw new Exception(trans('error_order_details'));
+    }
+
+    if (empty($request->post['total_amt'])) {
+        throw new Exception(trans('error_total_amt'));
+    }
+
+    if (empty($request->post['advance_amt'])) {
+        throw new Exception(trans('error_advance_amt'));
     }
 
     
 }
 // Check existance by id
-function validate_existance($request, $id = 0)
-{
-    $statement = db()->prepare("SELECT * FROM `customer` WHERE `c_mobile` = ? AND `id` != ?");
-    $statement->execute(array($request->post['c_mobile'], $id));
-    if ($statement->rowCount() > 0) {
-        throw new Exception(trans('error_customer_mobile_exist'));
-    }
+// function validate_existance($request, $id = 0)
+// {
+//     $statement = db()->prepare("SELECT * FROM `order` WHERE `p_code` = ? AND `id` != ?");
+//     $statement->execute(array($request->post['p_code'], $id));
+//     if ($statement->rowCount() > 0) {
+//         throw new Exception(trans('error_order_code_exist'));
+//     }
+// }
+
+function new_ref_no() {
+    $prfx = "OR";
+
+    // Get the latest order id
+    $statement = db()->prepare("SELECT id FROM orders ORDER BY id DESC LIMIT 1");
+    $statement->execute();
+    $lastEntry = $statement->fetch(PDO::FETCH_ASSOC);
+
+    // If no records yet, start from 1001
+    $lastId = $lastEntry ? (int)$lastEntry['id'] : 0;
+    $newId = 1001 + $lastId;
+
+    // Generate reference
+    return $prfx . $newId; // e.g. OR1001, OR1002...
 }
-// CREATE customer 
+
+// CREATE order 
 if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action_type']) && $request->post['action_type'] == 'CREATE') {
     try {
 
         // Check create permission
-        if (user_group_id() != 1 && !has_permission('access', 'create_customer')) {
+        if (user_group_id() != 1 && !has_permission('access', 'create_order')) {
             throw new Exception(trans('error_create_permission'));
         }
 
@@ -44,13 +75,21 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         validate_request_data($request);
 
         // Validate existance
-        validate_existance($request);
-
+        // validate_existance($request);
+        $ref = new_ref_no();
+        // check customer
+        if(!isset($request->post['c_id']) && $request->post['c_id'] != null){
+            $statement = db()->prepare("INSERT INTO `customer` ( `c_name`, `c_mobile`, `c_address`) VALUES (?, ?, ?)");
+    	    $statement->execute(array(  $data['cus_name'], $data['cus_mobile'], $data['cus_address']));
+            $cid = db()->lastInsertId(); 
+        }else{
+             $cid = $request->post['c_id'];
+        }
         // add role
-        $customer_id = $customer_model->addcustomer($request->post);
+        $order_id = $order_model->addorder($ref,$cid ,$request->post);
 
         header('Content-Type: application/json');
-        echo json_encode(array('msg' => trans('text_successful_created'), 'id' => $customer_id));
+        echo json_encode(array('msg' => trans('text_successful_created'), 'id' => $order_id));
         exit();
 
     } catch (Exception $e) {
@@ -65,11 +104,11 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
 if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action_type']) && $request->post['action_type'] == 'UPDATE') {
     try {
         // Check create permission
-        if (user_group_id() != 1 && !has_permission('access', 'update_customer')) {
+        if (user_group_id() != 1 && !has_permission('access', 'update_order')) {
             throw new Exception(trans('error_update_permission'));
         }
         if (empty($request->post['id'])) {
-            throw new Exception(trans('error_customer_id'));
+            throw new Exception(trans('error_order_id'));
         }
 
         $id = $request->post['id'];
@@ -77,11 +116,11 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         validate_request_data($request);
 
         // Validate existance
-        validate_existance($request, $id);
+        // validate_existance($request, $id);
         // Edit role
-        $customer_id = $customer_model->editCustomer($id, $request->post);
+        $order_id = $order_model->editorder($id, $request->post);
         header('Content-Type: application/json');
-        echo json_encode(array('msg' => trans('text_update_success'), 'id' => $customer_id));
+        echo json_encode(array('msg' => trans('text_update_success'), 'id' => $order_id));
         exit();
 
     } catch (Exception $e) {
@@ -96,15 +135,15 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
 if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action_type']) && $request->post['action_type'] == 'DELETE') {
     try {
         // Check create permission
-        if (user_group_id() != 1 && !has_permission('access', 'delete_customer')) {
+        if (user_group_id() != 1 && !has_permission('access', 'delete_order')) {
             throw new Exception(trans('error_delete_permission'));
         }
         if (empty($request->post['id'])) {
-            throw new Exception(trans('error_customer_id'));
+            throw new Exception(trans('error_order_id'));
         }
         $id = $request->post['id'];
-        $checkcustomer = $customer_model->getcustomer($id);
-        if($checkcustomer['status'] == 2){
+        $checkorder = $order_model->getorder($id);
+        if($checkorder['status'] == 2){
             $sts = 1;
           
              $msg = 'text_restore_success';
@@ -113,7 +152,7 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
               $msg = 'text_move_to_bin_success';
         }
 
-        $customer = $customer_model->updatecustomerStatus($id,$sts);
+        $order = $order_model->updateorderStatus($id,$sts);
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans($msg), 'id' => $id));
         exit();
@@ -128,21 +167,21 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
 }
 // add form
 if (isset($request->get['action_type']) && $request->get['action_type'] == 'CREATE') {
-    include 'template/customer_create_form.php';
+    include 'template/order_create_form.php';
     exit();
 }
 //edit form
 if (isset($request->get['action_type']) && $request->get['action_type'] == 'EDIT') {
     try {
         if (empty($request->get['id'])) {
-            throw new Exception(trans('error_customer_id'));
+            throw new Exception(trans('error_order_id'));
         }
         $id = $request->get['id'];
-        $customer = $customer_model->getcustomer($id);
-        if (!$customer) {
-            throw new Exception(trans('error_customer_not_found'));
+        $order = $order_model->getorder($id);
+        if (!$order) {
+            throw new Exception(trans('error_order_not_found'));
         }
-        include 'template/customer_edit_form.php';
+        include 'template/order_edit_form.php';
         exit();
     } catch (Exception $e) {
         header('HTTP/1.1 422 Unprocessable Entity');
@@ -153,24 +192,7 @@ if (isset($request->get['action_type']) && $request->get['action_type'] == 'EDIT
 
 }
 
-if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_THE_CUSTOMER" && $request->get['c_id']) {
-    try { 
-         if (empty($request->get['c_id'])) {
-            throw new Exception(trans('error_customer_id'));
-        }
-        $id = $request->get['c_id'];
-        $customer = $customer_model->getcustomer($id);
-        if (!$customer) {
-            throw new Exception(trans('error_customer_not_found'));
-        }
-          echo json_encode(array("customer" => $customer));
-    } catch (Exception $e) {
-        header('HTTP/1.1 422 Unprocessable Entity');
-        header('Content-Type: application/json; charset=UTF-8');
-        echo json_encode(array('errorMsg' => $e->getMessage()));
-        exit();
-    }
-}
+
 
 if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_TABLE_DATA") {
     try {
@@ -183,25 +205,29 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
              $where .= " AND status != 2";
         }
 
-        $statement = db()->prepare("SELECT * FROM customer $where");
+        $statement = db()->prepare("SELECT * FROM order $where");
         $statement->execute();
         $data = $statement->fetchAll(PDO::FETCH_ASSOC);
         $i = 0;
         foreach ($data as &$row) {
             $i++;
             $row["row_index"] = $i;
-            $row['pay'] = '<button id="view-customer" class="btn btn-outline-success btn-sm view-btn"  title="View"><i class="fas fa-money-bill-wave"></i></button>';
-            $row['profile'] = '<button id="view-customer" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-user"></i></button>';
 
+            $row['category'] = get_the_category($row['c_id'])['c_name'];
+            $row['supplier'] = get_the_supplier($row['s_id'])['s_name']." (". get_the_supplier($row['s_id'])['s_mobile'].")";
+
+          
+            
+            $row['view'] = '<button id="view-order" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-eye"></i></button>';
             //if ($row['id'] != 1) {
-            $row['edit'] = '<button id="edit-customer" class="btn btn-outline-success btn-sm edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
+            $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-sm edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
             // } else {
-            //     $row['edit'] = '<button id="edit-customer" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
+            //     $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
             // }
             if ($row['status'] == 2) {
-                $row['delete'] = '<button id="delete-customer" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
+                $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
              } else {
-                 $row['delete'] = '<button id="delete-customer" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+                 $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
             
              }
             //     $row['delete'] = '<button class="btn btn-outline-danger btn-sm delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';

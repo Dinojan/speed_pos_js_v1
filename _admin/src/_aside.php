@@ -59,7 +59,7 @@
                 <?php endif; ?>
 
                 <!-- Inventory menu -->
-                <?php if (user_group_id() == 1 || has_permission('access', 'read_category')|| has_permission('access', 'read_supplier') || has_permission('access', 'read_product')): ?>
+                <?php if (user_group_id() == 1 || has_permission('access', 'read_category') || has_permission('access', 'read_supplier') || has_permission('access', 'read_product')): ?>
                     <li
                         class="nav-item  <?php echo current_nav() == 'category' || current_nav() == 'product' || current_nav() == 'supplier' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
@@ -269,8 +269,34 @@
                         <p><?php echo trans('menu_customer') ?></p>
                     </a>
                 </li>
+                <?php if (user_group_id() == 1 || has_permission('access', 'read_order') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
+                    <li
+                        class="nav-item  <?php echo current_nav() == 'order' || current_nav() == 'order_group' || current_nav() == 'password' ? ' menu-open' : null; ?>">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-shopping-cart text-sm"></i>
+                            <p><?= trans('menu_orders') ?>
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_order')): ?>
+                                <li class="nav-item">
+                                    <a href="order.php"
+                                        class="nav-link  <?php echo current_nav() == 'order' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-plus text-sm"></i>
+                                        <p><?= trans('menu_order') ?></p>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                          
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
             </ul>
-             
         </nav>
         <!-- /.sidebar-menu -->
     </div>

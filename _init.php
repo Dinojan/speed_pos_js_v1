@@ -107,11 +107,13 @@ $store = new Store($registry);
 $registry->set('store', $store);
 
 // Helper
+require_once DIR_HELPER . 'customer.php';
 require_once DIR_HELPER . 'category.php';
 require_once DIR_HELPER . 'common.php';
 require_once DIR_HELPER . 'language.php';
 require_once DIR_HELPER . 'network.php';
 require_once DIR_HELPER . 'product.php';
+require_once DIR_HELPER . 'order.php';
 require_once DIR_HELPER . 'store.php';
 require_once DIR_HELPER . 'supplier.php';
 require_once DIR_HELPER . 'user_group.php';
