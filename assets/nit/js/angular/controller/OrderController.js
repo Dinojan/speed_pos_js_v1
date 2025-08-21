@@ -89,29 +89,14 @@ angularApp.controller("OrderController", [
 
             if (d) {
                 $scope.order = d;
-
-                var text;
-                var btnTxt;
-                //console.log($scope.order.status );
-                if ($scope.order.status == 2) {
-                    text = "You need to restore this order!";
-                    btnTxt = "Yes, Restore it!";
-                } else {
-                    text = "You won't be able to revert this!";
-                    btnTxt = "Yes, Delete it!";
-                }
-
-
-
-
                 Swal.fire({
                     title: "Are you sure?",
-                    text: text,
+                    text: "You won't be able to revert this!",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
-                    confirmButtonText: btnTxt,
+                    confirmButtonText: "Yes, Delete it!",
                 }).then((result) => {
                     if (result.isConfirmed) {
                         var formData = new FormData();
@@ -128,7 +113,7 @@ angularApp.controller("OrderController", [
                             function (response) {
                                 var alertMsg = response.data.msg;
                                 Swal.fire({
-                                    title: ($scope.order.status == 2) ? "Restored!" : "Deleted!",
+                                    title: "Deleted!",
                                     text: alertMsg,
                                     icon: "success"
                                 });

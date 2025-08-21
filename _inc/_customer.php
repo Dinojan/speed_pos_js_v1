@@ -20,7 +20,7 @@ function validate_request_data($request)
         throw new Exception(trans('error_customer_address'));
     }
 
-    
+
 }
 // Check existance by id
 function validate_existance($request, $id = 0)
@@ -104,16 +104,16 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         }
         $id = $request->post['id'];
         $checkcustomer = $customer_model->getcustomer($id);
-        if($checkcustomer['status'] == 2){
+        if ($checkcustomer['status'] == 2) {
             $sts = 1;
-          
-             $msg = 'text_restore_success';
-        }else{
-            $sts = 2; 
-              $msg = 'text_move_to_bin_success';
+
+            $msg = 'text_restore_success';
+        } else {
+            $sts = 2;
+            $msg = 'text_move_to_bin_success';
         }
 
-        $customer = $customer_model->updatecustomerStatus($id,$sts);
+        $customer = $customer_model->updatecustomerStatus($id, $sts);
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans($msg), 'id' => $id));
         exit();
@@ -154,8 +154,8 @@ if (isset($request->get['action_type']) && $request->get['action_type'] == 'EDIT
 }
 
 if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_THE_CUSTOMER" && $request->get['c_id']) {
-    try { 
-         if (empty($request->get['c_id'])) {
+    try {
+        if (empty($request->get['c_id'])) {
             throw new Exception(trans('error_customer_id'));
         }
         $id = $request->get['c_id'];
@@ -163,7 +163,7 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
         if (!$customer) {
             throw new Exception(trans('error_customer_not_found'));
         }
-          echo json_encode(array("customer" => $customer));
+        echo json_encode(array("customer" => $customer));
     } catch (Exception $e) {
         header('HTTP/1.1 422 Unprocessable Entity');
         header('Content-Type: application/json; charset=UTF-8');
@@ -177,10 +177,10 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
         $data = array();
         $where = "WHERE 1=1";
 
-        if(isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2){
+        if (isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2) {
             $where .= " AND status = 2";
-        }else {
-             $where .= " AND status != 2";
+        } else {
+            $where .= " AND status != 2";
         }
 
         $statement = db()->prepare("SELECT * FROM customer $where");
@@ -191,7 +191,13 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $i++;
             $row["row_index"] = $i;
             $row['pay'] = '<button id="view-customer" class="btn btn-outline-success btn-sm view-btn"  title="View"><i class="fas fa-money-bill-wave"></i></button>';
-            $row['profile'] = '<button id="view-customer" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-user"></i></button>';
+            // $row['profile'] = '<button id="view-customer" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-user"></i></button>';
+            $row['profile'] = '<a href="customer_profile.php?id=' . $row['id'] . '" 
+                      class="btn btn-outline-info btn-sm view-btn"
+                      title="View ">
+                      <i class="fas fa-user"></i>
+                   </a>';
+
 
             //if ($row['id'] != 1) {
             $row['edit'] = '<button id="edit-customer" class="btn btn-outline-success btn-sm edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
@@ -200,22 +206,22 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             // }
             if ($row['status'] == 2) {
                 $row['delete'] = '<button id="delete-customer" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
-             } else {
-                 $row['delete'] = '<button id="delete-customer" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
-            
-             }
+            } else {
+                $row['delete'] = '<button id="delete-customer" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+
+            }
             //     $row['delete'] = '<button class="btn btn-outline-danger btn-sm delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
             // }
-               if($row['status'] == 0){
+            if ($row['status'] == 0) {
                 $row['sts'] = 'Active';
 
-            } else  if($row['status'] == 2){
+            } else if ($row['status'] == 2) {
                 $row['sts'] = 'Deleted';
 
-            }else {
-                 $row['sts'] = 'inActive';
+            } else {
+                $row['sts'] = 'inActive';
             }
-            
+
         }
         // Return data as JSON
         echo json_encode(array("data" => $data));

@@ -24,7 +24,7 @@ $document->setController('SupplierController');
             <div class="card-body">
                 <div class="table-responsive">
                       <?php
-                    $hide_colums = "3,";
+                    $hide_colums = "";
                     if (user_group_id() != 1) {
                         if (!has_permission('access', 'update_supplier')) {
                             $hide_colums .= "4,";

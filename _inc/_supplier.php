@@ -14,7 +14,7 @@ function validate_request_data($request)
         throw new Exception(trans('error_supplier_name'));
     }
 
-     if (!validateString($request->post['s_mobile'])) {
+    if (!validateString($request->post['s_mobile'])) {
         throw new Exception(trans('error_supplier_mobile'));
     }
 }
@@ -43,7 +43,7 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
 
         // add role
         $supplier_id = $supplier_model->addSupplier($request->post);
-        
+
         $suplier = $supplier_model->getSupplier($supplier_id);
 
         header('Content-Type: application/json');
@@ -184,9 +184,12 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
         foreach ($data as &$row) {
             $i++;
             $row["row_index"] = $i;
-            $row['view'] = '<button id="view-supplier" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-eye"></i></button>';
+            // $row['view'] = '<button id="view-supplier" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-eye"></i></button>';
+            $row['view'] = '<a href="supplier_profile.php?id=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+                    <i class="fas fa-eye"></i>
+                 </a>';
             //if ($row['id'] != 1) {
-                $row['edit'] = '<button id="edit-supplier" class="btn btn-outline-success btn-sm edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
+            $row['edit'] = '<button id="edit-supplier" class="btn btn-outline-success btn-sm edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
             // } else {
             //     $row['edit'] = '<button id="edit-supplier" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
             // }
