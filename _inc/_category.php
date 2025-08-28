@@ -174,29 +174,45 @@ if (isset($request->get['action_type']) && $request->get['action_type'] == 'DELE
 
 if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_TABLE_DATA") {
     try {
-        // Recursive function to build tree
+        // Recursive function to build tree with weights
         function getCategoryTree($parentId = 0, $prefix = '')
         {
-            $stmt = db()->prepare("SELECT * FROM category WHERE p_id = ? ORDER BY c_name ASC");
+            $pdo = db();
+
+            // Get categories under this parent
+            $stmt = $pdo->prepare("SELECT * FROM category WHERE p_id = ? ORDER BY c_name ASC");
             $stmt->execute([$parentId]);
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $tree = [];
-            $counter = 1; // counter for children at this level
+            $counter = 1;
 
             foreach ($rows as $row) {
-                // Generate hierarchical number
                 $rowNumber = $prefix === '' ? (string) $counter : $prefix . '.' . $counter;
+
+                // 1️⃣ Get total weight of products in this category
+                $stmtProd = $pdo->prepare("SELECT COALESCE(SUM(wgt * qty),0) as total_wgt, COALESCE(SUM(qty),0) as total_pcs 
+                                           FROM product 
+                                           WHERE c_id = ?");
+                $stmtProd->execute([$row['id']]);
+                $productData = $stmtProd->fetch(PDO::FETCH_ASSOC);
+
                 $row['sl'] = $rowNumber; 
-                $row['wgt'] = 0;
-                $row['pcs'] = 0;
-                $row['view'] = '';//<a href="#" class="btn btn-primary  btn-view  btn-sm" data-id="'.$row['id'].'"><i class="fas fa-eye"></i> </a>';
+                $row['wgt'] = (float)$productData['total_wgt'];
+                $row['pcs'] = (int)$productData['total_pcs'];
+                $row['view'] = '';
                 $row['edit'] = '<a href="#" class="btn btn-success btn-edit btn-sm"  data-id="'.$row['id'].'"><i class="fas fa-edit"></i> </a>';
                 $row['delete'] = '<a href="#" class="btn btn-danger btn-del btn-sm" data-id="'.$row['id'].'"><i class="fas fa-trash"></i> </a>';
 
-                // Recursively get children, passing the new prefix
+                // 2️⃣ Recursively get children categories
                 $children = getCategoryTree($row['id'], $rowNumber);
+
+                // 3️⃣ If children exist, add their weights to parent
                 if (!empty($children)) {
+                    foreach ($children as $child) {
+                        $row['wgt'] += $child['wgt'];
+                        $row['pcs'] += $child['pcs'];
+                    }
                     $row['children'] = $children;
                 }
 
@@ -207,8 +223,7 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             return $tree;
         }
 
-
-        $treeData = getCategoryTree(0); // root categories (p_id = 0)
+        $treeData = getCategoryTree(0);
 
         header('Content-Type: application/json; charset=UTF-8');
         echo json_encode(["data" => $treeData], JSON_PRETTY_PRINT);
@@ -220,3 +235,53 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
         exit();
     }
 }
+
+
+// if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_TABLE_DATA") {
+//     try {
+//         // Recursive function to build tree
+//         function getCategoryTree($parentId = 0, $prefix = '')
+//         {
+//             $stmt = db()->prepare("SELECT * FROM category WHERE p_id = ? ORDER BY c_name ASC");
+//             $stmt->execute([$parentId]);
+//             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//             $tree = [];
+//             $counter = 1; // counter for children at this level
+
+//             foreach ($rows as $row) {
+//                 // Generate hierarchical number
+//                 $rowNumber = $prefix === '' ? (string) $counter : $prefix . '.' . $counter;
+//                 $row['sl'] = $rowNumber; 
+//                 $row['wgt'] = 0;
+//                 $row['pcs'] = 0;
+//                 $row['view'] = '';//<a href="#" class="btn btn-primary  btn-view  btn-sm" data-id="'.$row['id'].'"><i class="fas fa-eye"></i> </a>';
+//                 $row['edit'] = '<a href="#" class="btn btn-success btn-edit btn-sm"  data-id="'.$row['id'].'"><i class="fas fa-edit"></i> </a>';
+//                 $row['delete'] = '<a href="#" class="btn btn-danger btn-del btn-sm" data-id="'.$row['id'].'"><i class="fas fa-trash"></i> </a>';
+
+//                 // Recursively get children, passing the new prefix
+//                 $children = getCategoryTree($row['id'], $rowNumber);
+//                 if (!empty($children)) {
+//                     $row['children'] = $children;
+//                 }
+
+//                 $tree[] = $row;
+//                 $counter++;
+//             }
+
+//             return $tree;
+//         }
+
+
+//         $treeData = getCategoryTree(0); // root categories (p_id = 0)
+
+//         header('Content-Type: application/json; charset=UTF-8');
+//         echo json_encode(["data" => $treeData], JSON_PRETTY_PRINT);
+
+//     } catch (Exception $e) {
+//         header('HTTP/1.1 422 Unprocessable Entity');
+//         header('Content-Type: application/json; charset=UTF-8');
+//         echo json_encode(['errorMsg' => $e->getMessage()]);
+//         exit();
+//     }
+// }
