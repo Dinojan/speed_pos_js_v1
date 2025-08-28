@@ -61,7 +61,7 @@
                 <!-- Inventory menu -->
                 <?php if (user_group_id() == 1 || has_permission('access', 'read_category') || has_permission('access', 'read_supplier') || has_permission('access', 'read_product')): ?>
                     <li
-                        class="nav-item  <?php echo current_nav() == 'category' || current_nav() == 'product' || current_nav() == 'supplier' ? ' menu-open' : null; ?>">
+                        class="nav-item  <?php echo current_nav() == 'category' || current_nav() == 'product' || current_nav() == 'supplier' || current_nav() == 'supplier_profile' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-boxes text-sm"></i>
                             <p><?= trans('menu_inventory') ?>
