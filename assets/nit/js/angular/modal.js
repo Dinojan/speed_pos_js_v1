@@ -1422,3 +1422,85 @@ angularApp.factory("OrderEditModel", [
         };
     }
 ]);
+
+//OrderPayModel
+angularApp.factory("OrderPayModel", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (
+        API_URL,
+        window,
+        $,
+        $http,
+        $sce,
+        $rootScope,
+        $compile,
+        $timeout
+    ) {
+        return function ($scope) {
+            const modalId = "OrderPayModel";
+            // Step 1: Load modal form from server
+            $http.get(window.baseUrl + "/_inc/template/order_pay_form.php?order_id=" + $scope.order.id).then(function (response) {
+                const formHtml = response.data;
+                $(`#${modalId}`).remove();
+                $scope.modalTitle = "Pay order";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-md";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+                $scope.items = [];
+                $scope.order = [];
+
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+            });
+            $(document).off("click", "#update_order_submit").on("click", "#update_order_submit", function (e) {
+
+                e.preventDefault();
+
+                var $tag = $(this);
+
+                $http({
+                    url: window.baseUrl + "/_inc/_order.php",
+                    method: "POST",
+                    data: $('#update-order-form').serialize(),
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json"
+                }).then(
+                    function (response) {
+                        var alertMsg = response.data.msg;
+                        Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
+                        $('.table').DataTable().ajax.reload(null, false);
+
+                        if ($scope.modalInstance) {
+                            $scope.modalInstance.hide();
+                        }
+
+                    }, function (response) {
+                        var alertMsg = "";
+                        window.angular.forEach(response.data, function (value) {
+                            alertMsg += value + " ";
+                        });
+                        ;
+                        //window.toastr.warning(alertMsg, "Warning!");
+                        Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                    });
+            });
+        };
+    }
+]);

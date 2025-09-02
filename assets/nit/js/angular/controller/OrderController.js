@@ -1,6 +1,6 @@
 angularApp.controller("OrderController", [
-    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce", "OrderAddModel", "OrderEditModel",
-    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, OrderAddModel, OrderEditModel,) {
+    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce","OrderPayModel", "OrderAddModel", "OrderEditModel",
+    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce,OrderPayModel, OrderAddModel, OrderEditModel,) {
         var dt = $("#orderTable");
         var i;
         var hideColums = dt.data("hide-colums").split(",");
@@ -59,6 +59,20 @@ angularApp.controller("OrderController", [
                 $('.buttons-excel').removeClass('btn-secondary').addClass('btn-outline-success btn-sm');
                 $('.buttons-csv').removeClass('btn-secondary').addClass('btn-outline-success btn-sm');
                 $('.buttons-pdf').removeClass('btn-secondary').addClass('btn-outline-danger btn-sm');
+            }
+        });
+        $(document).delegate("#pay-order", "click", function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var table = dt.DataTable();
+            var $row = $(this).closest("tr");
+            var d = table.row($row).data();
+            if (!d) {
+                d = table.row($row.prev()).data();
+            }
+            if (d) {
+                $scope.order = d;
+                OrderPayModel($scope);
             }
         });
 

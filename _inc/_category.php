@@ -180,7 +180,7 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $pdo = db();
 
             // Get categories under this parent
-            $stmt = $pdo->prepare("SELECT * FROM category WHERE p_id = ? ORDER BY c_name ASC");
+            $stmt = $pdo->prepare("SELECT * FROM category WHERE p_id = ?  ORDER BY c_name ASC");
             $stmt->execute([$parentId]);
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -193,7 +193,7 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
                 // 1️⃣ Get total weight of products in this category
                 $stmtProd = $pdo->prepare("SELECT COALESCE(SUM(wgt * qty),0) as total_wgt, COALESCE(SUM(qty),0) as total_pcs 
                                            FROM product 
-                                           WHERE c_id = ?");
+                                           WHERE c_id = ? AND status != 2");
                 $stmtProd->execute([$row['id']]);
                 $productData = $stmtProd->fetch(PDO::FETCH_ASSOC);
 

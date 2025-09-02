@@ -1,7 +1,7 @@
 <nav class="main-header navbar <?= style_class('nav_class') ?>">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
-        <?php if (current_nav() == 'pos'): ?>
+        <?php if (current_nav() == '123'): ?>
             <li class="nav-item">
               <a class="nav-link fw-bold text-warning" href="dashboard.php" role="button">
                     <!-- Show on large screens (desktop) -->
@@ -16,13 +16,13 @@
                 </a>
             </li>
         <?php endif; ?>
-        <?php if (current_nav() != 'pos'): ?>
+        <?php //if (current_nav() != 'pos'): ?>
             <li class="nav-item">
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
 
            
-        <?php endif; ?>
+        <?php // endif; ?>
         <li class="nav-item d-none d-sm-inline-block">
             <a href="#" onClick="return false;" id="live_datetime"></a>
         </li>

@@ -47,16 +47,12 @@
                         <p><?php echo trans('menu_dashboard') ?></p>
                     </a>
                 </li>
-                <!-- POS -->
-                <?php if (user_group_id() == 0 || has_permission('access', 'create_sell_invoice')): ?>
-                    <!-- pos menu -->
-                    <li class="nav-item ">
-                        <a href="pos.php" class="nav-link <?php echo current_nav() == 'pos' ? ' active' : null; ?>">
-                            <i class="nav-icon fas fa-cash-register text-sm"></i>
-                            <p><?= trans('menu_pos') ?></p>
-                        </a>
-                    </li>
-                <?php endif; ?>
+                <li class="nav-item ">
+                    <a href="pos.php" class="nav-link <?php echo current_nav() == 'pos' ? ' active' : null; ?>">
+                        <i class="nav-icon fas fa-cash-register text-sm"></i>
+                        <p><?php echo trans('menu_pos') ?></p>
+                    </a>
+                </li>
 
                 <!-- Inventory menu -->
                 <?php if (user_group_id() == 1 || has_permission('access', 'read_category') || has_permission('access', 'read_supplier') || has_permission('access', 'read_product')): ?>
@@ -104,6 +100,60 @@
                         </ul>
                     </li>
                 <?php endif; ?>
+
+                <!-- Stock checking -->
+                <?php if (user_group_id() == 1 || has_permission('access', 'read_stock_checking') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
+                    <li
+                        class="nav-item  <?php echo current_nav() == 'stock_checking' || current_nav() == 'stock_checking_group' || current_nav() == 'password' ? ' menu-open' : null; ?>">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-search text-sm"></i>
+                            <p><?= trans('menu_stock_checking') ?>
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_check_stock')): ?>
+                                <li class="nav-item">
+                                    <a href="check_stock.php"
+                                        class="nav-link  <?php echo current_nav() == 'check_stock' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-clipboard-check text-sm"></i>
+                                        <p><?= trans('menu_check_stock') ?></p>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_in_stock_summary')): ?>
+                                <li class="nav-item">
+                                    <a href="in_stock_summary.php"
+                                        class="nav-link  <?php echo current_nav() == 'in_stock_summary' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-boxes text-sm"></i>
+                                        <p><?= trans('menu_in_stock_summary') ?></p>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_missing_stock')): ?>
+                                <li class="nav-item">
+                                    <a href="missing_stock.php"
+                                        class="nav-link  <?php echo current_nav() == 'missing_stock' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-exclamation-triangle text-sm"></i>
+                                        <p><?= trans('menu_missing_stock') ?></p>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+
 
                 <!-- customer -->
                 <?php if (user_group_id() == 0 || has_permission('access', 'read_customer')): ?>
@@ -269,6 +319,7 @@
                         <p><?php echo trans('menu_customer') ?></p>
                     </a>
                 </li>
+                <!-- // order  -->
                 <?php if (user_group_id() == 1 || has_permission('access', 'read_order') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
                     <li
                         class="nav-item  <?php echo current_nav() == 'order' || current_nav() == 'order_group' || current_nav() == 'password' ? ' menu-open' : null; ?>">
@@ -291,11 +342,165 @@
                                     </a>
                                 </li>
                             <?php endif; ?>
-                          
+
+                        </ul>
+                    </li>
+                <?php endif; ?>
+                <!-- // sales  -->
+                <?php if (user_group_id() == 1 || has_permission('access', 'read_sales') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
+                    <li
+                        class="nav-item  <?php echo current_nav() == 'sales' || current_nav() == 'sales_group' || current_nav() == 'password' ? ' menu-open' : null; ?>">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-chart-line text-sm"></i>
+                            <p><?= trans('menu_sales') ?>
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_pos')): ?>
+                                <li class="nav-item">
+                                    <a href="pos.php"
+                                        class="nav-link  <?php echo current_nav() == 'pos' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-cash-register text-sm"></i>
+                                        <p><?= trans('menu_pos') ?></p>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_sales_list')): ?>
+                                <li class="nav-item">
+                                    <a href="sales_list.php"
+                                        class="nav-link  <?php echo current_nav() == 'sales_list' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-list text-sm"></i>
+                                        <p><?= trans('menu_sales_list') ?></p>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_sales_return')): ?>
+                                <li class="nav-item">
+                                    <a href="sales_return.php"
+                                        class="nav-link  <?php echo current_nav() == 'sales_return' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-undo text-sm"></i>
+                                        <p><?= trans('menu_sales_return') ?></p>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_sales_summary')): ?>
+                                <li class="nav-item">
+                                    <a href="sales_summary.php"
+                                        class="nav-link  <?php echo current_nav() == 'sales_summary' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-chart-pie text-sm"></i>
+                                        <p><?= trans('menu_sales_summary') ?></p>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
                         </ul>
                     </li>
                 <?php endif; ?>
 
+                <!-- // report  -->
+                <?php if (user_group_id() == 1 || has_permission('access', 'read_report') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
+                    <li
+                        class="nav-item  <?php echo current_nav() == 'report' || current_nav() == 'report_group' || current_nav() == 'password' ? ' menu-open' : null; ?>">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-file-alt text-sm"></i>
+                            <p><?= trans('menu_report') ?>
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_orders_reports')): ?>
+                                <li class="nav-item">
+                                    <a href="orders_reports.php"
+                                        class="nav-link  <?php echo current_nav() == 'orders_reports' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-file-invoice text-sm"></i>
+                                        <p><?= trans('menu_orders_reports') ?></p>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_due_reports')): ?>
+                                <li class="nav-item">
+                                    <a href="due_reports.php"
+                                        class="nav-link  <?php echo current_nav() == 'due_reports' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-hourglass-half text-sm"></i>
+                                        <p><?= trans('menu_due_reports') ?></p>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_sales_reports')): ?>
+                                <li class="nav-item">
+                                    <a href="sales_reports.php"
+                                        class="nav-link  <?php echo current_nav() == 'sales_reports' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-clipboard-list text-sm"></i>
+                                        <p><?= trans('menu_sales_reports') ?></p>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_stock_reports')): ?>
+                                <li class="nav-item">
+                                    <a href="stock_reports.php"
+                                        class="nav-link  <?php echo current_nav() == 'stock_reports' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-boxes text-sm"></i>
+                                        <p><?= trans('menu_stock_reports') ?></p>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_missing_reports')): ?>
+                                <li class="nav-item">
+                                    <a href="missing_reports.php"
+                                        class="nav-link  <?php echo current_nav() == 'missing_reports' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-exclamation-circle text-sm"></i>
+                                        <p><?= trans('menu_missing_reports') ?></p>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_cash_book')): ?>
+                                <li class="nav-item">
+                                    <a href="cash_book.php"
+                                        class="nav-link  <?php echo current_nav() == 'cash_book' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-money-bill-wave text-sm"></i>
+                                        <p><?= trans('menu_cash_book') ?></p>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_purchase_reports')): ?>
+                                <li class="nav-item">
+                                    <a href="purchase_reports.php"
+                                        class="nav-link  <?php echo current_nav() == 'purchase_reports' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="nav-icon fas fa-shopping-bag text-sm"></i>
+                                        <p><?= trans('menu_purchase_reports') ?></p>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                        </ul>
+                    </li>
+                <?php endif; ?>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
