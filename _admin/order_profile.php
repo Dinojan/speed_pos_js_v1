@@ -9,14 +9,14 @@ if (user_group_id() != 1 && !has_permission('access', 'read_order')) {
 }
 $document->setTitle(trans('title_orders'));
 $document->setController('OrderProfileController');
-if (isset($request->get['id']) && $request->get['id'] != null) {
-    $the_order = get_the_order($request->get['id']);
+if (isset($request->get['order']) && $request->get['order'] != null) {
+    $the_order = get_the_order($request->get['order']);
     if (!$the_order) {
         redirect(root_url() . '/' . ADMINDIRNAME . '/order.php');
     }
     $p_count = 0;
     $statement = db()->prepare("SELECT * FROM `product` WHERE `id` = ?");
-    $statement->execute([$request->get['id']]);
+    $statement->execute([$request->get['order']]);
     $p_count = $statement->rowCount();
 } else {
     redirect(root_url() . '/' . ADMINDIRNAME . '/order.php');

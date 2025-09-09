@@ -60,10 +60,13 @@ angularApp.filter('strReplace', function () {
 });
 angularApp.filter("formatDecimal", function () {
     return function (value, limit) {
-        // if (!value) return "0.00";
-        return window.formatDecimal(value, limit);
+        if (!value) value = 0;
+        limit = limit || 2; // default 2 decimal places
+        // number to fixed decimal + comma separator
+        return parseFloat(value).toFixed(limit).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 });
+
 angularApp.directive("filterList", function ($timeout) {
     return {
         link: function (scope, element, attrs) {
