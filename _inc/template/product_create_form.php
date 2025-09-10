@@ -31,16 +31,16 @@
     </div>
     <div class="form-group">
         <label for="wgt"><?= trans('label_weight'); ?> <i class="text-danger">*</i></label>
-        <input type="text" class="form-control " id="wgt" name="wgt" placeholder="Weight in (g)" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value&lt;0){this.value='1';}" onclick="return select()" value="0.00" required="">
+        <input type="text" class="form-control " id="wgt" name="wgt" placeholder="Weight in (g)" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value<0){this.value='1';}" onclick="return select()" value="0.00" required="">
     </div>
     <div class="form-group">
         <label for="cost"><?= trans('label_cost'); ?> <i class="text-danger">*</i></label>
-        <input type="text" class="form-control " id="cost" name="cost" placeholder="Cost price" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value&lt;0){this.value='1';}" onclick="return select()" value="0.00" required="">
+        <input type="text" class="form-control " id="cost" name="cost" placeholder="Cost price" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value<0){this.value='1';}" onclick="return select()" value="0.00" required="">
    
     </div>
     <div class="form-group">
         <label for="qty"><?= trans('label_quantity'); ?> <i class="text-danger">*</i></label>
-        <input type="text" class="form-control " id="qty" name="qty" placeholder="qty" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value&lt;0){this.value='1';}" onclick="return select()" value="1" required="">
+        <input type="text" class="form-control " id="qty" name="qty" placeholder="qty" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value<0){this.value='1';}" onclick="return select()" value="1" required="">
    
     </div>
 

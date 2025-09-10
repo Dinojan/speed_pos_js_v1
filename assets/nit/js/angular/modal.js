@@ -1451,7 +1451,7 @@ angularApp.factory("OrderPayModel", [
                 $(`#${modalId}`).remove();
                 $scope.modalTitle = "Pay order";
                 $scope.modalId = modalId;
-                $scope.modalSize = "modal-md";
+                $scope.modalSize = "modal-lg";
                 $scope.modalBody = $sce.trustAsHtml(formHtml);
                 $scope.items = [];
                 $scope.order = [];
@@ -1467,16 +1467,16 @@ angularApp.factory("OrderPayModel", [
                     });
                 });
             });
-            $(document).off("click", "#update_order_submit").on("click", "#update_order_submit", function (e) {
+            $(document).off("click", "#create_payment_submit").on("click", "#create_payment_submit", function (e) {
 
                 e.preventDefault();
 
                 var $tag = $(this);
 
                 $http({
-                    url: window.baseUrl + "/_inc/_order.php",
+                    url: window.baseUrl + "/_inc/_payment.php",
                     method: "POST",
-                    data: $('#update-order-form').serialize(),
+                    data: $('#create_payment_form').serialize(),
                     cache: false,
                     processData: false,
                     contentType: false,
@@ -1501,6 +1501,30 @@ angularApp.factory("OrderPayModel", [
                         Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
                     });
             });
+
+
+            $scope.payAmount = 0;
+            $scope.amount = 0;
+            $scope.due = 0;
+            $scope.label = "Outstanding";
+
+            $scope.calc = function () {
+                $scope.due = parseFloat($('#due-amount').val()) || 0;
+                $scope.amount = parseFloat($('#pay-amount').val()) || 0;
+
+                $scope.balanceAmount = $scope.due - $scope.amount;
+
+                if ($scope.balanceAmount > 0) {
+                    $scope.label = "Outstanding";
+                } else {
+                    $scope.label = "Balance";
+                }
+
+                $scope.note = $scope.amount.toFixed(2) + " paid and " + $scope.balanceAmount.toFixed(2) + " outstanding";
+            };
+
+            // $scope.calc()
+
         };
     }
 ]);

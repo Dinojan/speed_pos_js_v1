@@ -33,8 +33,6 @@ function validate_request_data($request)
     if (empty($request->post['advance_amt'])) {
         throw new Exception(trans('error_advance_amt'));
     }
-
-
 }
 // Check existance by id
 // function validate_existance($request, $id = 0)
@@ -92,7 +90,6 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans('text_successful_created'), 'id' => $order_id));
         exit();
-
     } catch (Exception $e) {
 
         header('HTTP/1.1 422 Unprocessable Entity');
@@ -123,7 +120,6 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans('text_update_success'), 'id' => $order_id));
         exit();
-
     } catch (Exception $e) {
 
         header('HTTP/1.1 422 Unprocessable Entity');
@@ -152,7 +148,6 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans('text_delete_success'), 'id' => $id));
         exit();
-
     } catch (Exception $e) {
 
         header('HTTP/1.1 422 Unprocessable Entity');
@@ -185,7 +180,6 @@ if (isset($request->get['action_type']) && $request->get['action_type'] == 'EDIT
         echo json_encode(array('errorMsg' => $e->getMessage()));
         exit();
     }
-
 }
 
 
@@ -216,13 +210,11 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
 
             if ($totalDue > 0) {
                 $row['pay'] = '<button id="pay-order" class="btn btn-outline-primary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
-
             } else {
                 $row['pay'] = '<button  class="btn btn-outline-secondary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
-
             }
             // $row['view'] = '<button id="view-order" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-eye"></i></button>';
-            $row['view'] = '<a href="order_profile.php?id=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+            $row['view'] = '<a href="customer_profile.php?customer=' . $row['cus_id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
                     <i class="fas fa-eye"></i>
                  </a>';
             //if ($row['id'] != 1) {

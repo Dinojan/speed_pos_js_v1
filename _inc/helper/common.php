@@ -1,7 +1,8 @@
 <?php
 function dd($data)
 {
-	echo "<pre>".print_r($data,true)."</pre>"; exit;
+	echo "<pre>" . print_r($data, true) . "</pre>";
+	exit;
 }
 
 function isRTL()
@@ -15,10 +16,9 @@ function device_type()
 	return $deviceType;
 }
 
-function redirect($url, $status = 302) 
-{	
-	if (function_exists('registry')) 
-	{
+function redirect($url, $status = 302)
+{
+	if (function_exists('registry')) {
 		if (registry()->get('user') && registry()->get('user')->isLogged() && isset(registry()->get('request')->get['redirect_to']) && registry()->get('request')->get['redirect_to']) {
 			header('Location: ' . str_replace(array('&amp;', "\n", "\r"), array('&', '', ''), registry()->get('request')->get['redirect_to']), true, $status);
 			exit();
@@ -33,7 +33,7 @@ function is_https()
 	return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on" ? true : false;
 }
 
-function is_ajax() 
+function is_ajax()
 {
 	return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
 }
@@ -43,18 +43,18 @@ function get_protocol()
 	return PROTOCOL;
 }
 
-function root_url() 
+function root_url()
 {
-    return ROOT_URL;
+	return ROOT_URL;
 }
 
-function url() 
+function url()
 {
-    $request_uri = SUBDIRECTORY ? str_replace(SUBDIRECTORY, '', $_SERVER['REQUEST_URI']) : $_SERVER['REQUEST_URI'];
-    return root_url() . str_replace('//','/',$request_uri);
+	$request_uri = SUBDIRECTORY ? str_replace(SUBDIRECTORY, '', $_SERVER['REQUEST_URI']) : $_SERVER['REQUEST_URI'];
+	return root_url() . str_replace('//', '/', $request_uri);
 }
 
-function relative_url() 
+function relative_url()
 {
 	return strtok($_SERVER["REQUEST_URI"], '?');
 }
@@ -64,15 +64,15 @@ function query_string($name)
 	global $request;
 	if (isset($request->get[$name])) {
 		return htmlspecialchars($request->get[$name]);
-	}	
+	}
 }
 
 function is_cli()
 {
-	return (PHP_SAPI === 'cli' OR defined('STDIN'));
+	return (PHP_SAPI === 'cli' or defined('STDIN'));
 }
 
-function current_nav() 
+function current_nav()
 {
 	return basename(relative_url(), ".php");
 }
@@ -83,8 +83,10 @@ function create_box_state()
 	$box_state = array(
 		'open'
 	);
-	if (isset($request->get['box_state'] ) 
-		&& in_array($request->get['box_state'], $box_state)) {
+	if (
+		isset($request->get['box_state'])
+		&& in_array($request->get['box_state'], $box_state)
+	) {
 		return null;
 	}
 	return ' collapsed-card';
@@ -95,22 +97,23 @@ function year()
 	return date('Y');
 }
 
-function month() 
+function month()
 {
 	return date('m');
 }
 
-function day() 
+function day()
 {
 	return date('d');
 }
 
-function current_time() 
+function current_time()
 {
 	return date('h:i:s');
 }
 
-function to_am_pm($time) {
+function to_am_pm($time)
+{
 	return date("g:i A", strtotime($time));
 }
 
@@ -119,47 +122,48 @@ function date_time()
 	return date('Y-m-d H:i:s');
 }
 
-function format_date($date) 
+function format_date($date)
 {
 	return date("j M Y g:i A", strtotime($date));
 }
 
-function format_only_date($date) 
+function format_only_date($date)
 {
 	return date("j M Y", strtotime($date));
 }
 
 function format_input_number($val)
 {
-	return number_format($val,2,'.','');
+	return number_format($val, 2, '.', '');
 }
 
-function randomNumber($length) {
-    $result = '';
-
-    for($i = 0; $i < $length; $i++) {
-        $result .= mt_rand(0, 9);
-    }
-
-    return $result;
-}
-
-function unique_id($limit = 8) 
+function randomNumber($length)
 {
-    return substr(md5(uniqid(mt_rand(), true)), 0, $limit);
+	$result = '';
+
+	for ($i = 0; $i < $length; $i++) {
+		$result .= mt_rand(0, 9);
+	}
+
+	return $result;
 }
 
-function random_color_part() 
+function unique_id($limit = 8)
 {
-    return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT);
+	return substr(md5(uniqid(mt_rand(), true)), 0, $limit);
 }
 
-function random_color() 
+function random_color_part()
 {
-    return random_color_part() . random_color_part() . random_color_part();
+	return str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
 }
 
-function get_months($index) 
+function random_color()
+{
+	return random_color_part() . random_color_part() . random_color_part();
+}
+
+function get_months($index)
 {
 	$array = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
 	return isset($array[$index]) ? $array[$index] : $index;
@@ -170,16 +174,16 @@ function get_total_day_in_month()
 	if (function_exists('cal_days_in_month')) {
 		return cal_days_in_month(CAL_GREGORIAN, month(), year());
 	}
-	return date('t', mktime(0, 0, 0, month()+1, 0, year())); 
+	return date('t', mktime(0, 0, 0, month() + 1, 0, year()));
 }
 
 function limit_char($string, $max = 255)
 {
-   if(mb_strlen($string, 'utf-8') >= $max){
-       $string = mb_substr($string, 0, $max - 5, 'utf-8').'...';
-   } 
+	if (mb_strlen($string, 'utf-8') >= $max) {
+		$string = mb_substr($string, 0, $max - 5, 'utf-8') . '...';
+	}
 
-   return $string;
+	return $string;
 }
 
 function from()
@@ -187,7 +191,7 @@ function from()
 	global $request;
 	$from = null;
 	if (isset($request->get['from']) && $request->get['from'] && ($request->get['from'] != 'null')) {
-	  $from = $request->get['from'];
+		$from = $request->get['from'];
 	}
 	return $from;
 }
@@ -197,8 +201,8 @@ function to()
 	global $request;
 	$to = null;
 	if (isset($request->get['to']) && isset($request->get['from']) && ($request->get['to'] != 'null') && ($request->get['from'] != 'null')) {
-	  $to = $request->get['to'];
-	} elseif(isset($request->get['from']) && ($request->get['from'] != 'null')) {
+		$to = $request->get['to'];
+	} elseif (isset($request->get['from']) && ($request->get['from'] != 'null')) {
 		$to = date('Y-m-d 23:59:59', strtotime($request->get['from']));
 	}
 	return $to;
@@ -206,201 +210,204 @@ function to()
 function pdo_start()
 {
 	global $sql_details;
-    try {
-    	$db = @new PDO(	"mysql:host={$sql_details['host']};port={$sql_details['port']};dbname={$sql_details['db']};charset=utf8",
-    		$sql_details['user'], $sql_details['pass'], array( PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION )
-    	);
-    	
-    	return $db;
-    }
-    catch (PDOException $e) {
-    	throw new exception($e->getMessage());
-    }
+	try {
+		$db = @new PDO(
+			"mysql:host={$sql_details['host']};port={$sql_details['port']};dbname={$sql_details['db']};charset=utf8",
+			$sql_details['user'],
+			$sql_details['pass'],
+			array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+		);
+
+		return $db;
+	} catch (PDOException $e) {
+		throw new exception($e->getMessage());
+	}
 }
 
 function get_all_tables()
 {
-	$statement = db()->prepare("SHOW TABLES"); 
+	$statement = db()->prepare("SHOW TABLES");
 	$statement->execute(array());
-	return $statement->fetchAll(PDO::FETCH_NUM); 
+	return $statement->fetchAll(PDO::FETCH_NUM);
 }
 
-function tableExists($pdo, $table) {
-    try {
-        $result = $pdo->query("SELECT 1 FROM $table LIMIT 1");
-    } catch (Exception $e) {
-        return false;
-    }
-    return $result !== false;
-}
-if (!function_exists('health_checkup'))
+function tableExists($pdo, $table)
 {
+	try {
+		$result = $pdo->query("SELECT 1 FROM $table LIMIT 1");
+	} catch (Exception $e) {
+		return false;
+	}
+	return $result !== false;
+}
+if (!function_exists('health_checkup')) {
 	function health_checkup($store_id = null)
-	{		
+	{
 		return true;
 	}
 }
 
-function upper($state) {
-    return str_replace('_', ' ', ucwords($state));
-}
-
-function updateNameValue(&$data, $key) {
-	if($key == 'p_name') {
-	  $data = htmlspecialchars_decode($data);
-	}
-  }
-  
-  function get_progress_percentage($total, $substract)
-  {
-	  return 100 - (($substract / $total)*100);
-  }
-  
-function convert_number_to_word($number, $the_end = true) 
-{   
-    $hyphen      = '-';
-    $conjunction = '  ';
-    $separator   = ' ';
-    $negative    = 'negative ';
-    $decimal     = ' point ';
-    $dictionary  = array(
-        0                   => 'Zero',
-        1                   => 'One',
-        2                   => 'Two',
-        3                   => 'Three',
-        4                   => 'Four',
-        5                   => 'Five',
-        6                   => 'Six',
-        7                   => 'Seven',
-        8                   => 'Eight',
-        9                   => 'Nine',
-        10                  => 'Ten',
-        11                  => 'Eleven',
-        12                  => 'Twelve',
-        13                  => 'Thirteen',
-        14                  => 'Fourteen',
-        15                  => 'Fifteen',
-        16                  => 'Sixteen',
-        17                  => 'Seventeen',
-        18                  => 'Eighteen',
-        19                  => 'Nineteen',
-        20                  => 'Twenty',
-        30                  => 'Thirty',
-        40                  => 'Fourty',
-        50                  => 'Fifty',
-        60                  => 'Sixty',
-        70                  => 'Seventy',
-        80                  => 'Eighty',
-        90                  => 'Ninety',
-        100                 => 'Hundred',
-        1000                => 'Thousand',
-        1000000             => 'Million',
-        1000000000          => 'Billion',
-        1000000000000       => 'Trillion',
-        1000000000000000    => 'Quadrillion',
-        1000000000000000000 => 'Quintillion'
-    );
-   
-    if (!is_numeric($number)) {
-        return false;
-    }
-   
-    if (($number >= 0 && (int) $number < 0) || (int) $number < 0 - PHP_INT_MAX) {
-        // overflow
-        trigger_error(
-            'convert_number_to_word only accepts numbers between -' . PHP_INT_MAX . ' and ' . PHP_INT_MAX,
-            E_USER_WARNING
-        );
-        return false;
-    }
- 
-    if ($number < 0) {
-        return $negative . convert_number_to_word(abs($number), false);
-    }
-   
-    $string = $fraction = null;
-   
-    if (strpos($number, '.') !== false) {
-        list($number, $fraction) = explode('.', $number);
-    }
-   
-    switch (true) {
-        case $number < 21:
-            $string = $dictionary[$number];
-            break;
-        case $number < 100:
-            $tens   = ((int) ($number / 10)) * 10;
-            $units  = $number % 10;
-            $string = $dictionary[$tens];
-            if ($units) {
-                $string .= $hyphen . $dictionary[$units];
-            }
-            break;
-        case $number < 1000:
-            $hundreds  = $number / 100;
-            $remainder = $number % 100;
-            $string = $dictionary[$hundreds] . ' ' . $dictionary[100];
-            if ($remainder) {
-                $string .= $conjunction . convert_number_to_word($remainder, false);
-            }
-            break;
-        default:
-            $baseUnit = pow(1000, floor(log($number, 1000)));
-            $numBaseUnits = (int) ($number / $baseUnit);
-            $remainder = $number % $baseUnit;
-            $string = convert_number_to_word($numBaseUnits, false) . ' ' . $dictionary[$baseUnit];
-            if ($remainder) {
-                $string .= $remainder < 100 ? $conjunction : $separator;
-                $string .= convert_number_to_word($remainder, false);
-            }
-            break;
-    }
-   
-    if (null !== $fraction && is_numeric($fraction)) {
-        $words = array();
-        foreach (str_split((string) $fraction) as $number) {
-        	if ($number > 0) {
-        		$words[] = $dictionary[$number];
-        	}
-        }
-        if (!empty($words)) {
-        	$string .= $decimal;
-        }	
-        $string .= implode(' ', $words);
-    }
-   
-    return $the_end ? $string . ' only' : $string;
-}
-
-function mergeArray($array1,$array2)
+function upper($state)
 {
-    $mergedArray = [];
-
-    foreach ($array1 as $key => $value) 
-    {
-        if(isset($array2[$key]))
-        {
-           $mergedArray[$key] = $array2[$key];
-        } else {
-            $mergedArray[$key] = $array1[$key];
-        }
-    }
-    return $mergedArray;
+	return str_replace('_', ' ', ucwords($state));
 }
 
-function style_class($class) {
-    $app = registry()->get('app');
-    $preference = unserialize($app->_themStyle());
-    $css = '';
+function updateNameValue(&$data, $key)
+{
+	if ($key == 'p_name') {
+		$data = htmlspecialchars_decode($data);
+	}
+}
 
-    if (isset($preference[$class]) && is_array($preference[$class])) {
-        $current = $preference[$class];
-        foreach ($current as $key => $val) {
-            $css .= $val . ' ';
-        }
-    }
+function get_progress_percentage($total, $substract)
+{
+	return 100 - (($substract / $total) * 100);
+}
 
-    return trim($css); // Remove trailing space
+function convert_number_to_word($number, $the_end = true)
+{
+	$hyphen      = '-';
+	$conjunction = '  ';
+	$separator   = ' ';
+	$negative    = 'negative ';
+	$decimal     = ' point ';
+	$dictionary  = array(
+		0                   => 'Zero',
+		1                   => 'One',
+		2                   => 'Two',
+		3                   => 'Three',
+		4                   => 'Four',
+		5                   => 'Five',
+		6                   => 'Six',
+		7                   => 'Seven',
+		8                   => 'Eight',
+		9                   => 'Nine',
+		10                  => 'Ten',
+		11                  => 'Eleven',
+		12                  => 'Twelve',
+		13                  => 'Thirteen',
+		14                  => 'Fourteen',
+		15                  => 'Fifteen',
+		16                  => 'Sixteen',
+		17                  => 'Seventeen',
+		18                  => 'Eighteen',
+		19                  => 'Nineteen',
+		20                  => 'Twenty',
+		30                  => 'Thirty',
+		40                  => 'Fourty',
+		50                  => 'Fifty',
+		60                  => 'Sixty',
+		70                  => 'Seventy',
+		80                  => 'Eighty',
+		90                  => 'Ninety',
+		100                 => 'Hundred',
+		1000                => 'Thousand',
+		1000000             => 'Million',
+		1000000000          => 'Billion',
+		1000000000000       => 'Trillion',
+		1000000000000000    => 'Quadrillion',
+		1000000000000000000 => 'Quintillion'
+	);
+
+	if (!is_numeric($number)) {
+		return false;
+	}
+
+	if (($number >= 0 && (int) $number < 0) || (int) $number < 0 - PHP_INT_MAX) {
+		// overflow
+		trigger_error(
+			'convert_number_to_word only accepts numbers between -' . PHP_INT_MAX . ' and ' . PHP_INT_MAX,
+			E_USER_WARNING
+		);
+		return false;
+	}
+
+	if ($number < 0) {
+		return $negative . convert_number_to_word(abs($number), false);
+	}
+
+	$string = $fraction = null;
+
+	if (strpos($number, '.') !== false) {
+		list($number, $fraction) = explode('.', $number);
+	}
+
+	switch (true) {
+		case $number < 21:
+			$string = $dictionary[$number];
+			break;
+		case $number < 100:
+			$tens   = ((int) ($number / 10)) * 10;
+			$units  = $number % 10;
+			$string = $dictionary[$tens];
+			if ($units) {
+				$string .= $hyphen . $dictionary[$units];
+			}
+			break;
+		case $number < 1000:
+			$hundreds  = $number / 100;
+			$remainder = $number % 100;
+			$string = $dictionary[$hundreds] . ' ' . $dictionary[100];
+			if ($remainder) {
+				$string .= $conjunction . convert_number_to_word($remainder, false);
+			}
+			break;
+		default:
+			$baseUnit = pow(1000, floor(log($number, 1000)));
+			$numBaseUnits = (int) ($number / $baseUnit);
+			$remainder = $number % $baseUnit;
+			$string = convert_number_to_word($numBaseUnits, false) . ' ' . $dictionary[$baseUnit];
+			if ($remainder) {
+				$string .= $remainder < 100 ? $conjunction : $separator;
+				$string .= convert_number_to_word($remainder, false);
+			}
+			break;
+	}
+
+	if (null !== $fraction && is_numeric($fraction)) {
+		$words = array();
+		foreach (str_split((string) $fraction) as $number) {
+			if ($number > 0) {
+				$words[] = $dictionary[$number];
+			}
+		}
+		if (!empty($words)) {
+			$string .= $decimal;
+		}
+		$string .= implode(' ', $words);
+	}
+
+	return $the_end ? $string . ' only' : $string;
+}
+
+function mergeArray($array1, $array2)
+{
+	$mergedArray = [];
+
+	foreach ($array1 as $key => $value) {
+		if (isset($array2[$key])) {
+			$mergedArray[$key] = $array2[$key];
+		} else {
+			$mergedArray[$key] = $array1[$key];
+		}
+	}
+	return $mergedArray;
+}
+
+function style_class($class)
+{
+	$app = registry()->get('app');
+	$preference = unserialize($app->_themStyle());
+	$css = '';
+
+	if (isset($preference[$class]) && is_array($preference[$class])) {
+		$current = $preference[$class];
+		foreach ($current as $key => $val) {
+			$css .= $val . ' ';
+		}
+	}
+
+	return trim($css); // Remove trailing space
 }
 
 // function trans($str){
@@ -433,8 +440,8 @@ function date_range_purchase_payments_filter($from, $to)
 		$where_query .= " AND MONTH(`purchase_payments`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`purchase_payments`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND purchase_payments.created_at >= '{$from}' AND purchase_payments.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -452,8 +459,8 @@ function date_range_filter2($from, $to)
 		$where_query .= " AND MONTH(`purchase_info`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`purchase_info`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND purchase_info.created_at >= '{$from}' AND purchase_info.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -471,8 +478,8 @@ function date_range_filter_purchase($from, $to)
 		$where_query .= " AND MONTH(`purchase_info`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`purchase_info`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND purchase_info.created_at >= '{$from}' AND purchase_info.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -492,8 +499,8 @@ function date_range_purchase_log_filter($from, $to)
 		$where_query .= " AND MONTH(`purchase_logs`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`purchase_logs`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND purchase_logs.created_at >= '{$from}' AND purchase_logs.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -513,8 +520,8 @@ function date_range_purchase_return_filter($from, $to)
 		$where_query .= " AND MONTH(`purchase_returns`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`purchase_returns`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND purchase_returns.created_at >= '{$from}' AND purchase_returns.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -522,11 +529,11 @@ function date_range_purchase_return_filter($from, $to)
 
 function barcode_generator()
 {
-	require_once(DIR_INCLUDE.'vendor/barcode-reader/src/BarcodeGenerator.php');
-	require_once(DIR_INCLUDE.'vendor/barcode-reader/src/BarcodeGeneratorPNG.php');
-	require_once(DIR_INCLUDE.'vendor/barcode-reader/src/BarcodeGeneratorSVG.php');
-	require_once(DIR_INCLUDE.'vendor/barcode-reader/src/BarcodeGeneratorJPG.php');
-	require_once(DIR_INCLUDE.'vendor/barcode-reader/src/BarcodeGeneratorHTML.php');
+	require_once(DIR_INCLUDE . 'vendor/barcode-reader/src/BarcodeGenerator.php');
+	require_once(DIR_INCLUDE . 'vendor/barcode-reader/src/BarcodeGeneratorPNG.php');
+	require_once(DIR_INCLUDE . 'vendor/barcode-reader/src/BarcodeGeneratorSVG.php');
+	require_once(DIR_INCLUDE . 'vendor/barcode-reader/src/BarcodeGeneratorJPG.php');
+	require_once(DIR_INCLUDE . 'vendor/barcode-reader/src/BarcodeGeneratorHTML.php');
 
 	$generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
 	return $generator;
@@ -578,8 +585,8 @@ function date_range_holding_order_filter($from, $to)
 		$where_query .= " AND MONTH(`holding_info`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`holding_info`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND holding_info.created_at >= '{$from}' AND holding_info.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -598,8 +605,8 @@ function date_range_filter($from, $to)
 		$where_query .= " AND MONTH(`selling_info`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`selling_info`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND selling_info.created_at >= '{$from}' AND selling_info.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -618,8 +625,8 @@ function date_range_sell_log_filter($from, $to)
 		$where_query .= " AND MONTH(`sell_logs`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`sell_logs`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND sell_logs.created_at >= '{$from}' AND sell_logs.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -638,14 +645,15 @@ function date_range_selling_return_filter($from, $to)
 		$where_query .= " AND MONTH(`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND created_at >= '{$from}' AND created_at <= '{$to}'";
 	}
 	return $where_query;
 }
 
-function date_range_sell_hold_filter($from, $to){
+function date_range_sell_hold_filter($from, $to)
+{
 	$from = $from ? $from : date('Y-m-d');
 	$to = $to ? $to : date('Y-m-d');
 	$where_query = '';
@@ -657,8 +665,8 @@ function date_range_sell_hold_filter($from, $to){
 		$where_query .= " AND MONTH(`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND created_at >= '{$from}' AND created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -678,8 +686,8 @@ function date_range_accounting_filter($from, $to)
 		$where_query .= " AND MONTH(`bank_transaction_info`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`bank_transaction_info`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND bank_transaction_info.created_at >= '{$from}' AND bank_transaction_info.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -698,8 +706,8 @@ function date_range_sell_payments_filter($from, $to)
 		$where_query .= " AND MONTH(`payments`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`payments`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND payments.created_at >= '{$from}' AND payments.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -717,8 +725,8 @@ function date_range_expense_filter($from, $to)
 		$where_query .= " AND MONTH(`expenses`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`expenses`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND expenses.created_at >= '{$from}' AND expenses.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -742,8 +750,8 @@ function date_range_sell_payments_reverse_filter($from, $to)
 		$where_query .= " AND MONTH(`payments`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`payments`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND payments.created_at >= '{$from}' AND payments.created_at <= '{$to}'";
 	}
 	return $where_query;
@@ -762,9 +770,59 @@ function date_range_quotation_filter($from, $to)
 		$where_query .= " AND MONTH(`quotation_info`.`created_at`) = {$month}";
 		$where_query .= " AND YEAR(`quotation_info`.`created_at`) = {$year}";
 	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-		$to = date('Y-m-d H:i:s', strtotime($to.' '. '23:59:59'));
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
 		$where_query .= " AND quotation_info.created_at >= '{$from}' AND quotation_info.created_at <= '{$to}'";
 	}
-return $where_query;
+	return $where_query;
+}
+
+function unique_transaction_ref_no($type = 'deposit')
+
+{
+
+	if ($type == 'deposit') {
+
+		$prefix = 'D';
+	} elseif ($type == 'withdraw') {
+
+		$prefix = 'W';
+	} else {
+
+		$prefix = 'OT';
+	}
+
+	$statement = db()->prepare("SELECT `info_id` as `total` FROM `bank_transaction_info`");
+
+	$statement->execute(array());
+
+	$inc = (int) $statement->rowCount() + 1;
+
+	return $prefix . $inc;
+}
+
+
+function format_mobile($number)
+{
+	// Remove non-digit characters
+	$number = preg_replace('/\D/', '', $number);
+
+	// Remove first 0 if exists
+	if (substr($number, 0, 1) == '0') {
+		$number = substr($number, 1);
+	}
+
+
+	// Remove country code if exists
+	if (substr($number, 0, 2) == '94') {
+		$number = substr($number, 2);
+	}
+
+
+	// Format: XX-XXX-XXXX
+	if (strlen($number) == 9) {
+		return '+94 ' . substr($number, 0, 2) . ' ' . substr($number, 2, 3) . ' ' . substr($number, 5);
+	} else {
+		return $number;
+	}
 }
