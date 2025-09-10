@@ -800,3 +800,29 @@ function unique_transaction_ref_no($type = 'deposit')
 
 	return $prefix . $inc;
 }
+
+
+function format_mobile($number)
+{
+	// Remove non-digit characters
+	$number = preg_replace('/\D/', '', $number);
+
+	// Remove first 0 if exists
+	if (substr($number, 0, 1) == '0') {
+		$number = substr($number, 1);
+	}
+
+
+	// Remove country code if exists
+	if (substr($number, 0, 2) == '94') {
+		$number = substr($number, 2);
+	}
+
+
+	// Format: XX-XXX-XXXX
+	if (strlen($number) == 9) {
+		return '+94 ' . substr($number, 0, 2) . ' ' . substr($number, 2, 3) . ' ' . substr($number, 5);
+	} else {
+		return $number;
+	}
+}

@@ -21,59 +21,95 @@ if (user_group_id() != 1 && !has_permission('access', 'read_customer')) {
 }
 $customer_model = registry()->get('loader')->model('customer');
 
-
-if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_TABLE_DATA") {
+if ($request->server['REQUEST_METHOD'] == 'GET' && isset($request->get['action_type']) && $request->get['action_type'] == 'GET_TABLE_DATA') {
     try {
-        $data = array();
-        $where_query = ' WHERE  1=1';
-        if (isset($request->get['cId']) && $request->get['cId'] != null) {
-            $where_query .= ' AND c_id = ' . $request->get['cId'];
+        $customerId = $request->get['customer'] ?? null;
+        $orderId = $request->get['order'] ?? null;
+        $filter = $request->get['filter'] ?? 'all';
+        $table = $request->get['table'];
+        $isdeleted = $request->get['isdeleted'] ?? 0;
+
+        $data = [];
+        if ($filter === 'order' && $orderId) {
+            $sql = "SELECT payments.id, payments.order_id, payments.order_no, payments.c_id, payments.amount, payments.note, payments.created_by, payments.created_at,
+               orders.order_details FROM payments LEFT JOIN orders ON payments.order_id = orders.id  WHERE payments.order_id = ?";
+            $params = $orderId;
+        } else if ($filter === 'all' && $table == "order") {
+            $sql = "SELECT * FROM orders WHERE cus_id = ?";
+            $params = $customerId;
+        } else if ($filter === 'all' && $table == "payment") {
+            $sql = "SELECT payments.id, payments.order_id, payments.order_no, payments.c_id, payments.amount, payments.note, payments.created_by, payments.created_at,
+               orders.order_details FROM payments LEFT JOIN orders ON payments.c_id = orders.cus_id  WHERE payments.c_id = ?";
+            $params = $customerId;
         }
 
-        if (isset($request->get['loan_id']) && $request->get['loan_id'] != null) {
-            $where_query .= ' AND loan_id = ' . $request->get['loan_id'];
-        }
-        // if(user_group_id() != 1){
-        //     $where_query .= " AND customer.`id` != 1 ";
-        // } 
-        // if(user_group_id() == 2) {
-        //     $where_query .= " AND user_to_store.`store_id` = ".store_id();
-        // }
+        $stmt = db()->prepare($sql);
+        $stmt->execute([$params]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $statement = db()->prepare("SELECT * FROM payments $where_query");
-        $statement->execute();
-        $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+
         $i = 0;
+        foreach ($rows as &$row) {
 
-        foreach ($data as &$row) {
-            $i++;
-            $row["row_index"] = $i;
+            if ($table == "payment") {
 
-            $dateTime = date("d F, Y / h:i A", strtotime($row['created_at']));
-            $row['created_at'] = $dateTime;
 
-            $row['agent'] =  get_the_user($row['created_by'], 'username');
+                $i++;
+                $row['row_index'] = $i;
 
-            if ($row['ref_no']) {
-                $row['ref_no'] = $row['ref_no'];
-            } else {
-                $row['ref_no'] = 'Reference number not added';
+
+
+                if (isset($row['created_at'])) {
+                    $row['created_at'] = date("d F, Y / h:i A", strtotime($row['created_at']));
+                }
+
+                if ($row['note'] == "") {
+                    $row['note'] = "No note";
+                }
+
+                if (isset($row['payment_date'])) {
+                    $row['payment_date'] = date("d F, Y / h:i A", strtotime($row['payment_date']));
+                }
+
+                $row['view'] = '<a href="customer_profile.php?customer=' . $row['id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+                    <i class="fas fa-eye"></i>
+                 </a>';
             }
 
-            $payment_type = ucfirst($row['payment_type']);
-            $row['payment_type'] = $payment_type;
 
-            $amount = $row['pay_amount'];
-            $row["amount"] = number_format($amount, 2);
+            if ($table == "order") {
+                $i++;
+                $row['row_index'] = $i;
 
-            $row['view'] = '<a href="user_profile.php?u=' . $row['id'] . '" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-user"></i></a>';
+                if (isset($row['created_at'])) {
+                    $row['created_at'] = date("d F, Y / h:i A", strtotime($row['created_at']));
+                }
+
+                $outstanding = $row['total_amt'] - $row['total_paid'];
+                $row['outstanding'] = number_format($outstanding, 2);
+
+                $total_amt = number_format($row['total_amt'], 2);
+                $row['total_amt'] = $total_amt;
+
+                $total_paid = number_format($row['total_paid'], 2);
+                $row['total_paid'] = $total_paid;
+
+                if ($outstanding > 0) {
+                    $row['pay'] = '<button id="pay-order-profile-table-btn" class="btn btn-outline-primary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
+                } else {
+                    $row['pay'] = '<button  class="btn btn-outline-secondary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
+                }
+                $row['view'] = '<a href="customer_profile.php?customer=' . $row['cus_id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+                    <i class="fas fa-eye"></i>
+                 </a>';
+            }
         }
 
-        echo json_encode(['success' => true, 'data' => $data]);
+        echo json_encode(['success' => true, 'data' => $rows]);
     } catch (Exception $e) {
         header('HTTP/1.1 422 Unprocessable Entity');
         header('Content-Type: application/json; charset=UTF-8');
-        echo json_encode(array('errorMsg' => $e->getMessage()));
+        echo json_encode(['errorMsg' => $e->getMessage()]);
         exit();
     }
 }

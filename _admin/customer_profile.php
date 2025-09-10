@@ -27,58 +27,7 @@ if (isset($request->get['customer']) && $request->get['customer'] != null) {
     $cid = $_GET['customer'];
     $the_customer = $customer_model->getcustomer($cid);
     $order = $order_model->getCustomerOrders($cid);
-    if ($order) {
-        $the_order = $order[0];
-        if ($the_order) {
-            $total_amt = $the_order['total_amt'];
-            $total_paid = $the_order['total_paid'];
-            $payment = $payment_model->get_order_last_payment($the_order['id']);
-            $due_count = 0;
-            $the_payment = $payment;
-            if ($the_payment) {
-                $last_payment_date = new DateTime(date('Y-m-d', strtotime($the_payment['created_at'])));
-                $total_paid = $the_order['total_paid'];
-                $total_amt = $the_order['total_amt'];
-
-
-                $today = new DateTime(date("Y-m-d"));
-                $days_diff = $last_payment_date->diff($today);
-
-                // $due_count = floor($days_diff->days / $type_days_count);
-
-                $next_due_date = $last_payment_date;
-                // if ($payment_type == 'monthly') {
-                //     $next_due_date->modify('+' . ($due_count + 1) . ' month');
-                // } else {
-                //     $next_due_date->modify('+' . ($due_count + 1) . ' week');
-                // }
-
-                $next_due_date = $next_due_date->format('d M Y');
-
-
-                // Due amount
-                // $due_amount = $due_count * $installment;
-
-                $balance = $total_amt - $total_paid;
-                if ($due_amount > $balance) {
-                    $due_amount = $balance;
-                }
-            }
-
-            $next_due_date = new DateTime(date('Y-m-d', strtotime($the_order['created_at'])));
-            // if ($payment_type == 'monthly') {
-            //     $next_due_date->modify('+' . ($due_count + 1) . ' month');
-            // } else {
-            //     $next_due_date->modify('+' . ($due_count + 1) . ' week');
-            // }
-
-            $next_due_date = $next_due_date->format('d M Y');
-
-            // Outstanding
-            $outstanding = $total_amt - $total_paid;
-        }
-        $isActiveorder = true;
-    }
+    $order_count = count($order);
 } else {
     redirect(root_url() . '/' . ADMINDIRNAME . '/customer.php');
 }
@@ -87,7 +36,7 @@ include('src/_top.php');
 ?>
 
 <!-- Content Wrapper. Contains page content -->
-<div class="row" ng-controller="CustomerProfileController">
+<div class="row">
     <div class="col-md-3">
 
         <!-- Profile Image -->
@@ -101,32 +50,25 @@ include('src/_top.php');
                 <h3 class="profile-username text-center"><?php echo $the_customer['c_name'] ?></h3>
 
                 <p class="text-muted text-center"><?php echo trans('text_since'); ?>:
-                    <?php echo $the_customer['created_at'] ?>
+                    <?php echo date("M d, Y", strtotime($the_customer['created_at'])) ?>
                 </p>
 
                 <ul class="list-group list-group-unbordered mb-3">
                     <li class="list-group-item">
-                        <b> <?php echo trans('label_mobile_phone'); ?></b> <a class="float-right"><?php echo $the_customer['c_mobile'] ?></a>
+                        <b> <?php echo trans('label_mobile_phone'); ?></b> <a class="float-right"><?php echo format_mobile($the_customer['c_mobile']) ?></a>
                     </li>
                     <li class="list-group-item">
                         <b> <?php echo trans('label_address'); ?></b> <a class="float-right"><?php echo $the_customer['c_address'] ?></a>
                     </li>
 
-                    <!-- <li class="list-group-item">
-                        <b> <?php // echo trans('label_due_limit'); 
-                            ?></b> <a class="float-right"><?= "" // $p_count  
-                                                                                                    ?></a>
-                    </li> -->
-
                     <li class="list-group-item">
-                        <b><?php echo trans('text_total_invoice'); ?></b> <a class="float-right">
-                            0</a>
+                        <b><?php echo trans('text_total_invoice'); ?></b> <a class="float-right"><?= $order_count ?></a>
                     </li>
                 </ul>
 
-                <a href="#" class="btn btn-primary btn-block">
+                <button id="edit-customer-profile-btn" class="btn btn-primary btn-block">
                     <b><i class="fa fa-fw fa-edit"></i>
-                        Edit</b></a>
+                        Edit</b></button>
             </div>
             <!-- /.card-body -->
         </div>
@@ -140,22 +82,12 @@ include('src/_top.php');
                         <h1> <i>Rs</i></h1>
                     </div>
                     <div class="col-8">
-
-                        <!-- <h4 class="info-box-text text-green">
-                            <?php //echo trans('label_balance'); 
-                            ?>
-                        </h4>
-
-                        <span id="balance" class="info-box-number">
-                            0.00
-                        </span> -->
-
                         <hr style="margin-top:0;">
                         <h4 class="info-box-text text-red">
-                            <?php echo trans('label_due'); ?>
+                            <?php echo trans('label_outstandings'); ?>
                         </h4>
                         <span id="due" class="info-box-number">
-                            <?php echo $the_customer['total_due'] ?>
+                            <?php echo number_format($the_customer['total_due'], 2) ?>
                         </span>
                         <hr style="margin-top:0;">
 
@@ -170,7 +102,7 @@ include('src/_top.php');
     <div class="col-md-9">
         <div class="row">
             <div class="col-12">
-                <div class="card card-outline card-primary">
+                <div class="card card-outline card-primary" id="order-list-container">
                     <div class="card-header">
                         <h3 class="card-title">
                             <?php echo trans('text_order_list'); ?>
@@ -197,30 +129,28 @@ include('src/_top.php');
                                 data-id="" data-hide-colums="<?php echo $hide_colums; ?>">
                                 <thead class="bg-primary">
                                     <tr>
+                                        <th><?php echo trans('label_#'); ?></th>
                                         <th><?php echo trans('label_date'); ?></th>
-                                        <th><?php echo trans('label_invoice_id'); ?></th>
-                                        <th><?php echo trans('label_note'); ?></th>
+                                        <th><?php echo trans('label_customer_name'); ?></th>
+                                        <th><?php echo trans('label_order_ID'); ?></th>
                                         <th><?php echo trans('label_items'); ?></th>
-                                        <th><?php echo trans('label_invoice_amount'); ?></th>
-                                        <th><?php echo trans('label_prev_due'); ?></th>
-                                        <th><?php echo trans('label_payable'); ?></th>
-                                        <th><?php echo trans('label_paid'); ?></th>
-                                        <th><?php echo trans('label_due'); ?></th>
+                                        <th><?php echo trans('label_total_amount'); ?></th>
+                                        <th><?php echo trans('label_outstanding'); ?></th>
+                                        <th><?php echo trans('label_total_paid'); ?></th>
                                         <th><?php echo trans('label_view'); ?></th>
                                         <th><?php echo trans('label_pay'); ?></th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr class="bg-primary">
+                                        <th><?php echo trans('label_#'); ?></th>
                                         <th><?php echo trans('label_date'); ?></th>
-                                        <th><?php echo trans('label_invoice_id'); ?></th>
-                                        <th><?php echo trans('label_note'); ?></th>
+                                        <th><?php echo trans('label_customer_name'); ?></th>
+                                        <th><?php echo trans('label_order_ID'); ?></th>
                                         <th><?php echo trans('label_items'); ?></th>
-                                        <th><?php echo trans('label_invoice_amount'); ?></th>
-                                        <th><?php echo trans('label_prev_due'); ?></th>
-                                        <th><?php echo trans('label_payable'); ?></th>
-                                        <th><?php echo trans('label_paid'); ?></th>
-                                        <th><?php echo trans('label_due'); ?></th>
+                                        <th><?php echo trans('label_total_amount'); ?></th>
+                                        <th><?php echo trans('label_outstanding'); ?></th>
+                                        <th><?php echo trans('label_total_paid'); ?></th>
                                         <th><?php echo trans('label_view'); ?></th>
                                         <th><?php echo trans('label_pay'); ?></th>
                                     </tr>
@@ -257,32 +187,24 @@ include('src/_top.php');
                                 data-id="" data-hide-colums="<?php echo $hide_colums; ?>">
                                 <thead class="bg-primary">
                                     <tr>
+                                        <th><?php echo trans('label_#'); ?></th>
                                         <th><?php echo trans('label_date'); ?></th>
-                                        <th><?php echo trans('label_invoice_id'); ?></th>
-                                        <th><?php echo trans('label_note'); ?></th>
+                                        <th><?php echo trans('label_order_ID'); ?></th>
                                         <th><?php echo trans('label_items'); ?></th>
-                                        <th><?php echo trans('label_invoice_amount'); ?></th>
-                                        <th><?php echo trans('label_prev_due'); ?></th>
-                                        <th><?php echo trans('label_payable'); ?></th>
-                                        <th><?php echo trans('label_paid'); ?></th>
-                                        <th><?php echo trans('label_due'); ?></th>
+                                        <th><?php echo trans('label_note'); ?></th>
+                                        <th><?php echo trans('label_paid_amount'); ?></th>
                                         <th><?php echo trans('label_view'); ?></th>
-                                        <th><?php echo trans('label_pay'); ?></th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr class="bg-primary">
+                                        <th><?php echo trans('label_#'); ?></th>
                                         <th><?php echo trans('label_date'); ?></th>
-                                        <th><?php echo trans('label_invoice_id'); ?></th>
-                                        <th><?php echo trans('label_note'); ?></th>
+                                        <th><?php echo trans('label_order_ID'); ?></th>
                                         <th><?php echo trans('label_items'); ?></th>
-                                        <th><?php echo trans('label_invoice_amount'); ?></th>
-                                        <th><?php echo trans('label_prev_due'); ?></th>
-                                        <th><?php echo trans('label_payable'); ?></th>
-                                        <th><?php echo trans('label_paid'); ?></th>
-                                        <th><?php echo trans('label_due'); ?></th>
+                                        <th><?php echo trans('label_note'); ?></th>
+                                        <th><?php echo trans('label_paid_amount'); ?></th>
                                         <th><?php echo trans('label_view'); ?></th>
-                                        <th><?php echo trans('label_pay'); ?></th>
                                     </tr>
                                 </tfoot>
                             </table>
