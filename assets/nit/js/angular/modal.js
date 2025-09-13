@@ -1063,6 +1063,7 @@ angularApp.factory("ProductEditModal", [
         };
     }
 ]);
+
 // CustomerAddModel
 angularApp.factory("CustomerAddModal", [
     "API_URL",
@@ -1227,6 +1228,96 @@ angularApp.factory("CustomerEditModal", [
         };
     }
 ]);
+//CustomerSelectModel
+angularApp.factory("CustomerSelectModal", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (
+        API_URL,
+        window,
+        $,
+        $http,
+        $sce,
+        $rootScope,
+        $compile,
+        $timeout) {
+        return function ($scope) {
+            const modalId = "CustomerSelectModal";
+
+            $http.get(window.baseUrl + "/_inc/_pos.php?action_type=SELECT").then(function (response) {
+                const formHtml = response.data;
+
+                $(`#${modalId}`).remove();
+                $scope.modalTitle = "Select or Create Customer";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-md";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+                });
+            });
+
+            // Submit button click
+            $(document).off("click", "#select_customer_btn").on("click", "#select_customer_btn", function (e) {
+                e.preventDefault();
+
+                let selectedId = $('#c_id').val();
+                let cName = $('#c_name').val();
+                let cMobile = $('#c_mobile').val();
+                let cAddress = $('#c_address').val();
+                console.log(selectedId)
+
+                if (selectedId !== "") {
+                    // Existing customer select
+                    $('#hidden_c_id').val(selectedId);
+                    $('#hidden_c_name').val(cName);
+                    $('#hidden_c_address').val(cAddress);
+                    $('#hidden_c_mobile').val(cMobile);
+                    $('th span.text-primary').text(cName);
+                    if ($scope.modalInstance) $scope.modalInstance.hide();
+                } else {
+                    // Create new customer
+                    $http({
+                        url: window.baseUrl + "/_inc/_customer.php",
+                        method: "POST",
+                        data: $('#select-customer-form').serialize(),
+                        dataType: "json"
+                    }).then(
+                        function (response) {
+                            Toast.fire({ icon: 'success', title: 'Success!', text: response.data.msg });
+                            $('#hidden_c_id').val(selectedId);
+                            $('#hidden_c_name').val(cName);
+                            $('#hidden_c_address').val(cAddress);
+                            $('#hidden_c_mobile').val(cMobile);
+                            $('th span.text-primary').text(cName);
+                            
+                            if ($scope.modalInstance) $scope.modalInstance.hide();
+                        }, function (response) {
+                            let alertMsg = "";
+                            angular.forEach(response.data, function (value) {
+                                alertMsg += value + " ";
+                            });
+                            Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                        }
+                    );
+                }
+            });
+        };
+    }
+]);
+
 // OrderAddModel
 angularApp.factory("OrderAddModel", [
     "API_URL",
