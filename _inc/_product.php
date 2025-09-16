@@ -114,7 +114,7 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         $id = $request->post['id'];
         $checkProduct = $product_model->getproduct($id);
         if ($checkProduct['status'] == 2) {
-            $sts = 1;
+            $sts = 0;
 
             $msg = 'text_restore_success';
         } else {
@@ -188,7 +188,6 @@ if (isset($_GET['action_type']) && $_GET['action_type'] == 'GET_POS_PRODUCT') {
         exit();
     }
 }
-
 
 if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_TABLE_DATA") {
     try {

@@ -1266,7 +1266,28 @@ angularApp.factory("CustomerSelectModal", [
                 $timeout(function () {
                     $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
                     $scope.modalInstance.show();
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
                 });
+            });
+
+            $(document).off("change", "#c_id").on("change", "#c_id", function (e) {
+                e.preventDefault();
+
+                let selected = $('#c_id').find(':selected');
+                let selectedId = selected.val();
+
+                if (selectedId !== "") {
+                    let cName = selected.data('name');
+                    let cMobile = selected.data('mobile');
+                    let cAddress = selected.data('address');
+
+                    // Fill the text fields with selected customer's info
+                    $('#c_name').val(cName);
+                    $('#c_address').val(cAddress);
+                    $('#c_mobile').val(cMobile);
+                }
             });
 
             // Submit button click
@@ -1274,21 +1295,28 @@ angularApp.factory("CustomerSelectModal", [
                 e.preventDefault();
 
                 let selectedId = $('#c_id').val();
-                let cName = $('#c_name').val();
-                let cMobile = $('#c_mobile').val();
-                let cAddress = $('#c_address').val();
-                console.log(selectedId)
 
                 if (selectedId !== "") {
-                    // Existing customer select
+                    // Existing customer
+                    let selected = $('#c_id').find(':selected');
+                    let cName = selected.data('name');
+                    let cMobile = selected.data('mobile');
+                    let cAddress = selected.data('address');
+
                     $('#hidden_c_id').val(selectedId);
                     $('#hidden_c_name').val(cName);
                     $('#hidden_c_address').val(cAddress);
                     $('#hidden_c_mobile').val(cMobile);
+
                     $('th span.text-primary').text(cName);
+                    $scope.onCustomerChange();
                     if ($scope.modalInstance) $scope.modalInstance.hide();
                 } else {
                     // Create new customer
+                    let cName = $('#c_name').val();
+                    let cMobile = $('#c_mobile').val();
+                    let cAddress = $('#c_address').val();
+
                     $http({
                         url: window.baseUrl + "/_inc/_customer.php",
                         method: "POST",
@@ -1297,12 +1325,29 @@ angularApp.factory("CustomerSelectModal", [
                     }).then(
                         function (response) {
                             Toast.fire({ icon: 'success', title: 'Success!', text: response.data.msg });
-                            $('#hidden_c_id').val(selectedId);
+
+                            if ($('#c_id option[value="' + response.data.id + '"]').length === 0) {
+                                $('#c_id').append(
+                                    $('<option>')
+                                        .val(response.data.id)
+                                        .text(cName)
+                                        .attr('data-name', cName)
+                                        .attr('data-mobile', cMobile)
+                                        .attr('data-address', cAddress)
+                                );
+                            }
+
+                            $('#c_id').val(response.data.id).trigger('change');
+
+                            let selectedId = $('#c_id').val();
+                            console.log(selectedId)
+
+                            $('#hidden_c_id').val(response.data.id);
                             $('#hidden_c_name').val(cName);
                             $('#hidden_c_address').val(cAddress);
                             $('#hidden_c_mobile').val(cMobile);
                             $('th span.text-primary').text(cName);
-                            
+                            $scope.onCustomerChange();
                             if ($scope.modalInstance) $scope.modalInstance.hide();
                         }, function (response) {
                             let alertMsg = "";
@@ -1314,6 +1359,7 @@ angularApp.factory("CustomerSelectModal", [
                     );
                 }
             });
+
         };
     }
 ]);

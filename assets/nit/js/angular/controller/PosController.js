@@ -1,53 +1,69 @@
 angularApp.controller("PosController", [
-    "$scope",
-    "API_URL",
-    "window",
-    "jQuery",
-    "$compile",
-    "$uibModal",
-    "$http",
-    "$sce",
+    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce", "$timeout",
     "categoryAddModal", "categoryEditModal", "categoryDeleteModal", "OrderAddModel", "CustomerSelectModal",
-
-    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, categoryAddModal, categoryEditModal, categoryDeleteModal, OrderAddModel, CustomerSelectModal) {
+    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, $timeout, categoryAddModal, categoryEditModal, categoryDeleteModal, OrderAddModel, CustomerSelectModal) {
+        // Initialize scope variables
         $scope.cart = [];
-        $('.select2').select2();
         $scope.products = [];
         $scope.barcode = null;
         $scope.nameOrBarcode = null;
+        $scope.paymentMethod = "Cash";
+        $scope.showPaymentProcess = false;
+        $scope.showItems = false;
+        $scope.selectedCategory = null;
+        $scope.selectedCustomer = null;
+        $scope.searchOption = "barcode";
+        $scope.payment = {
+            advance: 0,
+            received: 0,
+            return: 0,
+            sub_total: 0,
+            total_discount: 0,
+            final_payment: 0,
+            balance: 0,
+            outstanding: 0
+        };
+        $scope.cus = {
+            id: '',
+            name: '',
+            address: '',
+            mobile: ''
+        };
+        $scope.ref = $("#order-ref").val();
+        // Initialize select2 safely
+        if (typeof $.fn.select2 === 'function') {
+            $('.select2').select2();
+        } else {
+            console.warn('Select2 library is not loaded');
+        }
 
+        // Fetch all products
         $scope.get_all_product = function (c_id = null) {
             $http({
                 url: window.baseUrl + "/_inc/_product.php",
                 method: "GET",
                 params: { action_type: "GET_POS_PRODUCT", c_id: c_id },
-                responseType: "json",
+                responseType: "json"
             }).then(
                 function (response) {
-                    $scope.products = response.data.products;
+                    $scope.products = response.data.products || [];
                 },
                 function (response) {
-                    var alertMsg = "";
-                    if (response.data && typeof response.data === 'object') {
-                        window.angular.forEach(response.data, function (value) {
-                            alertMsg += value + " ";
-                        });
-                    } else {
-                        alertMsg = response.statusText || "Error fetching products";
-                    }
+                    var alertMsg = response.data && typeof response.data === 'object'
+                        ? Object.values(response.data).join(" ")
+                        : response.statusText || "Error fetching products";
                     Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
                 }
             );
         };
-
         $scope.get_all_product();
 
-        $('#categorySelect').on('change', function () {
-            var c_id = $(this).val();
-            $scope.get_all_product(c_id);
-            $scope.$apply();
-        });
+        // Category change handler
+        $scope.onCategoryChange = function () {
+            $scope.get_all_product($scope.selectedCategory);
+        };
 
+        // Add item to cart
         $scope.addToCart = function (product) {
             let exists = $scope.cart.find(item => item.id === product.id);
             if (exists) {
@@ -58,98 +74,169 @@ angularApp.controller("PosController", [
                 newItem.discount = 0;
                 $scope.cart.push(newItem);
             }
+            $scope.updatePayment();
         };
 
+        // Remove item from cart
         $scope.removeItem = function (index) {
             $scope.cart.splice(index, 1);
+            $scope.updatePayment();
         };
 
+        // Calculate subtotal for an item
         $scope.getSubtotal = function (item) {
-            return (item.material_price * item.qty * (item.wgt / 8)) - item.discount;
+            if (!item.material_price || !item.wgt || !item.qty) return 0;
+
+            const subtotal = (item.material_price * item.qty * (item.wgt / 8)) - (parseFloat(item.discount) || 0);
+            item.sub_total = subtotal;
+            return subtotal;
         };
 
+
+        $scope.getActualTotal = function (item) {
+            if (!item.material_price || !item.wgt || !item.qty) return 0;
+            return (item.material_price * item.qty * (item.wgt / 8));
+        }
+
+        // Calculate total
         $scope.getTotal = function () {
-            return $scope.cart.reduce((sum, item) => sum + $scope.getSubtotal(item), 0);
+            return $scope.cart.reduce((sum, item) => sum + $scope.getActualTotal(item), 0);
         };
 
+        // Calculate total discount
         $scope.getTotalDiscount = function () {
             return $scope.cart.reduce((sum, item) => sum + (parseFloat(item.discount) || 0), 0);
         };
 
+        // Calculate final amount
         $scope.getFinalAmount = function () {
-            return $scope.getTotal() - $scope.getTotalDiscount();
+            return $scope.getTotal() - $scope.getTotalDiscount()
         };
 
-        $scope.showItems = false;
-
+        // Toggle items display
         $scope.toggleItems = function () {
             $scope.showItems = !$scope.showItems;
         };
 
+        // Open customer modal
         $scope.openCustomerModal = function () {
-            CustomerSelectModal($scope)
-        }
-
-        $(document).on('change', '#c_id', function () {
-            var selected = $(this).find(':selected');
-
-            if (selected.val() !== "") {
-                $('#c_name').val(selected.data('name'));
-                $('#c_mobile').val(selected.data('mobile'));
-                $('#c_address').val(selected.data('address'));
-            } else {
-                $('#c_name').val('');
-                $('#c_mobile').val('');
-                $('#c_address').val('');
-            }
-        });
-
-
-        $scope.showPaymentProcess = false;
-
-        $scope.openPaymentProcess = function () {
-            $scope.showPaymentProcess = true;
-            console.log('openPaymentProcess');
+            CustomerSelectModal($scope);
         };
 
+        // Set default customer
+        $scope.defaultCustomer = function () {
+            $http({
+                url: window.baseUrl + "/_inc/_customer.php?cus=last&action_type=DEFAULT_CUSTOMER",
+                method: "GET",
+                responseType: "json"
+            }).then(
+                function (response) {
+                    const customer = response.data.customer;
+                    $scope.cus = {
+                        id: customer.id,
+                        name: customer.c_name,
+                        address: customer.c_address,
+                        mobile: customer.c_mobile
+                    };
+                    $('#hidden_c_id').val(customer.id);
+                    $('#hidden_c_name').val(customer.c_name);
+                    $('#hidden_c_address').val(customer.c_address);
+                    $('#hidden_c_mobile').val(customer.c_mobile);
+                    if ($scope.modalInstance) $scope.modalInstance.hide();
+                },
+                function (response) {
+                    var alertMsg = response.data && typeof response.data === 'object'
+                        ? Object.values(response.data).join(" ")
+                        : response.statusText || "Error fetching customer";
+                    Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                }
+            );
+        };
+
+        $scope.defaultCustomer();
+
+        // Customer change handler
+        $scope.onCustomerChange = function () {
+            var selected = $('#c_id').find(':selected');
+            if (selected.val()) {
+                $scope.cus = {
+                    id: selected.val(),
+                    name: selected.data('name'),
+                    address: selected.data('address'),
+                    mobile: selected.data('mobile')
+                };
+                $('#c_name').val($scope.cus.name);
+                $('#c_mobile').val($scope.cus.mobile);
+                $('#c_address').val($scope.cus.address);
+            } else {
+                $scope.defaultCustomer();
+            }
+        };
+
+
+        // Update payment calculations
+        $scope.updatePayment = function () {
+            const advance = parseFloat($scope.payment.advance) || 0;
+            const received = parseFloat($scope.payment.received) || 0;
+            const finalPayable = $scope.getFinalAmount() || 0;
+
+            $scope.payment.sub_total = $scope.getTotal();
+            $scope.payment.total_discount = $scope.getTotalDiscount();
+            $scope.payment.final_payment = finalPayable;
+            $scope.payment.balance = received - advance;
+            $scope.payment.outstanding = finalPayable - advance;
+            $scope.payment.return = received >= finalPayable ? received - finalPayable : 0;
+        };
+
+        // Watch cart and payment fields for changes
+        $scope.$watch('[cart, payment.advance, payment.received, payment.total_discount]', $scope.updatePayment, true);
+
+        // Open payment process
+        $scope.openPaymentProcess = function () {
+            var customerId = $scope.cus.id;
+            var hasProducts = $scope.cart.length > 0;
+
+            if (customerId && hasProducts) {
+                $scope.showPaymentProcess = true;
+                $scope.updatePayment();
+            } else {
+                if (!customerId) {
+                    Toast.fire({ icon: 'warning', title: 'Warning!', text: "Please select or add a customer" });
+                }
+                if (!hasProducts) {
+                    Toast.fire({ icon: 'warning', title: 'Warning!', text: "Please select at least one product" });
+                }
+            }
+        };
+
+        // Close payment process
         $scope.closePaymentProcess = function () {
             $scope.showPaymentProcess = false;
-            console.log('closePaymentProcess');
         };
 
-        $scope.paymentMethod = "Cash";
+        // Select payment method
         $scope.selectPaymentMethod = function (method) {
-            if (method === "card") {
-                $scope.paymentMethod = "Card"
-            } else if (method === "cheque") {
-                $scope.paymentMethod = "Cheque"
-            } else {
-                $scope.paymentMethod = "Cash"
-            }
-        }
+            $scope.paymentMethod = method.charAt(0).toUpperCase() + method.slice(1);
+        };
 
-        $scope.searchOption = "barcode";
-
+        // Toggle search option
         $scope.toggleSearchOption = function () {
             $scope.searchOption = $scope.searchOption === "name" ? "barcode" : "name";
         };
 
+        // Search by barcode
         $scope.getProductByBarcode = function () {
             $scope.barcode = $("#barcode").val();
-
             if (!$scope.barcode) return;
 
             $http({
                 url: window.baseUrl + "/_inc/_product.php",
                 method: "GET",
-                params: {
-                    action_type: "GET_POS_PRODUCT",
-                    barcode: $scope.barcode
-                },
+                params: { action_type: "GET_POS_PRODUCT", barcode: $scope.barcode },
                 responseType: "json"
             }).then(
                 function (response) {
-                    $scope.products = response.data.products;
+                    $scope.products = response.data.products || [];
                     if ($scope.products.length === 1) {
                         $scope.addToCart($scope.products[0]);
                         $("#barcode").val('');
@@ -157,38 +244,27 @@ angularApp.controller("PosController", [
                     }
                 },
                 function (response) {
-                    var alertMsg = "";
-                    if (response.data && typeof response.data === 'object') {
-                        window.angular.forEach(response.data, function (value) {
-                            alertMsg += value + " ";
-                        });
-                    } else {
-                        alertMsg = response.statusText || "Error fetching products";
-                    }
+                    var alertMsg = response.data && typeof response.data === 'object'
+                        ? Object.values(response.data).join(" ")
+                        : response.statusText || "Error fetching products";
                     Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
                 }
             );
         };
-        
+
+        // Search by name or barcode
         $scope.getProductByNameOrBarcode = function () {
             $scope.nameOrBarcode = $("#name-or-barcode").val();
-            
             if (!$scope.nameOrBarcode) return;
-            
+
             $http({
                 url: window.baseUrl + "/_inc/_product.php",
                 method: "GET",
-                params: {
-                    action_type: "GET_POS_PRODUCT",
-                    nameOrBarcode: $scope.nameOrBarcode
-                },
+                params: { action_type: "GET_POS_PRODUCT", nameOrBarcode: $scope.nameOrBarcode },
                 responseType: "json"
             }).then(
                 function (response) {
-                    console.log($scope.products)
-                    console.log("success")
-                    $scope.products = response.data.products;
-                    console.log($scope.products)
+                    $scope.products = response.data.products || [];
                     if ($scope.products.length === 1) {
                         $scope.addToCart($scope.products[0]);
                         $("#name-or-barcode").val('');
@@ -196,17 +272,167 @@ angularApp.controller("PosController", [
                     }
                 },
                 function (response) {
-                    console.log("error")
-                    var alertMsg = "";
-                    if (response.data && typeof response.data === 'object') {
-                        window.angular.forEach(response.data, function (value) {
-                            alertMsg += value + " ";
-                        });
-                    } else {
-                        alertMsg = response.statusText || "Error fetching products";
-                    }
+                    var alertMsg = response.data && typeof response.data === 'object'
+                        ? Object.values(response.data).join(" ")
+                        : response.statusText || "Error fetching products";
                     Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
                 }
             );
         };
-    }]);
+
+        // Digital keyboard setup
+        $scope.activeInput = null;
+        $scope.setActiveInput = function (field) {
+            $scope.activeInput = field;
+        };
+
+        $scope.appendValue = function (val) {
+            if ($scope.activeInput) {
+                $scope.payment[$scope.activeInput] = ($scope.payment[$scope.activeInput] || "") + val;
+                $scope.updatePayment();
+            }
+        };
+
+        $scope.allowNumbersOnly = function (event) {
+            var allowed = /[0-9.]/;
+            if (!allowed.test(event.key)) {
+                event.preventDefault();
+            }
+        };
+
+        // Full amount button
+        $scope.fullAmount = function () {
+            $scope.payment.advance = $scope.payment.final_payment || 0;
+            $scope.payment.received = $scope.payment.final_payment || 0;
+            $scope.updatePayment();
+        };
+
+        // Clear payment button
+        $scope.clearPayment = function () {
+            $scope.payment.advance = 0;
+            $scope.payment.received = 0;
+            $scope.payment.total_discount = 0;
+            $scope.updatePayment();
+        };
+
+        // Checkout order
+        // $scope.checkoutOrder = function () {
+        //     if ($scope.payment.outstanding < 0) {
+        //         Toast.fire({ icon: 'warning', title: 'Warning!', text: "Outstanding amount cannot be negative" });
+        //         return;
+        //     }
+
+        //     const orderData = {
+        //         customer: $scope.cus,
+        //         paymentMethod: $scope.paymentMethod,
+        //         cart: $scope.cart,
+        //         payment: $scope.payment,
+        //         ref: $scope.ref
+        //     };
+
+        //     $http({
+        //         url: window.baseUrl + "/_inc/_pos.php?action_type=PLACE_ORDER",
+        //         method: "POST",
+        //         data: orderData,
+        //         headers: { 'Content-Type': 'application/json' }
+        //     }).then(
+        //         function (response) {
+        //             Toast.fire({ icon: 'success', title: 'Order Placed!', text: response.data.msg });
+
+        //             $scope.cart = [];
+        //             $scope.payment = {
+        //                 advance: 0,
+        //                 received: 0,
+        //                 return: 0,
+        //                 sub_total: 0,
+        //                 total_discount: 0,
+        //                 final_payment: 0,
+        //                 balance: 0,
+        //                 outstanding: 0
+        //             };
+        //             $scope.paymentMethod = "cash";
+        //             $scope.ref = "";
+
+        //             $scope.closePaymentProcess();
+        //             $scope.defaultCustomer();
+        //         },
+        //         function (error) {
+        //             var alertMsg = error.data && error.data.msg
+        //                 ? error.data.msg
+        //                 : "Failed to place order";
+        //             Toast.fire({ icon: 'error', title: 'Error', text: alertMsg });
+        //         }
+        //     );
+        // };
+
+        $scope.checkoutOrder = function () {
+            if ($scope.payment.outstanding < 0) {
+                Toast.fire({ icon: 'warning', title: 'Warning!', text: "Outstanding amount cannot be negative" });
+                return;
+            }
+
+            // FormData create
+            var formData = new FormData();
+            formData.append('action_type', 'PLACE_ORDER');
+            formData.append('customer', JSON.stringify($scope.cus));
+            formData.append('paymentMethod', $scope.paymentMethod);
+            formData.append('cart', JSON.stringify($scope.cart));
+            formData.append('payment', JSON.stringify($scope.payment));
+            formData.append('ref', $scope.ref);
+
+            $http({
+                url: window.baseUrl + "/_inc/_pos.php",
+                method: "POST",
+                data: formData,
+                headers: { 'Content-Type': undefined }, // browser will set correct multipart/form-data
+                transformRequest: angular.identity
+            }).then(
+                function (response) {
+                    Toast.fire({ icon: 'success', title: 'Order Placed!', text: response.data.msg });
+
+                    $scope.cart = [];
+                    $scope.payment = {
+                        advance: 0,
+                        received: 0,
+                        return: 0,
+                        sub_total: 0,
+                        total_discount: 0,
+                        final_payment: 0,
+                        balance: 0,
+                        outstanding: 0
+                    };
+                    $scope.paymentMethod = "cash";
+                    $scope.ref = "";
+
+                    $scope.closePaymentProcess();
+                    $scope.defaultCustomer();
+                },
+                function (error) {
+                    var alertMsg = error.data && error.data.msg
+                        ? error.data.msg
+                        : "Failed to place order";
+                    Toast.fire({ icon: 'error', title: 'Error', text: alertMsg });
+                }
+            );
+        };
+
+
+
+        // Handle select2 change events to avoid digest errors
+        if (typeof $.fn.select2 === 'function') {
+            $('#categorySelect').on('select2:select', function (e) {
+                $timeout(function () {
+                    $scope.selectedCategory = e.target.value;
+                    $scope.onCategoryChange();
+                });
+            });
+
+            $('#c_id').on('select2:select', function (e) {
+                $timeout(function () {
+                    $scope.selectedCustomer = e.target.value;
+                    $scope.onCustomerChange();
+                });
+            });
+        }
+    }
+]);

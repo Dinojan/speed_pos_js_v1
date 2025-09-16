@@ -4,9 +4,9 @@
 
     <div class="form-group">
         <label for="s_id"><?= trans('label_customer'); ?> <i class="text-danger">*</i></label>
-        <select id="c_id" name="c_id" class="form-control" required>
+        <select id="c_id" name="c_id" class="form-control select2" required>
             <option value="">-- Select Customer --</option>
-            <?php foreach (get_all_customers(1) as $customer): ?>
+            <?php foreach (get_all_customers(0) as $customer): ?>
                 <option
                     value="<?= $customer['id'] ?>"
                     data-name="<?= $customer['c_name'] ?>"

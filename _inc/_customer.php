@@ -19,8 +19,6 @@ function validate_request_data($request)
     if (!validateString($request->post['c_address'])) {
         throw new Exception(trans('error_customer_address'));
     }
-
-
 }
 // Check existance by id
 function validate_existance($request, $id = 0)
@@ -52,7 +50,6 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans('text_successful_created'), 'id' => $customer_id));
         exit();
-
     } catch (Exception $e) {
 
         header('HTTP/1.1 422 Unprocessable Entity');
@@ -83,7 +80,6 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans('text_update_success'), 'id' => $customer_id));
         exit();
-
     } catch (Exception $e) {
 
         header('HTTP/1.1 422 Unprocessable Entity');
@@ -117,7 +113,6 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans($msg), 'id' => $id));
         exit();
-
     } catch (Exception $e) {
 
         header('HTTP/1.1 422 Unprocessable Entity');
@@ -150,7 +145,6 @@ if (isset($request->get['action_type']) && $request->get['action_type'] == 'EDIT
         echo json_encode(array('errorMsg' => $e->getMessage()));
         exit();
     }
-
 }
 
 if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_THE_CUSTOMER" && $request->get['c_id']) {
@@ -208,20 +202,16 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
                 $row['delete'] = '<button id="delete-customer" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
             } else {
                 $row['delete'] = '<button id="delete-customer" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
-
             }
             //     $row['delete'] = '<button class="btn btn-outline-danger btn-sm delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
             // }
             if ($row['status'] == 0) {
                 $row['sts'] = 'Active';
-
             } else if ($row['status'] == 2) {
                 $row['sts'] = 'Deleted';
-
             } else {
                 $row['sts'] = 'inActive';
             }
-
         }
         // Return data as JSON
         echo json_encode(array("data" => $data));
@@ -229,6 +219,29 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
         header('HTTP/1.1 422 Unprocessable Entity');
         header('Content-Type: application/json; charset=UTF-8');
         echo json_encode(array('errorMsg' => $e->getMessage()));
+        exit();
+    }
+}
+
+// Get default customer
+if (isset($_GET['action_type']) && $_GET['action_type'] == 'DEFAULT_CUSTOMER' && isset($_GET['cus']) && $_GET['cus'] == "last") {
+
+    try {
+        $statement = db()->prepare("SELECT * FROM customer  ORDER BY id DESC LIMIT 1");
+        $statement->execute();
+        $data = $statement->fetch(PDO::FETCH_ASSOC);
+
+        // ✅ Send JSON response
+        header('Content-Type: application/json');
+        echo json_encode([
+            'msg' => 'Success',
+            'customer' => $data
+        ]);
+        exit();
+    } catch (Exception $e) {
+        header('HTTP/1.1 422 Unprocessable Entity');
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode(['errorMsg' => $e->getMessage()]);
         exit();
     }
 }
