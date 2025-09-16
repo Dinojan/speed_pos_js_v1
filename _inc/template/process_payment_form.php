@@ -41,7 +41,7 @@
             </div>
         </div>
         <div class="mt-5">
-            <div class="p-0">
+            <div class="p-0 d-none">
                 <p class="my-2 text-md font-weight-bold"><?= trans("label_paid_by_return_invoice") ?></p>
                 <div class="d-flex flex-row position-relative">
                     <div class="col-8 col-md-10 pl-0">

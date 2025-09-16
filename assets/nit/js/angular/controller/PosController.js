@@ -11,10 +11,45 @@ angularApp.controller("PosController", [
 
     function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, categoryAddModal, categoryEditModal, categoryDeleteModal, OrderAddModel, CustomerSelectModal) {
         $scope.cart = [];
+        $('.select2').select2();
+        $scope.products = [];
+        $scope.barcode = null;
+        $scope.nameOrBarcode = null;
+
+        $scope.get_all_product = function (c_id = null) {
+            $http({
+                url: window.baseUrl + "/_inc/_product.php",
+                method: "GET",
+                params: { action_type: "GET_POS_PRODUCT", c_id: c_id },
+                responseType: "json",
+            }).then(
+                function (response) {
+                    $scope.products = response.data.products;
+                },
+                function (response) {
+                    var alertMsg = "";
+                    if (response.data && typeof response.data === 'object') {
+                        window.angular.forEach(response.data, function (value) {
+                            alertMsg += value + " ";
+                        });
+                    } else {
+                        alertMsg = response.statusText || "Error fetching products";
+                    }
+                    Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                }
+            );
+        };
+
+        $scope.get_all_product();
+
+        $('#categorySelect').on('change', function () {
+            var c_id = $(this).val();
+            $scope.get_all_product(c_id);
+            $scope.$apply();
+        });
 
         $scope.addToCart = function (product) {
-            console.log(product)
-            let exists = $scope.cart.find(item => item.serial === product.serial);
+            let exists = $scope.cart.find(item => item.id === product.id);
             if (exists) {
                 exists.qty += 1;
             } else {
@@ -30,7 +65,7 @@ angularApp.controller("PosController", [
         };
 
         $scope.getSubtotal = function (item) {
-            return (item.price * item.qty) - item.discount;
+            return (item.material_price * item.qty * (item.wgt / 8)) - item.discount;
         };
 
         $scope.getTotal = function () {
@@ -54,46 +89,6 @@ angularApp.controller("PosController", [
         $scope.openCustomerModal = function () {
             CustomerSelectModal($scope)
         }
-
-        // $(document).off("click", "#create_customer_submit").on("click", "#create_customer_submit", function (e) {
-        //     e.preventDefault();
-
-        //     var formData = $('#create-customer-form').serialize();
-
-        //     $http({
-        //         url: window.baseUrl + "/_inc/_customer.php",
-        //         method: "POST",
-        //         data: formData,
-        //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        //     }).then(
-        //         function (response) {
-        //             var alertMsg = response.data.msg;
-        //             Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-
-        //             // புதிய customer details assign பண்ணு
-        //             $scope.customer = response.data.customer;
-
-        //             // Order form auto-fill
-        //             if ($scope.customer) {
-        //                 $('#cus_name').val($scope.customer.c_name);
-        //                 $('#cus_mobile').val($scope.customer.c_mobile);
-        //                 $('#cus_address').val($scope.customer.c_address);
-        //             }
-
-        //             // modal close
-        //             if ($scope.modalInstance) {
-        //                 $scope.modalInstance.hide();
-        //             }
-
-        //         }, function (response) {
-        //             var alertMsg = "";
-        //             window.angular.forEach(response.data, function (value) {
-        //                 alertMsg += value + " ";
-        //             });
-        //             Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
-        //         }
-        //     );
-        // });
 
         $(document).on('change', '#c_id', function () {
             var selected = $(this).find(':selected');
@@ -120,5 +115,98 @@ angularApp.controller("PosController", [
         $scope.closePaymentProcess = function () {
             $scope.showPaymentProcess = false;
             console.log('closePaymentProcess');
+        };
+
+        $scope.paymentMethod = "Cash";
+        $scope.selectPaymentMethod = function (method) {
+            if (method === "card") {
+                $scope.paymentMethod = "Card"
+            } else if (method === "cheque") {
+                $scope.paymentMethod = "Cheque"
+            } else {
+                $scope.paymentMethod = "Cash"
+            }
+        }
+
+        $scope.searchOption = "barcode";
+
+        $scope.toggleSearchOption = function () {
+            $scope.searchOption = $scope.searchOption === "name" ? "barcode" : "name";
+        };
+
+        $scope.getProductByBarcode = function () {
+            $scope.barcode = $("#barcode").val();
+
+            if (!$scope.barcode) return;
+
+            $http({
+                url: window.baseUrl + "/_inc/_product.php",
+                method: "GET",
+                params: {
+                    action_type: "GET_POS_PRODUCT",
+                    barcode: $scope.barcode
+                },
+                responseType: "json"
+            }).then(
+                function (response) {
+                    $scope.products = response.data.products;
+                    if ($scope.products.length === 1) {
+                        $scope.addToCart($scope.products[0]);
+                        $("#barcode").val('');
+                        $scope.barcode = '';
+                    }
+                },
+                function (response) {
+                    var alertMsg = "";
+                    if (response.data && typeof response.data === 'object') {
+                        window.angular.forEach(response.data, function (value) {
+                            alertMsg += value + " ";
+                        });
+                    } else {
+                        alertMsg = response.statusText || "Error fetching products";
+                    }
+                    Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                }
+            );
+        };
+        
+        $scope.getProductByNameOrBarcode = function () {
+            $scope.nameOrBarcode = $("#name-or-barcode").val();
+            
+            if (!$scope.nameOrBarcode) return;
+            
+            $http({
+                url: window.baseUrl + "/_inc/_product.php",
+                method: "GET",
+                params: {
+                    action_type: "GET_POS_PRODUCT",
+                    nameOrBarcode: $scope.nameOrBarcode
+                },
+                responseType: "json"
+            }).then(
+                function (response) {
+                    console.log($scope.products)
+                    console.log("success")
+                    $scope.products = response.data.products;
+                    console.log($scope.products)
+                    if ($scope.products.length === 1) {
+                        $scope.addToCart($scope.products[0]);
+                        $("#name-or-barcode").val('');
+                        $scope.nameOrBarcode = '';
+                    }
+                },
+                function (response) {
+                    console.log("error")
+                    var alertMsg = "";
+                    if (response.data && typeof response.data === 'object') {
+                        window.angular.forEach(response.data, function (value) {
+                            alertMsg += value + " ";
+                        });
+                    } else {
+                        alertMsg = response.statusText || "Error fetching products";
+                    }
+                    Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                }
+            );
         };
     }]);

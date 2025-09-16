@@ -11,11 +11,20 @@
         <input type="text" class="form-control" id="p_code" name="p_code" placeholder="Code" required>
     </div>
     <div class="form-group">
+        <label for="c_id"><?= trans('label_material'); ?> <i class="text-danger">*</i></label>
+        <select class="form-control select2" id="c_id" name="material" required>
+            <option value="">-- Select Material --</option>
+            <?php foreach (set_materials_to_select() as $material) : ?>
+                <option value="<?= $material['id'] ?>"><?= $material['c_name'] ?></option>
+            <?php endforeach ?>
+        </select>
+    </div>
+    <div class="form-group">
         <label for="c_id"><?= trans('label_category'); ?> <i class="text-danger">*</i></label>
         <select class="form-control select2" id="c_id" name="c_id" required>
             <option value="">-- Select Category --</option>
             <?= set_category_tree_to_select(get_category_tree()); ?>
-           
+
         </select>
     </div>
 
@@ -23,9 +32,9 @@
         <label for="s_id"><?= trans('label_supplier'); ?> <i class="text-danger">*</i></label>
         <select class="form-control select2" id="s_id" name="s_id" required>
             <option value="">-- Select Supplier --</option>
-            <?php foreach(get_suppliers() as $sup) {?>
-            <option value="<?= $sup['id']?>"><?= $sup['s_name']?> (<?= $sup['s_mobile']?>)</option>
-            <?php }?>
+            <?php foreach (get_suppliers() as $sup) { ?>
+                <option value="<?= $sup['id'] ?>"><?= $sup['s_name'] ?> (<?= $sup['s_mobile'] ?>)</option>
+            <?php } ?>
         </select>
         <!-- <button ng-click="suplierAddModal()" class="btn btn-outline-primary">Add</button> -->
     </div>
@@ -36,12 +45,12 @@
     <div class="form-group">
         <label for="cost"><?= trans('label_cost'); ?> <i class="text-danger">*</i></label>
         <input type="text" class="form-control " id="cost" name="cost" placeholder="Cost price" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value<0){this.value='1';}" onclick="return select()" value="0.00" required="">
-   
+
     </div>
     <div class="form-group">
         <label for="qty"><?= trans('label_quantity'); ?> <i class="text-danger">*</i></label>
         <input type="text" class="form-control " id="qty" name="qty" placeholder="qty" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value<0){this.value='1';}" onclick="return select()" value="1" required="">
-   
+
     </div>
 
     <div class="row mt-3">
