@@ -121,7 +121,7 @@ $query_string = str_replace(array('&'), '?', $query_string);
       <!-- Content Header (Page header) -->
       <?php if (current_nav() != 'pos') { ?>
         <div class="content-header">
-          <div class="container-fluid">
+          <div class="container-fluid ">
             <div class="row mb-2">
               <div class="col-sm-6">
                 <strong class="m-0 text-lg"><?= $document->getTitle(); ?> </strong>
@@ -141,5 +141,5 @@ $query_string = str_replace(array('&'), '?', $query_string);
       <!-- /.content-header -->
 
       <!-- Main content -->
-      <section class="content">
-        <div class="container-fluid">
+      <section class="<?php echo (current_nav() != 'pos') ? 'content ' : '' ?>">
+        <div class="<?php echo (current_nav() != 'pos') ? 'container-fluid ' : '' ?>">

@@ -88,6 +88,7 @@
             </div>
         </div>
         <div class="mt-5">
+            <!-- Not allowed to display ------------------------------------------------------------------------------------------------------------------------------------------ -->
             <div class="p-0 d-none">
                 <p class="my-2 text-md font-weight-bold"><?= trans("label_paid_by_return_invoice") ?></p>
                 <div class="d-flex flex-row position-relative">
@@ -98,19 +99,17 @@
                 </div>
                 <div class="text-danger text-center"></div>
             </div>
-            <!-- <div class="p-0">
-                <p class="my-2 text-md font-weight-bold"><?php // echo trans("label_paid_by_advance_invoice") 
-                                                            ?></p>
+            <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+            <div class="p-0">
+                <p class="my-2 text-md font-weight-bold"><?php echo trans("label_paid_by_advance_invoice") ?></p>
                 <div class="d-flex flex-row position-relative">
                     <div class="col-8 col-md-10 pl-0">
-                        <input type="text" class="form-control" placeholder="<?php // echo trans("label_advance_invoice_ref._no") 
-                                                                                ?>">
+                        <input type="text" class="form-control" placeholder="<?php echo trans("label_advance_invoice_ref._no") ?>">
                     </div>
-                    <button class="btn btn-primary col-4 col-md-2"><i class="fas fa-search"></i> <? // echo trans("label_check") 
-                                                                                                    ?></button>
+                    <button class="btn btn-primary col-4 col-md-2"><i class="fas fa-search"></i> <?php echo trans("label_check") ?></button>
                 </div>
                 <div class="text-danger text-center"></div>
-            </div> -->
+            </div>
         </div>
     </div>
 </form>

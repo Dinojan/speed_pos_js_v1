@@ -65,7 +65,7 @@
 var from = "<?php echo from() ? format_date(from()) : format_date(date('Y/m/d')); ?>";
 var to = "<?php echo to() ? format_date(to()) : format_date(date('Y/m/d')); ?>";
 </script>
-<footer class="main-footer <?= style_class('footerClass') ?>"><b>
+<footer class="main-footer <?= style_class('footerClass') ?>" style="position: fixed; bottom: 0; left: 0; width: 100vw;"><b>
         <?php echo trans('text_powered_by') ?> <a href="<?= $appConfig['CopyrightsUrl'] ?>" class="text-gray" target="_blank"><?= strtoupper($appConfig['Copyrights']) ?></a> </b>
     <div class="float-right d-none d-sm-inline-block">
         <b><?php echo trans('text_version') ?></b> <?= $appConfig['Version'] ?>

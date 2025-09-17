@@ -1,7 +1,7 @@
 angularApp.controller("PosController", [
     "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce", "$timeout",
-    "categoryAddModal", "categoryEditModal", "categoryDeleteModal", "OrderAddModel", "CustomerSelectModal",
-    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, $timeout, categoryAddModal, categoryEditModal, categoryDeleteModal, OrderAddModel, CustomerSelectModal) {
+    "categoryAddModal", "categoryEditModal", "categoryDeleteModal", "OrderAddModel", "CustomerSelectModal", "OrderHoldModel",
+    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, $timeout, categoryAddModal, categoryEditModal, categoryDeleteModal, OrderAddModel, CustomerSelectModal, OrderHoldModel) {
         // Initialize scope variables
         $scope.cart = [];
         $scope.products = [];
@@ -113,6 +113,16 @@ angularApp.controller("PosController", [
             return $scope.getTotal() - $scope.getTotalDiscount()
         };
 
+        // Calculate total number of items
+        $scope.getTotalItems = function () {
+            let total = 0;
+            angular.forEach($scope.cart, function (item) {
+                total += item.qty || 0;
+            });
+            return total;
+        };
+
+
         // Toggle items display
         $scope.toggleItems = function () {
             $scope.showItems = !$scope.showItems;
@@ -121,6 +131,19 @@ angularApp.controller("PosController", [
         // Open customer modal
         $scope.openCustomerModal = function () {
             CustomerSelectModal($scope);
+        };
+
+        // Open order gold modal
+        $scope.openOrderHoldModal = function () {
+            var hasProducts = $scope.cart.length > 0;
+
+            if (hasProducts) {
+                OrderHoldModel($scope);
+            } else {
+                if (!hasProducts) {
+                    Toast.fire({ icon: 'error', title: 'Error!', text: "Please select at least one product" });
+                }
+            }
         };
 
         // Set default customer
@@ -195,19 +218,33 @@ angularApp.controller("PosController", [
         $scope.openPaymentProcess = function () {
             var customerId = $scope.cus.id;
             var hasProducts = $scope.cart.length > 0;
+            var refNo = $scope.ref;
 
-            if (customerId && hasProducts) {
-                $scope.showPaymentProcess = true;
-                $scope.updatePayment();
+            if (customerId && hasProducts && refNo) {
+                $http({
+                    url: window.baseUrl + "/_inc/_pos.php?ref=" + encodeURIComponent(refNo),
+                    method: "GET"
+                }).then(function (response) {
+                    if (response.data.status === 'holded' || response.data.status === 'exist') {
+                        Toast.fire({ icon: 'error', title: 'Error', text: response.data.msg });
+                    } else {
+                        $scope.showPaymentProcess = true;
+                        $scope.updatePayment();
+                    }
+                });
             } else {
                 if (!customerId) {
-                    Toast.fire({ icon: 'warning', title: 'Warning!', text: "Please select or add a customer" });
+                    Toast.fire({ icon: 'error', title: 'Error!', text: "Please select or add a customer" });
                 }
                 if (!hasProducts) {
-                    Toast.fire({ icon: 'warning', title: 'Warning!', text: "Please select at least one product" });
+                    Toast.fire({ icon: 'error', title: 'Error!', text: "Please select at least one product" });
+                }
+                if (!refNo) {
+                    Toast.fire({ icon: 'error', title: 'Error!', text: "Please enter a bill or reference number" });
                 }
             }
         };
+
 
         // Close payment process
         $scope.closePaymentProcess = function () {
@@ -370,7 +407,7 @@ angularApp.controller("PosController", [
                 Toast.fire({ icon: 'warning', title: 'Warning!', text: "Outstanding amount cannot be negative" });
                 return;
             }
-
+            $scope.cart.material_price = parseInt($scope.cart.material_price)
             // FormData create
             var formData = new FormData();
             formData.append('action_type', 'PLACE_ORDER');
@@ -384,7 +421,7 @@ angularApp.controller("PosController", [
                 url: window.baseUrl + "/_inc/_pos.php",
                 method: "POST",
                 data: formData,
-                headers: { 'Content-Type': undefined }, // browser will set correct multipart/form-data
+                headers: { 'Content-Type': undefined },
                 transformRequest: angular.identity
             }).then(
                 function (response) {
@@ -434,5 +471,57 @@ angularApp.controller("PosController", [
                 });
             });
         }
-    }
-]);
+        // $scope.categorySelect = function (id) {
+        //     console.log("Clicked" + id)
+        // }
+        // Remove previous bindings to avoid multiple click logs
+        // Remove previous bindings to avoid multiple click logs
+        $(document).off("click", ".category-select").on("click", ".category-select", function (e) {
+            e.preventDefault();
+            var id = $(this).find("li.category-select").last().data("cid");
+
+            if (!id) {
+                id = $(this).data("cid");
+            }
+            $scope.selectedCategory = id;
+            $scope.get_all_product($scope.selectedCategory);
+
+            console.log("First id: " + id);
+            $(this).parents("ul.nav-treeview").show().parent("li").addClass("menu-open");
+        });
+
+
+        $("#sidebar-search-input").on("keyup", function () {
+            let filter = $(this).val().toLowerCase();
+            let firstMatch = null;
+
+            // பழைய active class remove பண்ணு
+            $(".nav-sidebar li.nav-item a.nav-link").removeClass("active");
+
+            if (filter === "") return; // search empty இருந்தா எதுவும் செய்யாதீங்க
+
+            $(".nav-sidebar li.nav-item").each(function () {
+                let text = $(this).text().toLowerCase();
+
+                if (text.indexOf(filter) > -1) {
+                    // match ஆன category மட்டும் active
+                    $(this).children("a.nav-link").addClass("active");
+
+                    // parent expand பண்ணனும்
+                    $(this).parents("ul.nav-treeview").show().parent("li").addClass("menu-open");
+
+                    // first match store பண்ணு
+                    if (!firstMatch) {
+                        firstMatch = $(this);
+                    }
+                }
+            });
+
+            // first match இருந்தா scroll பண்ணு
+            if (firstMatch) {
+                $(".nav-sidebar").animate({
+                    scrollTop: $(".nav-sidebar").scrollTop() + firstMatch.position().top - 100
+                }, 500);
+            }
+        });
+    }]);

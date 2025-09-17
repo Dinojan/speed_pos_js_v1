@@ -19,7 +19,7 @@ class ModelProduct extends Model
 
 	public function updateProductStatus($id, $sts)
 	{
-		$statement = $this->db->prepare("UPDATE product SET `status` = ? WHERE id =?");
+		$statement = $this->db->prepare("UPDATE product SET `status` = ? WHERE id = ?");
 		$statement->execute([$sts, $id]);
 		return $id;
 	}
@@ -60,7 +60,7 @@ class ModelProduct extends Model
 		}
 
 		// Get products for current category
-		$stmt = $this->db->prepare("SELECT p.*, m.price AS material_price FROM product p LEFT JOIN material_price m ON p.material = m.m_id $where");
+		$stmt = $this->db->prepare("SELECT p.*, mp.price AS material_price, mp.m_name AS material_name FROM product p LEFT JOIN material_price mp ON mp.m_id = p.material AND mp.id = (SELECT id FROM material_price WHERE m_id = p.material ORDER BY id DESC LIMIT 1) $where");
 		$stmt->execute($execute);
 		$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -93,7 +93,7 @@ class ModelProduct extends Model
 			$execute = [$searchTerm, $searchTerm, $sts];
 		}
 		// Get products for current category
-		$stmt = $this->db->prepare("SELECT p.*, m.price AS material_price FROM product p LEFT JOIN material_price m ON p.material = m.m_id $where");
+		$stmt = $this->db->prepare("SELECT p.*, mp.price AS material_price, mp.m_name AS material_name FROM product p LEFT JOIN material_price mp ON mp.m_id = p.material AND mp.id = (SELECT id FROM material_price WHERE m_id = p.material ORDER BY id DESC LIMIT 1) $where");
 		$stmt->execute($execute);
 		$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
