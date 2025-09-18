@@ -336,6 +336,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['ref']) && $_GET['ref'] !
     }
 }
 
+// GET_POS_ORDERS
+if (isset($_GET['action_type']) && $_GET['action_type'] == 'GET_POS_ORDERS') {
+    try {
+        $from = from();
+        $to = to();
+        $where = date_range_filter($from, $to);
+
+        $statement = db()->prepare("SELECT * FROM invoice_info WHERE status = ? $where");
+        $statement->execute([0]);
+        $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $i = 0;
+        foreach ($data as &$row) {
+            $i++;
+            $row["row_index"] = $i;
+            $row["biller"] = get_the_user($row["created_by"], 'username');
+
+
+
+            $row['customer'] = $row['cus_name'] . " (" . format_mobile($row['cus_mobile']) . ")";
+
+
+            //if ($row['id'] != 1) {
+            $row['view'] = '<button id="edit-customer" class="btn btn-outline-primary btn-sm edit-btn"  title="Edit"><i class="fas fa-eye"></i></button>';
+            // } else {
+            //     $row['edit'] = '<button id="edit-customer" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
+            // }
+            if ($row['outstanding'] > 0) {
+                $row['pay'] = '<button id="view-customer" class="btn btn-outline-success btn-sm view-btn"  title="View"><i class="fas fa-money-bill-wave"></i></button>';
+                $row['delete'] = '<button id="delete-customer" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete" disabled><i class="fas fa-undo"></i></button>';
+            } else {
+                $row['pay'] = '<button id="view-customer" class="btn btn-outline-success btn-sm view-btn"  title="View" disabled><i class="fas fa-money-bill-wave"></i></button>';
+                $row['delete'] = '<button id="delete-customer" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+            }
+        }
+        // Return data as JSON
+        echo json_encode(array("data" => $data));
+        exit();
+    } catch (Exception $e) {
+        header('HTTP/1.1 422 Unprocessable Entity');
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode(['errorMsg' => $e->getMessage()]);
+        exit();
+    }
+}
+
 // // GET_HELD_ORDERS_COUNT
 // if (isset($_GET['action_type']) && $_GET['action_type'] == 'GET_HELD_ORDERS_COUNT') {
 //     try {

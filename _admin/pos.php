@@ -77,7 +77,7 @@ include('src/_top.php');
     }
 </style>
 
-<div ng-controller="PosController">
+<div>
     <div class="fixed-top">
         <nav class="navbar navbar-dark bg-dark px-lg-4">
             <a class="btn btn-dark" href="../_admin/dashboard.php"><i class="fas fa-home"></i></a>

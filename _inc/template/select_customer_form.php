@@ -22,15 +22,15 @@
 
     <div class="form-group">
         <label for="c_name"><?= trans('label_name'); ?> <i class="text-danger">*</i></label>
-        <input type="text" class="form-control" id="c_name" name="c_name" placeholder="Name">
+        <input type="text" class="form-control" id="c_name" name="c_name" placeholder="Name" required>
     </div>
     <div class="form-group">
         <label for="c_mobile"><?= trans('label_mobile'); ?> <i class="text-danger">*</i></label>
-        <input type="text" class="form-control" id="c_mobile" name="c_mobile" placeholder="Mobile">
+        <input type="text" class="form-control" id="c_mobile" name="c_mobile" placeholder="Mobile" maxlength="9" required>
     </div>
     <div class="form-group">
         <label for="c_address"><?= trans('label_address'); ?> <i class="text-danger">*</i></label>
-        <input type="text" class="form-control" id="c_address" name="c_address" placeholder="Address">
+        <input type="text" class="form-control" id="c_address" name="c_address" placeholder="Address" required>
     </div>
 
     <div class="row mt-3">

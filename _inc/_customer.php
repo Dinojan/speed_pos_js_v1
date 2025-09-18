@@ -190,7 +190,7 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $row["row_index"] = $i;
             $row['pay'] = '<button id="view-customer" class="btn btn-outline-success btn-sm view-btn"  title="View"><i class="fas fa-money-bill-wave"></i></button>';
             // $row['profile'] = '<button id="view-customer" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-user"></i></button>';
-            $row['profile'] = '<a href="customer_profile.php?id=' . $row['id'] . '" 
+            $row['profile'] = '<a href="customer_profile.php?customer=' . $row['id'] . '" 
                       class="btn btn-outline-info btn-sm view-btn"
                       title="View ">
                       <i class="fas fa-user"></i>

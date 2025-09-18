@@ -125,7 +125,6 @@ $query_string = str_replace(array('&'), '?', $query_string);
             <div class="row mb-2">
               <div class="col-sm-6">
                 <strong class="m-0 text-lg"><?= $document->getTitle(); ?> </strong>
-                <?php include("../_inc/template/partials/apply_filter.php"); ?>
               </div><!-- /.col -->
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -134,6 +133,17 @@ $query_string = str_replace(array('&'), '?', $query_string);
                 </ol>
               </div><!-- /.col -->
             </div><!-- /.row -->
+            <div class="row justify-content-between px-2">
+              <?php include("../_inc/template/partials/apply_filter.php"); ?>
+              <span></span>
+              <?php if (in_array(current_nav(), array('order', 'customer_profile', 'customer', 'sales_list'))): ?>
+                <?php if (user_group_id() == 1 || has_permission('access', 'filtering')): ?>
+
+                  <!-- Date filter -->
+                  <a class="btn btn-primary btn-sm" href="#dateFilterModal" data-toggle="modal" data-target="#dateFilterModal" role="button"><i class="far fa-calendar-alt mr-1"></i> Date Filter</a>
+                <?php endif; ?>
+              <?php endif; ?>
+            </div>
           </div><!-- /.container-fluid -->
         </div>
       <?php } ?>

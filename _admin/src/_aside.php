@@ -443,17 +443,6 @@
                                 </li>
                             <?php endif; ?>
 
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_sales_reports')): ?>
-                                <li class="nav-item">
-                                    <a href="sales_reports.php"
-                                        class="nav-link  <?php echo current_nav() == 'sales_reports' ? ' active' : null; ?>">
-                                        <span class="line"><i class="fas fa-minus"></i></span>
-                                        <i class="nav-icon fas fa-clipboard-list text-sm"></i>
-                                        <p><?= trans('menu_sales_reports') ?></p>
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-
                             <?php if (user_group_id() == 1 || has_permission('access', 'read_stock_reports')): ?>
                                 <li class="nav-item">
                                     <a href="stock_reports.php"
@@ -486,18 +475,6 @@
                                     </a>
                                 </li>
                             <?php endif; ?>
-
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_purchase_reports')): ?>
-                                <li class="nav-item">
-                                    <a href="purchase_reports.php"
-                                        class="nav-link  <?php echo current_nav() == 'purchase_reports' ? ' active' : null; ?>">
-                                        <span class="line"><i class="fas fa-minus"></i></span>
-                                        <i class="nav-icon fas fa-shopping-bag text-sm"></i>
-                                        <p><?= trans('menu_purchase_reports') ?></p>
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-
                         </ul>
                     </li>
                 <?php endif; ?>
