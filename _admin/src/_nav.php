@@ -45,7 +45,7 @@
             </form>
         </li>
         
-        <?php if (in_array(current_nav(), array(''))): ?>
+        <?php if (in_array(current_nav(), array('order', 'customer_profile', 'customer'))): ?>
             <?php if (user_group_id() == 1 || has_permission('access', 'filtering')): ?>
 
                 <!-- Navbar Search -->

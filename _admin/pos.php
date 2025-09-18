@@ -79,16 +79,27 @@ include('src/_top.php');
 
 <div ng-controller="PosController">
     <div class="fixed-top">
-        <nav class="navbar navbar-primary bg-primary px-4">
-            <a class="btn btn-primary" href="../_admin/dashboard.php"><i class="fas fa-home"></i></a>
+        <nav class="navbar navbar-dark bg-dark px-lg-4">
+            <a class="btn btn-dark" href="../_admin/dashboard.php"><i class="fas fa-home"></i></a>
+            <a href="">SPEED POS >>> <small><?php echo store('name') ?></small></a>
             <div>
-                <button class="btn btn-primary position-relative">
+                <!-- <button class="btn btn-primary position-relative" ng-click="openHeldOrdersModal()">
                     <i class="fas fa-hand-paper"></i>
-                    <span class="position-absolute bg-danger text-white px-1" style="top: -5px; right: -5px; border-radius: 20px;">{{cart.length}}</span>
+                    <span class="position-absolute bg-danger text-white px-1" style="top: -5px; right: -5px; border-radius: 20px;">{{held_orders_count}}</span>
+                </button> -->
+                <!-- <button class="btn btn-primary"><i class="fas fa-expand-arrows-alt"></i></button>
+                <button class="btn btn-primary"><i class="fas fa-sign-out-alt"></i></button> -->
+                <button class="btn btn-dark">
+                    <a class="text-white" data-widget="fullscreen" id="fullscreen-trigger" href="#" role="button">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </a>
                 </button>
-                <button class="btn btn-primary"><i class="fas fa-expand-arrows-alt"></i></button>
-                <button class="btn btn-primary"><i class="fas fa-sign-out-alt"></i></button>
-                <button class="btn btn-primary d-lg-none" ng-click="toggleItems()"><i class="fas fa-bars"></i></button>
+                <button class="btn btn-dark">
+                    <a class="text-white" href="logout.php" role="button" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </button>
+                <button class="btn btn-dark d-lg-none" ng-click="toggleItems()"><i class="fas fa-bars"></i></button>
             </div>
         </nav>
     </div>
@@ -120,7 +131,7 @@ include('src/_top.php');
                                     </th>
                                     <th class="text-center p-1">
                                         <input name="price" type="text" class="text-center text-primary font-weight-bold mt-3"
-                                            style="border: none; max-width:80px; outline: none; background: none;"  onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onclick="return select()"
+                                            style="border: none; max-width:80px; outline: none; background: none;" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onclick="return select()"
                                             ng-model="item.material_price" ng-change="updatePayment()">
                                     </th>
                                     <th class="text-center p-1" style="gap: 0.5rem;">
@@ -184,9 +195,10 @@ include('src/_top.php');
                             class="btn btn-success p-2 py-3 font-weight-normal" style="width: 100%;">
                             <i class="fas fa-money-bill"></i> <?= trans("label_process_payment") ?>
                         </button>
-                        <button ng-click="openOrderHoldModal()" class="btn btn-warning py-3 font-weight-normal" style="width: 100%;">
-                            <i class="fas fa-pause"></i> <?= trans("label_hold_order") ?>
-                        </button>
+                        <!-- <button ng-click="openOrderHoldingModal()" class="btn btn-warning py-3 font-weight-normal" style="width: 100%;">
+                            <i class="fas fa-pause"></i> <?php // echo trans("label_hold_order") 
+                                                            ?>
+                        </button> -->
                     </div>
                 </div>
             </form>
@@ -199,7 +211,7 @@ include('src/_top.php');
                         ng-click="toggleItems()"><i class="fas fa-times text-white"></i></button>
                 </div>
                 <div class="card-body" style="overflow-y: auto;">
-                    <div class="d-flex flex-row position-relative" ng-if="searchOption === 'name'">
+                    <div class="d-flex flex-row position-relative mx-2" ng-if="searchOption === 'name'">
                         <div class="col-8 col-md-10 pl-0">
                             <button class="position-absolute btn text-primary" style="top: 0; left: 0.2rem; height: 100%;">
                                 <i class="fas fa-search"></i>
@@ -212,7 +224,7 @@ include('src/_top.php');
                             <i class="fas fa-barcode"></i> <?= trans("label_scan") ?>
                         </button>
                     </div>
-                    <div class="d-flex flex-row position-relative" ng-if="searchOption === 'barcode'">
+                    <div class="d-flex flex-row position-relative mx-2" ng-if="searchOption === 'barcode'">
                         <div class="col-8 col-md-10 pl-0">
                             <button class="position-absolute btn text-primary" style="top: 0; left: 0.2rem; height: 100%;">
                                 <i class="fas fa-barcode"></i>
@@ -301,178 +313,178 @@ include('src/_top.php');
                     </div>
                 </div>
             </div>
-            <div id="payment-process" class="card position-absolute" style="left: 0; top: 0; min-height: 100vh;"
-                ng-show="showPaymentProcess">
-                <div class="card d-lg-flex flex-lg-row mt-5">
-                    <button class="btn position-absolute" style="top: 0; right: 0; z-index: 10000;"
-                        ng-click="closePaymentProcess()">
-                        <i class="fas fa-times text-danger"></i>
-                    </button>
-                    <div class="card-body col-12 col-lg-6 p-3">
-                        <?php include(__DIR__ . '/../_inc/template/payment_process_form.php'); ?>
-                    </div>
-                    <div class="col-12 col-lg-6 p-0">
-                        <div class="card-body px-3 mt-2">
-                            <div class="d-flex flex-row justify-content-between" style="gap: 1rem;">
-                                <button class="btn btn-outline-primary" ng-click="selectPaymentMethod('cash')"
-                                    style="width: 100%;"><?= trans("label_cash") ?></button>
-                                <button class="btn btn-outline-primary" ng-click="selectPaymentMethod('card')"
-                                    style="width: 100%;"><?= trans("label_card") ?></button>
-                            </div>
-                            <p class="text-center my-2">
-                                <?= trans("label_payment_method:") ?> <span class="font-weight-bold">{{ paymentMethod }}</span>
-                            </p>
+        </div>
+        <div id="payment-process" class="card position-absolute mt-5 mx-2" style="left: 0; min-height: 90vh;"
+            ng-show="showPaymentProcess">
+            <div class="d-lg-flex flex-lg-row mt-5">
+                <button class="btn position-absolute" style="top: 0; right: 0; z-index: 10000;"
+                    ng-click="closePaymentProcess()">
+                    <i class="fas fa-times text-danger"></i>
+                </button>
+                <div class="card-body col-12 col-lg-6 p-3">
+                    <?php include(__DIR__ . '/../_inc/template/payment_process_form.php'); ?>
+                </div>
+                <div class="col-12 col-lg-6 p-0">
+                    <div class="card-body px-3 mt-2">
+                        <div class="d-flex flex-row justify-content-between" style="gap: 1rem;">
+                            <button class="btn btn-outline-primary" ng-click="selectPaymentMethod('cash')"
+                                style="width: 100%;"><?= trans("label_cash") ?></button>
+                            <button class="btn btn-outline-primary" ng-click="selectPaymentMethod('card')"
+                                style="width: 100%;"><?= trans("label_card") ?></button>
                         </div>
-                        <div class="keyboard mb-3">
-                            <div class="numbers d-flex flex-column col-12" style="gap: 0.5rem;">
-                                <div class="num-row d-flex flex-row col-12" style="gap: 0.5rem;">
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('1')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">1</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('2')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">2</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('3')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">3</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                        <p class="text-center my-2">
+                            <?= trans("label_payment_method:") ?> <span class="font-weight-bold">{{ paymentMethod }}</span>
+                        </p>
+                    </div>
+                    <div class="keyboard mb-3">
+                        <div class="numbers d-flex flex-column col-12" style="gap: 0.5rem;">
+                            <div class="num-row d-flex flex-row col-12" style="gap: 0.5rem;">
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('1')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">1</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('2')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">2</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('3')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">3</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('5000')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">Rs. 5000</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('2000')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">Rs. 2000</p>
+                                </span>
+                            </div>
+                            <!-- Repeat for other rows (4-6, 7-9, 0-000) as in original -->
+                            <div class="num-row d-flex flex-row col-12" style="gap: 0.5rem;">
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('4')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">4</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('5')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">5</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('6')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">6</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('1000')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">Rs. 1000</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('500')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">Rs. 500</p>
+                                </span>
+                            </div>
+                            <div class="num-row d-flex flex-row col-12" style="gap: 0.5rem;">
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('7')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">7</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('8')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">8</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('9')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">9</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('100')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">Rs. 100</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('50')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">Rs. 50</p>
+                                </span>
+                            </div>
+                            <div class="num-row d-flex flex-row col-12" style="gap: 0.5rem;">
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('0')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">0</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('00')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">00</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('000')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">000</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('20')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">Rs. 20</p>
+                                </span>
+                                <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    ng-click="appendValue('5')">
+                                    <p class="mt-lg-2" style="font-size: 2rem;">Rs. 5</p>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="d-lg-none px-3" style="margin-top: 0.5rem;">
+                            <div class="d-flex flex-column" style="gap: 0.5rem;">
+                                <div class="d-flex flex-row" style="gap: 0.5rem;">
+                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
                                         ng-click="appendValue('5000')">
                                         <p class="mt-lg-2" style="font-size: 2rem;">Rs. 5000</p>
                                     </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
                                         ng-click="appendValue('2000')">
                                         <p class="mt-lg-2" style="font-size: 2rem;">Rs. 2000</p>
                                     </span>
                                 </div>
-                                <!-- Repeat for other rows (4-6, 7-9, 0-000) as in original -->
-                                <div class="num-row d-flex flex-row col-12" style="gap: 0.5rem;">
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('4')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">4</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('5')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">5</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('6')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">6</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                <div class="d-flex flex-row" style="gap: 0.5rem;">
+                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
                                         ng-click="appendValue('1000')">
                                         <p class="mt-lg-2" style="font-size: 2rem;">Rs. 1000</p>
                                     </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
                                         ng-click="appendValue('500')">
                                         <p class="mt-lg-2" style="font-size: 2rem;">Rs. 500</p>
                                     </span>
                                 </div>
-                                <div class="num-row d-flex flex-row col-12" style="gap: 0.5rem;">
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('7')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">7</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('8')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">8</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('9')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">9</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                <div class="d-flex flex-row" style="gap: 0.5rem;">
+                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
                                         ng-click="appendValue('100')">
                                         <p class="mt-lg-2" style="font-size: 2rem;">Rs. 100</p>
                                     </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
                                         ng-click="appendValue('50')">
                                         <p class="mt-lg-2" style="font-size: 2rem;">Rs. 50</p>
                                     </span>
                                 </div>
-                                <div class="num-row d-flex flex-row col-12" style="gap: 0.5rem;">
+                                <div class="d-flex flex-row" style="gap: 0.5rem;">
                                     <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('0')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">0</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('00')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">00</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                        ng-click="appendValue('000')">
-                                        <p class="mt-lg-2" style="font-size: 2rem;">000</p>
-                                    </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
                                         ng-click="appendValue('20')">
                                         <p class="mt-lg-2" style="font-size: 2rem;">Rs. 20</p>
                                     </span>
-                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4 d-none d-lg-block" style="width: 100%; cursor: pointer;"
+                                    <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
                                         ng-click="appendValue('5')">
                                         <p class="mt-lg-2" style="font-size: 2rem;">Rs. 5</p>
                                     </span>
                                 </div>
                             </div>
-                            <div class="d-lg-none px-3" style="margin-top: 0.5rem;">
-                                <div class="d-flex flex-column" style="gap: 0.5rem;">
-                                    <div class="d-flex flex-row" style="gap: 0.5rem;">
-                                        <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
-                                            ng-click="appendValue('5000')">
-                                            <p class="mt-lg-2" style="font-size: 2rem;">Rs. 5000</p>
-                                        </span>
-                                        <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
-                                            ng-click="appendValue('2000')">
-                                            <p class="mt-lg-2" style="font-size: 2rem;">Rs. 2000</p>
-                                        </span>
-                                    </div>
-                                    <div class="d-flex flex-row" style="gap: 0.5rem;">
-                                        <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
-                                            ng-click="appendValue('1000')">
-                                            <p class="mt-lg-2" style="font-size: 2rem;">Rs. 1000</p>
-                                        </span>
-                                        <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
-                                            ng-click="appendValue('500')">
-                                            <p class="mt-lg-2" style="font-size: 2rem;">Rs. 500</p>
-                                        </span>
-                                    </div>
-                                    <div class="d-flex flex-row" style="gap: 0.5rem;">
-                                        <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
-                                            ng-click="appendValue('100')">
-                                            <p class="mt-lg-2" style="font-size: 2rem;">Rs. 100</p>
-                                        </span>
-                                        <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; height: fit-content; cursor: pointer;"
-                                            ng-click="appendValue('50')">
-                                            <p class="mt-lg-2" style="font-size: 2rem;">Rs. 50</p>
-                                        </span>
-                                    </div>
-                                    <div class="d-flex flex-row" style="gap: 0.5rem;">
-                                        <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                            ng-click="appendValue('20')">
-                                            <p class="mt-lg-2" style="font-size: 2rem;">Rs. 20</p>
-                                        </span>
-                                        <span class="num btn btn-dark pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%; cursor: pointer;"
-                                            ng-click="appendValue('5')">
-                                            <p class="mt-lg-2" style="font-size: 2rem;">Rs. 5</p>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-md-flex flex-row px-3" style="gap: 0.5rem; margin-top: 0.5rem;">
-                                <span class="num btn btn-primary pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%;"
-                                    ng-click="fullAmount()">
-                                    <p class="mt-lg-2" style="font-size: 2rem;"><?= trans("label_full_amount") ?></p>
-                                </span>
-                                <span class="num btn btn-secondary pb-2 pt-4 pb-lg-4 pt-lg-4 mt-2 mt-md-0" style="width: 100%;"
-                                    ng-click="clearPayment()">
-                                    <p class="mt-lg-2" style="font-size: 2rem;"><?= trans("label_clear") ?></p>
-                                </span>
-                                <span class="num btn btn-success pb-2 pt-4 pb-lg-4 pt-lg-4 mt-2 mt-md-0" style="width: 100%;"
-                                    ng-click="checkoutOrder()">
-                                    <p class="mt-lg-2" style="font-size: 2rem;"><?= trans("label_check_out") ?></p>
-                                </span>
-                            </div>
+                        </div>
+                        <div class="d-md-flex flex-row px-3" style="gap: 0.5rem; margin-top: 0.5rem;">
+                            <span class="num btn btn-primary pb-2 pt-4 pb-lg-4 pt-lg-4" style="width: 100%;"
+                                ng-click="fullAmount()">
+                                <p class="mt-lg-2" style="font-size: 2rem;"><?= trans("label_full_amount") ?></p>
+                            </span>
+                            <span class="num btn btn-secondary pb-2 pt-4 pb-lg-4 pt-lg-4 mt-2 mt-md-0" style="width: 100%;"
+                                ng-click="clearPayment()">
+                                <p class="mt-lg-2" style="font-size: 2rem;"><?= trans("label_clear") ?></p>
+                            </span>
+                            <span class="num btn btn-success pb-2 pt-4 pb-lg-4 pt-lg-4 mt-2 mt-md-0" style="width: 100%;"
+                                ng-click="checkoutOrder()">
+                                <p class="mt-lg-2" style="font-size: 2rem;"><?= trans("label_check_out") ?></p>
+                            </span>
                         </div>
                     </div>
                 </div>

@@ -1,10 +1,13 @@
 angularApp.controller("CustomerController", [
-    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce","CustomerAddModal", "CustomerEditModal",
-    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, CustomerAddModal,CustomerEditModal,){
+    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce", "CustomerAddModal", "CustomerEditModal",
+    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, CustomerAddModal, CustomerEditModal,) {
         var dt = $("#CustomerTable");
         var i;
         var hideColums = dt.data("hide-colums").split(",");
         var hideColumsArray = [];
+        $scope.from = window.getParameterByName("from");
+        $scope.to = window.getParameterByName("to");
+
         if (hideColums.length) {
             for (i = 0; i < hideColums.length; i += 1) {
                 hideColumsArray.push(parseInt(hideColums[i]));
@@ -21,8 +24,8 @@ angularApp.controller("CustomerController", [
             dom: '<"row mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 text-end"f>>rt<"row mt-3"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6 text-end"p>>',
 
             columnDefs: [
-                { targets: [5, 6, 7, 8], orderable: false },
-                { className: "text-center", targets: [0, 1, 3, 4, 5, 6, 7, 8 ] },
+                { targets: [6, 7, 8, 9], orderable: false },
+                { className: "text-center", targets: [0, 1, 3, 4, 5, 6, 7, 8, 9] },
                 { visible: false, targets: hideColumsArray },
             ],
             aLengthMenu: [
@@ -32,11 +35,18 @@ angularApp.controller("CustomerController", [
             ajax: {
                 url: "../_inc/_customer.php",
                 type: "GET",
-                data: { action_type: "GET_TABLE_DATA",isdeleted:isdeleted },
+                data: {
+                    action_type: "GET_TABLE_DATA",
+                    isdeleted: isdeleted,
+                    from: $scope.from,
+                    to: $scope.to
+                },
                 dataSrc: "data"
             },
             aoColumns: [
                 { data: "row_index" },
+                { data: "created_at" },
+                // { data: "row_index" },
                 { data: "c_name" },
                 { data: "c_mobile" },
                 { data: "c_address" },
@@ -87,16 +97,13 @@ angularApp.controller("CustomerController", [
                 var text;
                 var btnTxt;
                 //console.log($scope.Customer.status );
-                if($scope.Customer.status == 2){
+                if ($scope.Customer.status == 2) {
                     text = "You need to restore this customer!";
                     btnTxt = "Yes, Restore it!";
-                } else{
+                } else {
                     text = "You won't be able to revert this!";
                     btnTxt = "Yes, Delete it!";
                 }
-
-
-
 
                 Swal.fire({
                     title: "Are you sure?",
@@ -122,7 +129,7 @@ angularApp.controller("CustomerController", [
                             function (response) {
                                 var alertMsg = response.data.msg;
                                 Swal.fire({
-                                    title:($scope.Customer.status == 2)? "Restored!": "Deleted!",
+                                    title: ($scope.Customer.status == 2) ? "Restored!" : "Deleted!",
                                     text: alertMsg,
                                     icon: "success"
                                 });

@@ -1,7 +1,7 @@
 angularApp.controller("PosController", [
     "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce", "$timeout",
-    "categoryAddModal", "categoryEditModal", "categoryDeleteModal", "OrderAddModel", "CustomerSelectModal", "OrderHoldModel",
-    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, $timeout, categoryAddModal, categoryEditModal, categoryDeleteModal, OrderAddModel, CustomerSelectModal, OrderHoldModel) {
+    "categoryAddModal", "categoryEditModal", "categoryDeleteModal", "OrderAddModel", "CustomerSelectModal", "OrderHoldingModel", "OrderHeldModel",
+    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, $timeout, categoryAddModal, categoryEditModal, categoryDeleteModal, OrderAddModel, CustomerSelectModal, OrderHoldingModel, OrderHeldModel) {
         // Initialize scope variables
         $scope.cart = [];
         $scope.products = [];
@@ -38,7 +38,7 @@ angularApp.controller("PosController", [
         }
 
         // Fetch all products
-        $scope.get_all_product = function (c_id = null) {
+        $scope.get_all_products = function (c_id = null) {
             $http({
                 url: window.baseUrl + "/_inc/_product.php",
                 method: "GET",
@@ -56,11 +56,31 @@ angularApp.controller("PosController", [
                 }
             );
         };
-        $scope.get_all_product();
+        $scope.get_all_products();
+
+        // $scope.get_all_held_orders_count = function () {
+        //     $http({
+        //         url: window.baseUrl + "/_inc/_pos.php",
+        //         method: "GET",
+        //         params: { action_type: "GET_HELD_ORDERS_COUNT" },
+        //         responseType: "json"
+        //     }).then(
+        //         function (response) {
+        //             $scope.held_orders_count = response.data.count || 0;
+        //         },
+        //         function (response) {
+        //             var alertMsg = response.data && typeof response.data === 'object'
+        //                 ? Object.values(response.data).join(" ")
+        //                 : response.statusText || "Error fetching products";
+        //             Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+        //         }
+        //     );
+        // };
+        // $scope.get_all_held_orders_count();
 
         // Category change handler
         $scope.onCategoryChange = function () {
-            $scope.get_all_product($scope.selectedCategory);
+            $scope.get_all_products($scope.selectedCategory);
         };
 
         // Add item to cart
@@ -133,18 +153,27 @@ angularApp.controller("PosController", [
             CustomerSelectModal($scope);
         };
 
-        // Open order gold modal
-        $scope.openOrderHoldModal = function () {
+        // Open order hold modal
+        $scope.openOrderHoldingModal = function () {
             var hasProducts = $scope.cart.length > 0;
 
             if (hasProducts) {
-                OrderHoldModel($scope);
+                OrderHoldingModel($scope);
             } else {
                 if (!hasProducts) {
                     Toast.fire({ icon: 'error', title: 'Error!', text: "Please select at least one product" });
                 }
             }
         };
+
+        // Open held orders modal
+        // $scope.openHeldOrdersModal = function () {
+        //     if ($scope.held_orders_count === 0) {
+        //         Toast.fire({ icon: 'error', title: 'Error!', text: "No orders are on hold" });
+        //     } else {
+        //         OrderHeldModel($scope);
+        //     }
+        // };
 
         // Set default customer
         $scope.defaultCustomer = function () {
@@ -225,7 +254,7 @@ angularApp.controller("PosController", [
                     url: window.baseUrl + "/_inc/_pos.php?ref=" + encodeURIComponent(refNo),
                     method: "GET"
                 }).then(function (response) {
-                    if (response.data.status === 'holded' || response.data.status === 'exist') {
+                    if (response.data.status === 'held' || response.data.status === 'exist') {
                         Toast.fire({ icon: 'error', title: 'Error', text: response.data.msg });
                     } else {
                         $scope.showPaymentProcess = true;
@@ -250,7 +279,6 @@ angularApp.controller("PosController", [
         $scope.closePaymentProcess = function () {
             $scope.showPaymentProcess = false;
         };
-
         // Select payment method
         $scope.selectPaymentMethod = function (method) {
             $scope.paymentMethod = method.charAt(0).toUpperCase() + method.slice(1);
@@ -352,56 +380,6 @@ angularApp.controller("PosController", [
             $scope.updatePayment();
         };
 
-        // Checkout order
-        // $scope.checkoutOrder = function () {
-        //     if ($scope.payment.outstanding < 0) {
-        //         Toast.fire({ icon: 'warning', title: 'Warning!', text: "Outstanding amount cannot be negative" });
-        //         return;
-        //     }
-
-        //     const orderData = {
-        //         customer: $scope.cus,
-        //         paymentMethod: $scope.paymentMethod,
-        //         cart: $scope.cart,
-        //         payment: $scope.payment,
-        //         ref: $scope.ref
-        //     };
-
-        //     $http({
-        //         url: window.baseUrl + "/_inc/_pos.php?action_type=PLACE_ORDER",
-        //         method: "POST",
-        //         data: orderData,
-        //         headers: { 'Content-Type': 'application/json' }
-        //     }).then(
-        //         function (response) {
-        //             Toast.fire({ icon: 'success', title: 'Order Placed!', text: response.data.msg });
-
-        //             $scope.cart = [];
-        //             $scope.payment = {
-        //                 advance: 0,
-        //                 received: 0,
-        //                 return: 0,
-        //                 sub_total: 0,
-        //                 total_discount: 0,
-        //                 final_payment: 0,
-        //                 balance: 0,
-        //                 outstanding: 0
-        //             };
-        //             $scope.paymentMethod = "cash";
-        //             $scope.ref = "";
-
-        //             $scope.closePaymentProcess();
-        //             $scope.defaultCustomer();
-        //         },
-        //         function (error) {
-        //             var alertMsg = error.data && error.data.msg
-        //                 ? error.data.msg
-        //                 : "Failed to place order";
-        //             Toast.fire({ icon: 'error', title: 'Error', text: alertMsg });
-        //         }
-        //     );
-        // };
-
         $scope.checkoutOrder = function () {
             if ($scope.payment.outstanding < 0) {
                 Toast.fire({ icon: 'warning', title: 'Warning!', text: "Outstanding amount cannot be negative" });
@@ -425,7 +403,7 @@ angularApp.controller("PosController", [
                 transformRequest: angular.identity
             }).then(
                 function (response) {
-                    Toast.fire({ icon: 'success', title: 'Order Placed!', text: response.data.msg });
+                    Toast.fire({ icon: 'success', title: '"Order has been placed!', text: response.data.msg });
 
                     $scope.cart = [];
                     $scope.payment = {
@@ -447,13 +425,11 @@ angularApp.controller("PosController", [
                 function (error) {
                     var alertMsg = error.data && error.data.msg
                         ? error.data.msg
-                        : "Failed to place order";
+                        : "Failed to place the order";
                     Toast.fire({ icon: 'error', title: 'Error', text: alertMsg });
                 }
             );
         };
-
-
 
         // Handle select2 change events to avoid digest errors
         if (typeof $.fn.select2 === 'function') {
@@ -471,10 +447,7 @@ angularApp.controller("PosController", [
                 });
             });
         }
-        // $scope.categorySelect = function (id) {
-        //     console.log("Clicked" + id)
-        // }
-        // Remove previous bindings to avoid multiple click logs
+
         // Remove previous bindings to avoid multiple click logs
         $(document).off("click", ".category-select").on("click", ".category-select", function (e) {
             e.preventDefault();
@@ -484,7 +457,7 @@ angularApp.controller("PosController", [
                 id = $(this).data("cid");
             }
             $scope.selectedCategory = id;
-            $scope.get_all_product($scope.selectedCategory);
+            $scope.get_all_products($scope.selectedCategory);
 
             console.log("First id: " + id);
             $(this).parents("ul.nav-treeview").show().parent("li").addClass("menu-open");
@@ -495,29 +468,24 @@ angularApp.controller("PosController", [
             let filter = $(this).val().toLowerCase();
             let firstMatch = null;
 
-            // பழைய active class remove பண்ணு
             $(".nav-sidebar li.nav-item a.nav-link").removeClass("active");
 
-            if (filter === "") return; // search empty இருந்தா எதுவும் செய்யாதீங்க
+            if (filter === "") return;
 
             $(".nav-sidebar li.nav-item").each(function () {
                 let text = $(this).text().toLowerCase();
 
                 if (text.indexOf(filter) > -1) {
-                    // match ஆன category மட்டும் active
                     $(this).children("a.nav-link").addClass("active");
 
-                    // parent expand பண்ணனும்
                     $(this).parents("ul.nav-treeview").show().parent("li").addClass("menu-open");
 
-                    // first match store பண்ணு
                     if (!firstMatch) {
                         firstMatch = $(this);
                     }
                 }
             });
 
-            // first match இருந்தா scroll பண்ணு
             if (firstMatch) {
                 $(".nav-sidebar").animate({
                     scrollTop: $(".nav-sidebar").scrollTop() + firstMatch.position().top - 100

@@ -125,13 +125,12 @@ $query_string = str_replace(array('&'), '?', $query_string);
             <div class="row mb-2">
               <div class="col-sm-6">
                 <strong class="m-0 text-lg"><?= $document->getTitle(); ?> </strong>
-
+                <?php include("../_inc/template/partials/apply_filter.php"); ?>
               </div><!-- /.col -->
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                   <li class="breadcrumb-item"><a href="dashboard.php"><?= trans('title_home') ?></a></li>
                   <li class="breadcrumb-item active"><?= $document->getTitle(); ?> </li>
-
                 </ol>
               </div><!-- /.col -->
             </div><!-- /.row -->

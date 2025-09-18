@@ -44,6 +44,7 @@ function validate_request_data($request)
 //     }
 // }
 
+
 function new_ref_no()
 {
     $prfx = "OR";
@@ -188,6 +189,12 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
     try {
         $data = array();
         $where = "WHERE 1=1";
+
+        $from = from();
+        $to = to();
+        $where .= date_range_filter($from, $to);
+
+
 
         // if(isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2){
         //     $where .= " AND status = 2";

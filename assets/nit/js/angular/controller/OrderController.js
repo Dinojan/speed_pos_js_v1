@@ -11,6 +11,8 @@ angularApp.controller("OrderController", [
             }
         }
         var isdeleted = window.getParameterByName('isdeleted');
+        var from = window.getParameterByName('from');
+        var to = window.getParameterByName('to');
         dt.DataTable({
             processing: true,
             responsive: true,
@@ -32,7 +34,7 @@ angularApp.controller("OrderController", [
             ajax: {
                 url: "../_inc/_order.php",
                 type: "GET",
-                data: { action_type: "GET_TABLE_DATA", isdeleted: isdeleted },
+                data: { action_type: "GET_TABLE_DATA", isdeleted: isdeleted , from: from, to: to},
                 dataSrc: "data"
             },
             aoColumns: [

@@ -52,12 +52,12 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer mx-auto">
+            <!-- <div class="modal-footer mx-auto">
 
                 <div class="filter_close" data-dismiss="modal">
                     <strong class="text-lg"><i class="fas fa-times"></i></strong>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>

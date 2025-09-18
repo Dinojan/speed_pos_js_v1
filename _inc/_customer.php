@@ -171,6 +171,10 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
         $data = array();
         $where = "WHERE 1=1";
 
+        $from = from();
+        $to = to();
+        $where .= date_range_filter($from, $to, 'customer.');
+
         if (isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2) {
             $where .= " AND status = 2";
         } else {

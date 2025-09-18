@@ -33,6 +33,18 @@ if (isset($request->get['action_type']) && $request->get['action_type'] == 'HOLD
     }
 }
 
+// if (isset($request->get['action_type']) && $request->get['action_type'] == 'HELD') {
+//     try {
+//         include 'template/held_orders_list.php';
+//         exit();
+//     } catch (Exception $e) {
+//         header('HTTP/1.1 422 Unprocessable Entity');
+//         header('Content-Type: application/json; charset=UTF-8');
+//         echo json_encode(array('errorMsg' => $e->getMessage()));
+//         exit();
+//     }
+// }
+
 function gererateUniqueId()
 {
     $prepix = "SPJ";
@@ -117,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type']) && $_PO
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($result && $result['status'] == 1) {
-            throw new Exception("Reference or bill number already holded");
+            throw new Exception("Reference or bill number already held");
         } else if ($result) {
             throw new Exception("Reference or bill number already exist");
         }
@@ -221,10 +233,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type']) && $_PO
 
     try {
         // Decode FormData fields
-        // $customer = isset($_POST['customer']) ? json_decode($_POST['customer'], true) : null;
+        $customer = isset($_POST['customer']) ? json_decode($_POST['customer'], true) : null;
         $cart     = isset($_POST['cart']) ? json_decode($_POST['cart'], true) : [];
         $payment  = isset($_POST['payment']) ? json_decode($_POST['payment'], true) : [];
-        $ref      = isset($_POST['ref']) ? $_POST['ref'] : '';
+        $ref      = isset($_POST['hold_ref_no']) ? $_POST['hold_ref_no'] : '';
         // $method   = isset($_POST['paymentMethod']) ? $_POST['paymentMethod'] : '';
 
         if (!$customer || !$payment) {
@@ -233,21 +245,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action_type']) && $_PO
 
         $statement = db()->prepare("SELECT * FROM invoice_info WHERE ref_no = ?");
         $statement->execute([$ref]);
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-        if ($result && $result['status'] == 1) {
-            throw new Exception("Reference or bill number already holded");
-        } else if ($result) {
-            throw new Exception("Reference or bill number already exist");
+        if ($statement->rowCount() > 0) {
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+            if ($result && $result['status'] == 1) {
+                throw new Exception("Reference or bill number already held");
+            } else {
+                throw new Exception("Reference or bill number already exist");
+            }
         }
-
 
         $unique_no = gererateUniqueId();
 
         // Insert into invoice_info
         $stmt = db()->prepare("INSERT INTO invoice_info 
             (`invoice_no`, `ref_no`, `cus_id`, `cus_name`, `cus_mobile`, `cus_address`, `sub_total`, `discount`, `total_payable`, `status`, `created_by`) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $unique_no,
             $ref,
@@ -307,8 +320,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['ref']) && $_GET['ref'] !
             $result = $statement->fetch(PDO::FETCH_ASSOC);
             if ($result['status'] == 1) {
                 echo json_encode([
-                    "status" => "holded",
-                    "msg" => "Reference or bill number already holded"
+                    "status" => "held",
+                    "msg" => "Reference or bill number already held"
                 ]);
             } else {
                 echo json_encode([
@@ -319,6 +332,73 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['ref']) && $_GET['ref'] !
         }
     } catch (Exception $e) {
         header('HTTP/1.1 500 Internal Server Error');
-        echo json_encode(["status" => "error", "msg" => $e->getMessage()]);
+        echo json_encode(["status" => "error", "errorMsg" => $e->getMessage()]);
     }
 }
+
+// // GET_HELD_ORDERS_COUNT
+// if (isset($_GET['action_type']) && $_GET['action_type'] == 'GET_HELD_ORDERS_COUNT') {
+//     try {
+
+//         $statement = db()->prepare('SELECT * FROM invoice_info WHERE status = ?');
+//         $statement->execute([1]);
+//         $count = $statement->rowCount();
+
+//         header('Content-Type: application/json');
+//         echo json_encode([
+//             'msg' => 'Success',
+//             'count' => $count
+//         ]);
+//         exit();
+//     } catch (Exception $e) {
+//         header('HTTP/1.1 422 Unprocessable Entity');
+//         header('Content-Type: application/json; charset=UTF-8');
+//         echo json_encode(['errorMsg' => $e->getMessage()]);
+//         exit();
+//     }
+// }
+
+// // GET_HELD_ORDERS
+// if (isset($request->get['action_type']) && $request->get['action_type'] == 'GET_HELD_ORDERS') {
+//     try {
+//         $statement = db()->prepare('SELECT * FROM invoice_info WHERE status = ?');
+//         $statement->execute([1]);
+//         $orders = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+//         header('Content-Type: application/json');
+//         echo json_encode([
+//             'status' => 'success',
+//             'orders' => $orders,
+//             'count'  => count($orders)
+//         ]);
+//         exit();
+//     } catch (Exception $e) {
+//         header('HTTP/1.1 422 Unprocessable Entity');
+//         header('Content-Type: application/json; charset=UTF-8');
+//         echo json_encode(['errorMsg' => $e->getMessage()]);
+//         exit();
+//     }
+// }
+
+
+// // GET_HELD_ORDER_PRODUCTS
+// if (isset($request->get['action_type']) && $request->get['action_type'] == 'GET_HELD_ORDER_PRODUCTS') {
+//     try {
+//         $statement = db()->prepare('SELECT * FROM invoice_item WHERE invoice_info_id = ?');
+//         $statement->execute([$_GET['id']]);
+//         $orders = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+//         header('Content-Type: application/json');
+//         echo json_encode([
+//             'status' => 'success',
+//             'orders' => $orders,
+//             'count'  => count($orders)
+//         ]);
+//         exit();
+//     } catch (Exception $e) {
+//         header('HTTP/1.1 422 Unprocessable Entity');
+//         header('Content-Type: application/json; charset=UTF-8');
+//         echo json_encode(['errorMsg' => $e->getMessage()]);
+//         exit();
+//     }
+// }

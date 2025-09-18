@@ -382,17 +382,17 @@
                                 </li>
                             <?php endif; ?>
 
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_sales_return')): ?>
+                            <!-- <?php // if (user_group_id() == 1 || has_permission('access', 'read_sales_return')): ?>
                                 <li class="nav-item">
                                     <a href="sales_return.php"
-                                        class="nav-link  <?php echo current_nav() == 'sales_return' ? ' active' : null; ?>">
+                                        class="nav-link  <?php // echo current_nav() == 'sales_return' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-undo text-sm"></i>
-                                        <p><?= trans('menu_sales_return') ?></p>
+                                        <p><?php // echo trans('menu_sales_return') ?></p>
 
                                     </a>
                                 </li>
-                            <?php endif; ?>
+                            <?php // endif; ?> -->
 
                             <?php if (user_group_id() == 1 || has_permission('access', 'read_sales_summary')): ?>
                                 <li class="nav-item">
