@@ -44,6 +44,7 @@ function validate_request_data($request)
 //     }
 // }
 
+
 function new_ref_no()
 {
     $prfx = "OR";
@@ -189,6 +190,12 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
         $data = array();
         $where = "WHERE 1=1";
 
+        $from = from();
+        $to = to();
+        $where .= date_range_filter($from, $to);
+
+
+
         // if(isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2){
         //     $where .= " AND status = 2";
         // }else {
@@ -207,6 +214,87 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $row["due"] = number_format($totalDue, 2);
             // $row['category'] = get_the_category($row['c_id'])['c_name'];
             // $row['supplier'] = get_the_supplier($row['s_id'])['s_name']." (". get_the_supplier($row['s_id'])['s_mobile'].")";
+
+            $row["biller"] = get_the_user($row["created_by"], 'username');
+
+            $row['customer'] = $row['cus_name'] . " (" . format_mobile($row['cus_mobile']) . ")";
+
+            if ($totalDue > 0) {
+                $row['pay'] = '<button id="pay-order" class="btn btn-outline-primary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
+            } else {
+                $row['pay'] = '<button  class="btn btn-outline-secondary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
+            }
+            // $row['view'] = '<button id="view-order" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-eye"></i></button>';
+            $row['view'] = '<a href="customer_profile.php?customer=' . $row['cus_id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+                    <i class="fas fa-eye"></i>
+                 </a>';
+            //if ($row['id'] != 1) {
+            $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-sm edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
+            // } else {
+            //     $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
+            // }
+            // if ($row['status'] == 2) {
+            //  $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
+            //  } else {
+            $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+
+            //  }
+            //     $row['delete'] = '<button class="btn btn-outline-danger btn-sm delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
+            // }
+            //    if($row['status'] == 0){
+            //     $row['sts'] = 'Active';
+
+            // } else  if($row['status'] == 2){
+            //     $row['sts'] = 'Deleted';
+
+            // }else {
+            //      $row['sts'] = 'inActive';
+            // }
+
+        }
+        // Return data as JSON
+        echo json_encode(array("data" => $data));
+    } catch (Exception $e) {
+        header('HTTP/1.1 422 Unprocessable Entity');
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode(array('errorMsg' => $e->getMessage()));
+        exit();
+    }
+}
+
+if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_DUE_ORDERS") {
+    try {
+        $data = array();
+        $where = "WHERE 1=1 AND total_amt > total_paid";
+
+        $from = from();
+        $to = to();
+        $where .= date_range_filter($from, $to);
+
+
+
+        // if(isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2){
+        //     $where .= " AND status = 2";
+        // }else {
+        //      $where .= " AND status != 2";
+        // }
+
+        $statement = db()->prepare("SELECT * FROM orders $where");
+        $statement->execute();
+        $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $i = 0;
+        foreach ($data as &$row) {
+            $i++;
+            $row["row_index"] = $i;
+
+            $totalDue = $row["total_amt"] - $row["total_paid"];
+            $row["due"] = number_format($totalDue, 2);
+            // $row['category'] = get_the_category($row['c_id'])['c_name'];
+            // $row['supplier'] = get_the_supplier($row['s_id'])['s_name']." (". get_the_supplier($row['s_id'])['s_mobile'].")";
+
+            $row["biller"] = get_the_user($row["created_by"], 'username');
+
+            $row['customer'] = $row['cus_name'] . " (" . format_mobile($row['cus_mobile']) . ")";
 
             if ($totalDue > 0) {
                 $row['pay'] = '<button id="pay-order" class="btn btn-outline-primary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';

@@ -44,21 +44,7 @@
                 </div>
             </form>
         </li>
-        
-        <?php if (in_array(current_nav(), array(''))): ?>
-            <?php if (user_group_id() == 1 || has_permission('access', 'filtering')): ?>
-
-                <!-- Navbar Search -->
-                <li class="nav-item ">
-                    <a class="nav-link" href="#dateFilterModal" data-toggle="modal" data-target="#dateFilterModal"
-                        role="button">
-                       <i class="fas fa-search text-center"> <span class="fas d-none d-lg-block pt-1">&nbsp; Filter </span></i>
-                        
-                    </a>
-
-                </li>
-            <?php endif; ?>
-        <?php endif; ?>
+    
        
         <li class="nav-item">
             <a class="nav-link" data-widget="fullscreen" id="fullscreen-trigger" href="#" role="button">

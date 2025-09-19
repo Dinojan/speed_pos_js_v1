@@ -8,6 +8,7 @@ if (!is_loggedin()) {
 }
 $payment_model = registry()->get('loader')->model('payment'); // call modal file
 
+
 function validate_request_data($request)
 {
     if (!validateString($request->post['order_id'])) {
@@ -55,7 +56,6 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans('text_successful_created'), 'id' => $payment_id));
         exit();
-
     } catch (Exception $e) {
 
         header('HTTP/1.1 422 Unprocessable Entity');

@@ -26,6 +26,9 @@ window.angularApp.controller("CustomerProfileController", [
         //     }
         // }
 
+        $scope.from = window.getParameterByName('from');
+        $scope.to = window.getParameterByName('to');
+
         function initCustomerTable(tableSelector, ajaxParams, columns, unorderable, textCenter) {
             var dt = $(tableSelector);
             var hideColums = dt.data("hide-colums").split(",");
@@ -109,7 +112,9 @@ window.angularApp.controller("CustomerProfileController", [
                     action_type: "GET_TABLE_DATA",
                     isdeleted: isdeleted,
                     filter: filter,
-                    table: "payment"
+                    table: "payment",
+                    from: $scope.from,
+                    to: $scope.to
                 },
                 dataSrc: "data"
             },
@@ -122,7 +127,7 @@ window.angularApp.controller("CustomerProfileController", [
                 { data: "amount" },
                 { data: "view" }
             ],
-            [3, 5],
+            [3, 4, 6],
             [0, 1, 2, 3, 6]
         );
 
@@ -132,7 +137,7 @@ window.angularApp.controller("CustomerProfileController", [
             $("#order-list-container").show();
         }
 
-        $(document).on("click", "#pay-order-profile-table-btn", function (e) {
+        $(window).on("click", "#pay-order-profile-table-btn", function (e) {
             e.stopPropagation();
             e.preventDefault();
 
@@ -150,7 +155,7 @@ window.angularApp.controller("CustomerProfileController", [
 
 
 
-        $(document).on("click", "#edit-customer-profile-btn", function (e) {
+        $(window).on("click", "#edit-customer-profile-btn", function (e) {
             e.preventDefault();
 
             $scope.$apply(function () {

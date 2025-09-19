@@ -1063,6 +1063,7 @@ angularApp.factory("ProductEditModal", [
         };
     }
 ]);
+
 // CustomerAddModel
 angularApp.factory("CustomerAddModal", [
     "API_URL",
@@ -1227,6 +1228,142 @@ angularApp.factory("CustomerEditModal", [
         };
     }
 ]);
+//CustomerSelectModel
+angularApp.factory("CustomerSelectModal", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (
+        API_URL,
+        window,
+        $,
+        $http,
+        $sce,
+        $rootScope,
+        $compile,
+        $timeout) {
+        return function ($scope) {
+            const modalId = "CustomerSelectModal";
+
+            $http.get(window.baseUrl + "/_inc/_pos.php?action_type=SELECT").then(function (response) {
+                const formHtml = response.data;
+
+                $(`#${modalId}`).remove();
+                $scope.modalTitle = "Select or Create Customer";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-md";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+            });
+
+            $(document).off("change", "#c_id").on("change", "#c_id", function (e) {
+                e.preventDefault();
+
+                let selected = $('#c_id').find(':selected');
+                let selectedId = selected.val();
+
+                if (selectedId !== "") {
+                    let cName = selected.data('name');
+                    let cMobile = selected.data('mobile');
+                    let cAddress = selected.data('address');
+
+                    // Fill the text fields with selected customer's info
+                    $('#c_name').val(cName);
+                    $('#c_address').val(cAddress);
+                    $('#c_mobile').val(cMobile);
+                }
+            });
+
+            // Submit button click
+            $(document).off("click", "#select_customer_btn").on("click", "#select_customer_btn", function (e) {
+                e.preventDefault();
+
+                let selectedId = $('#c_id').val();
+
+                if (selectedId !== "") {
+                    // Existing customer
+                    let selected = $('#c_id').find(':selected');
+                    let cName = selected.data('name');
+                    let cMobile = selected.data('mobile');
+                    let cAddress = selected.data('address');
+
+                    $('#hidden_c_id').val(selectedId);
+                    $('#hidden_c_name').val(cName);
+                    $('#hidden_c_address').val(cAddress);
+                    $('#hidden_c_mobile').val(cMobile);
+
+                    $('th span.text-primary').text(cName);
+                    $scope.onCustomerChange();
+                    if ($scope.modalInstance) $scope.modalInstance.hide();
+                } else {
+                    // Create new customer
+                    let cName = $('#c_name').val();
+                    let cMobile = $('#c_mobile').val();
+                    let cAddress = $('#c_address').val();
+
+                    $http({
+                        url: window.baseUrl + "/_inc/_customer.php",
+                        method: "POST",
+                        data: $('#select-customer-form').serialize(),
+                        dataType: "json"
+                    }).then(
+                        function (response) {
+                            Toast.fire({ icon: 'success', title: 'Success!', text: response.data.msg });
+
+                            if ($('#c_id option[value="' + response.data.id + '"]').length === 0) {
+                                $('#c_id').append(
+                                    $('<option>')
+                                        .val(response.data.id)
+                                        .text(cName)
+                                        .attr('data-name', cName)
+                                        .attr('data-mobile', cMobile)
+                                        .attr('data-address', cAddress)
+                                );
+                            }
+
+                            $('#c_id').val(response.data.id).trigger('change');
+
+                            let selectedId = $('#c_id').val();
+                            console.log(selectedId)
+
+                            $('#hidden_c_id').val(response.data.id);
+                            $('#hidden_c_name').val(cName);
+                            $('#hidden_c_address').val(cAddress);
+                            $('#hidden_c_mobile').val(cMobile);
+                            $('th span.text-primary').text(cName);
+                            $scope.onCustomerChange();
+                            if ($scope.modalInstance) $scope.modalInstance.hide();
+                        }, function (response) {
+                            let alertMsg = "";
+                            angular.forEach(response.data, function (value) {
+                                alertMsg += value + " ";
+                            });
+                            Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+                        }
+                    );
+                }
+            });
+
+        };
+    }
+]);
+
 // OrderAddModel
 angularApp.factory("OrderAddModel", [
     "API_URL",
@@ -1525,6 +1662,221 @@ angularApp.factory("OrderPayModel", [
 
             // $scope.calc()
 
+        };
+    }
+]);
+//OrderHoldModel
+angularApp.factory("OrderHoldingModel", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (API_URL, window, $, $http, $sce, $rootScope, $compile, $timeout) {
+        return function ($scope) {
+            const modalId = "OrderHoldingModel";
+
+            // Ensure modal can access PosController data
+            $scope.modalCart = $scope.cart;
+            $scope.modalPayment = $scope.payment;
+            $scope.modalCus = $scope.cus;
+
+            // Step 1: Load modal HTML from server
+            $http.get(window.baseUrl + "/_inc/_pos.php?action_type=HOLD").then(function (response) {
+                const formHtml = response.data;
+
+                // Remove existing modal if any
+                $(`#${modalId}`).remove();
+
+                // Setup modal scope variables
+                $scope.modalTitle = "Hold Order";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-md";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                // Compile modal
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+
+                // Show modal after DOM ready
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+
+                    // Initialize select2 if exists
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+            });
+
+            // Step 2: Submit hold order
+            $scope.submitHoldOrder = function () {
+                if ($scope.hold_ref_no) {
+                    var formData = new FormData();
+                    formData.append('action_type', 'HOLDING_ORDER');
+                    formData.append('customer', JSON.stringify($scope.modalCus));
+                    formData.append('cart', JSON.stringify($scope.modalCart));
+                    formData.append('payment', JSON.stringify($scope.modalPayment));
+                    formData.append('hold_ref_no', $scope.hold_ref_no);
+
+                    $http({
+                        url: window.baseUrl + "/_inc/_pos.php",
+                        method: "POST",
+                        data: formData,
+                        headers: { 'Content-Type': undefined },
+                        transformRequest: angular.identity
+                    }).then(function (response) {
+                        Toast.fire({ icon: 'success', title: 'Success!', text: response.data.msg });
+                        $scope.modalInstance.hide();
+                        $scope.cart = [];
+                        $scope.payment = [];
+                    }, function (error) {
+                        let msg = (error.data && error.data.errorMsg) ? error.data.errorMsg : "Failed to place hold order";
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: msg
+                        });
+                    });
+                } else {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: "Please enter reference or bill number"
+                    });
+                    document.getElementById("hold_ref_no_input").focus();
+                }
+            };
+
+            // Step 3: Live calculation inside modal
+            $scope.calc = function () {
+                const due = parseFloat($scope.modalPayment.final_payment || 0);
+                const paid = parseFloat($scope.modalPayment.advance || 0);
+
+                $scope.balanceAmount = due - paid;
+
+                $scope.modalLabel = $scope.balanceAmount > 0 ? "Outstanding" : "Balance";
+                $scope.note = paid.toFixed(2) + " paid and " + $scope.balanceAmount.toFixed(2) + " " + $scope.modalLabel;
+            };
+
+            // Watch payment changes to recalc automatically
+            $scope.$watch('[modalPayment.advance, modalPayment.received, modalPayment.total_discount]', $scope.calc, true);
+        };
+    }
+]);
+//OrderHeldModel
+angularApp.factory("OrderHeldModel", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (API_URL, window, $, $http, $sce, $rootScope, $compile, $timeout) {
+        return function ($scope) {
+            const modalId = "OrderHeldModel";
+
+            // Ensure modal can access PosController data
+            // $scope.held_orders_count = $scope.count;
+            // $scope.modalPayment = $scope.payment;
+            // $scope.modalCus = $scope.cus;
+
+            // Step 1: Load modal HTML from server
+            $http.get(window.baseUrl + "/_inc/_pos.php?action_type=HELD").then(function (response) {
+                const formHtml = response.data;
+
+                // Remove existing modal if any
+                $(`#${modalId}`).remove();
+
+                // Setup modal scope variables
+                $scope.modalTitle = "Hold Order";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-xl";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                // Compile modal
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+
+                // Show modal after DOM ready
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+
+                    // Initialize select2 if exists
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+            });
+
+            $http({
+                url: window.baseUrl + "/_inc/_pos.php",
+                method: "GET",
+                params: { action_type: "GET_HELD_ORDERS" }
+            }).then(function (response) {
+                $scope.orders = response.data.orders;
+            }, function (error) {
+                let msg = (error.data && error.data.msg) ? error.data.msg : "Failed to find held orders";
+                Toast.fire({ icon: 'error', title: 'Error!', text: msg });
+            });
+
+            // Step 2: Submit hold order
+            $scope.submitHoldOrder = function () {
+                if ($scope.hold_ref_no) {
+                    var formData = new FormData();
+                    formData.append('action_type', 'HOLDING_ORDER');
+                    formData.append('customer', JSON.stringify($scope.modalCus));
+                    formData.append('cart', JSON.stringify($scope.modalCart));
+                    formData.append('payment', JSON.stringify($scope.modalPayment));
+                    formData.append('hold_ref_no', $scope.hold_ref_no);
+
+                    $http({
+                        url: window.baseUrl + "/_inc/_pos.php",
+                        method: "POST",
+                        data: formData,
+                        headers: { 'Content-Type': undefined },
+                        transformRequest: angular.identity
+                    }).then(function (response) {
+                        Toast.fire({ icon: 'success', title: 'Success!', text: response.data.msg });
+                        $scope.modalInstance.hide();
+                        $scope.cart = [];
+                        $scope.payment = [];
+                    }, function (error) {
+                        let msg = (error.data && error.data.msg) ? error.data.msg : "Failed to holding order";
+                        Toast.fire({ icon: 'error', title: 'Error!', text: msg });
+                    });
+                } else {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: "Please enter reference or bill number"
+                    });
+                    document.getElementById("hold_ref_no_input").focus();
+                }
+            };
+
+            // Step 3: Live calculation inside modal
+            $scope.calc = function () {
+                const due = parseFloat($scope.modalPayment.final_payment || 0);
+                const paid = parseFloat($scope.modalPayment.advance || 0);
+
+                $scope.balanceAmount = due - paid;
+
+                $scope.modalLabel = $scope.balanceAmount > 0 ? "Outstanding" : "Balance";
+                $scope.note = paid.toFixed(2) + " paid and " + $scope.balanceAmount.toFixed(2) + " " + $scope.modalLabel;
+            };
+
+            // Watch payment changes to recalc automatically
+            $scope.$watch('[modalPayment.advance, modalPayment.received, modalPayment.total_discount]', $scope.calc, true);
         };
     }
 ]);
