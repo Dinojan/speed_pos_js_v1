@@ -101,39 +101,54 @@ $query_string = str_replace(array('&'), '?', $query_string);
 
 </head>
 
-<body class="<?= style_class('body_class') . " " . $body_class ?> sidebar-mini layout-fixed skin-green pace-primary">
-     <!--begin::App Wrapper-->
-    <div class="app-wrapper" ng-controller="<?= $document->getController(); ?>">
-          <!-- Preloader -->
+<body class="<?= style_class('body_class') . " " . $body_class ?>   <?php echo (current_nav() != 'pos') ? 'sidebar-mini' : '' ?> layout-fixed skin-green pace-primary" <?php echo (current_nav() == 'pos') ? 'style="min-height: 100vh;"' : '' ?>>
+  <!--begin::App Wrapper-->
+  <div class="app-wrapper1" ng-controller="<?= $document->getController(); ?>">
+    <!-- Preloader -->
     <?php include('src/_preloader.php'); ?>
     <!-- Navbar -->
-    <?php include('src/_nav.php'); ?>
+    <?php if (current_nav() != 'pos') {
+      include('src/_nav.php');
+    } ?>
     <!-- /.navbar -->
     <!-- Main Sidebar Container -->
-    <?php include('src/_aside.php'); ?>
+    <?php if (current_nav() != 'pos') {
+      include('src/_aside.php');
+    } ?>
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
+      <!-- Content Header (Page header) -->
+      <?php if (current_nav() != 'pos') { ?>
         <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <strong class="m-0 text-lg"><?= $document->getTitle(); ?> </strong>
+          <div class="container-fluid ">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <strong class="m-0 text-lg"><?= $document->getTitle(); ?> </strong>
+              </div><!-- /.col -->
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="dashboard.php"><?= trans('title_home') ?></a></li>
+                  <li class="breadcrumb-item active"><?= $document->getTitle(); ?> </li>
+                </ol>
+              </div><!-- /.col -->
+            </div><!-- /.row -->
+            <div class="row justify-content-between px-2">
+              <?php include("../_inc/template/partials/apply_filter.php"); ?>
+              <span></span>
+              <?php if (in_array(current_nav(), array('order', 'customer_profile', 'customer', 'sales_list', 'orders_reports', 'due_reports', 'in_stock_summary'))): ?>
+                <?php if (user_group_id() == 1 || has_permission('access', 'filtering')): ?>
 
-                    </div><!-- /.col -->
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="dashboard.php"><?= trans('title_home') ?></a></li>
-                            <li class="breadcrumb-item active"><?= $document->getTitle(); ?> </li>
-
-                        </ol>
-                    </div><!-- /.col -->
-                </div><!-- /.row -->
-            </div><!-- /.container-fluid -->
+                  <!-- Date filter -->
+                  <a class="btn btn-primary btn-sm" href="#dateFilterModal" data-toggle="modal" data-target="#dateFilterModal" role="button"><i class="far fa-calendar-alt mr-1"></i> Date Filter</a>
+                <?php endif; ?>
+              <?php endif; ?>
+            </div>
+          </div><!-- /.container-fluid -->
         </div>
-        <!-- /.content-header -->
+      <?php } ?>
+      <!-- /.content-header -->
 
-        <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
+      <!-- Main content -->
+      <section class="<?php echo (current_nav() != 'pos') ? 'content ' : '' ?>">
+        <div class="<?php echo (current_nav() != 'pos') ? 'container-fluid ' : '' ?>">

@@ -17,8 +17,8 @@ class _system{
             'body_class' => [
                 'dark_mode' => '',
                 'hold_transition' => 'hold-transition',
-                'sidebar_mini' => 'sidebar-mini',
-                'layout_fixed' => 'layout-fixed',
+                 //'sidebar_mini' => 'sidebar-mini',
+                 'layout_fixed' => 'layout-fixed',
                 'layout_navbar_fixed' => 'layout-navbar-fixed',
                 'layout_footer_fixed' => 'layout-footer-fixed',
                 'sidebar_collapse' => '',

@@ -572,105 +572,105 @@ function barcode_symbology($generator, $type = 'code39')
 	return $symbology;
 }
 
-function date_range_holding_order_filter($from, $to)
+function date_range_filter($from, $to, $table = '')
 {
-	$from = $from ? $from : date('Y-m-d');
-	$to = $to ? $to : date('Y-m-d');
-	$where_query = '';
-	if (($from && ($to == false)) || ($from == $to)) {
-		$day = date('d', strtotime($from));
-		$month = date('m', strtotime($from));
-		$year = date('Y', strtotime($from));
-		$where_query .= " AND DAY(`holding_info`.`created_at`) = {$day}";
-		$where_query .= " AND MONTH(`holding_info`.`created_at`) = {$month}";
-		$where_query .= " AND YEAR(`holding_info`.`created_at`) = {$year}";
-	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
-		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
-		$where_query .= " AND holding_info.created_at >= '{$from}' AND holding_info.created_at <= '{$to}'";
-	}
-	return $where_query;
+    $from = $from ? $from : date('Y-m-d');
+    $to = $to ? $to : date('Y-m-d');
+    $where_query = '';
+    if (($from && ($to == false)) || ($from == $to)) {
+        $day = date('d', strtotime($from));
+        $month = date('m', strtotime($from));
+        $year = date('Y', strtotime($from));
+        $where_query .= " AND DAY($table`created_at`) = {$day}";
+        $where_query .= " AND MONTH($table`created_at`) = {$month}";
+        $where_query .= " AND YEAR($table`created_at`) = {$year}";
+    } else {
+        $from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+        $to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
+        $where_query .= " AND $table`created_at` >= '{$from}' AND $table`created_at` <= '{$to}'";
+    }
+    return $where_query;
 }
 
-function date_range_filter($from, $to)
-{
-	$from = $from ? $from : date('Y-m-d');
-	$to = $to ? $to : date('Y-m-d');
-	$where_query = '';
-	if (($from && ($to == false)) || ($from == $to)) {
-		$day = date('d', strtotime($from));
-		$month = date('m', strtotime($from));
-		$year = date('Y', strtotime($from));
-		$where_query .= " AND DAY(`selling_info`.`created_at`) = {$day}";
-		$where_query .= " AND MONTH(`selling_info`.`created_at`) = {$month}";
-		$where_query .= " AND YEAR(`selling_info`.`created_at`) = {$year}";
-	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
-		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
-		$where_query .= " AND selling_info.created_at >= '{$from}' AND selling_info.created_at <= '{$to}'";
-	}
-	return $where_query;
-}
+// function date_range_filter($from, $to)
+// {
+// 	$from = $from ? $from : date('Y-m-d');
+// 	$to = $to ? $to : date('Y-m-d');
+// 	$where_query = '';
+// 	if (($from && ($to == false)) || ($from == $to)) {
+// 		$day = date('d', strtotime($from));
+// 		$month = date('m', strtotime($from));
+// 		$year = date('Y', strtotime($from));
+// 		$where_query .= " AND DAY(`selling_info`.`created_at`) = {$day}";
+// 		$where_query .= " AND MONTH(`selling_info`.`created_at`) = {$month}";
+// 		$where_query .= " AND YEAR(`selling_info`.`created_at`) = {$year}";
+// 	} else {
+// 		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+// 		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
+// 		$where_query .= " AND selling_info.created_at >= '{$from}' AND selling_info.created_at <= '{$to}'";
+// 	}
+// 	return $where_query;
+// }
 
-function date_range_sell_log_filter($from, $to)
-{
-	$from = $from ? $from : date('Y-m-d');
-	$to = $to ? $to : date('Y-m-d');
-	$where_query = '';
-	if (($from && ($to == false)) || ($from == $to)) {
-		$day = date('d', strtotime($from));
-		$month = date('m', strtotime($from));
-		$year = date('Y', strtotime($from));
-		$where_query .= " AND DAY(`sell_logs`.`created_at`) = {$day}";
-		$where_query .= " AND MONTH(`sell_logs`.`created_at`) = {$month}";
-		$where_query .= " AND YEAR(`sell_logs`.`created_at`) = {$year}";
-	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
-		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
-		$where_query .= " AND sell_logs.created_at >= '{$from}' AND sell_logs.created_at <= '{$to}'";
-	}
-	return $where_query;
-}
+// function date_range_sell_log_filter($from, $to)
+// {
+// 	$from = $from ? $from : date('Y-m-d');
+// 	$to = $to ? $to : date('Y-m-d');
+// 	$where_query = '';
+// 	if (($from && ($to == false)) || ($from == $to)) {
+// 		$day = date('d', strtotime($from));
+// 		$month = date('m', strtotime($from));
+// 		$year = date('Y', strtotime($from));
+// 		$where_query .= " AND DAY(`sell_logs`.`created_at`) = {$day}";
+// 		$where_query .= " AND MONTH(`sell_logs`.`created_at`) = {$month}";
+// 		$where_query .= " AND YEAR(`sell_logs`.`created_at`) = {$year}";
+// 	} else {
+// 		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+// 		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
+// 		$where_query .= " AND sell_logs.created_at >= '{$from}' AND sell_logs.created_at <= '{$to}'";
+// 	}
+// 	return $where_query;
+// }
 
-function date_range_selling_return_filter($from, $to)
-{
-	$from = $from ? $from : date('Y-m-d');
-	$to = $to ? $to : date('Y-m-d');
-	$where_query = '';
-	if (($from && ($to == false)) || ($from == $to)) {
-		$day = date('d', strtotime($from));
-		$month = date('m', strtotime($from));
-		$year = date('Y', strtotime($from));
-		$where_query .= " AND DAY(`created_at`) = {$day}";
-		$where_query .= " AND MONTH(`created_at`) = {$month}";
-		$where_query .= " AND YEAR(`created_at`) = {$year}";
-	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
-		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
-		$where_query .= " AND created_at >= '{$from}' AND created_at <= '{$to}'";
-	}
-	return $where_query;
-}
+// function date_range_selling_return_filter($from, $to)
+// {
+// 	$from = $from ? $from : date('Y-m-d');
+// 	$to = $to ? $to : date('Y-m-d');
+// 	$where_query = '';
+// 	if (($from && ($to == false)) || ($from == $to)) {
+// 		$day = date('d', strtotime($from));
+// 		$month = date('m', strtotime($from));
+// 		$year = date('Y', strtotime($from));
+// 		$where_query .= " AND DAY(`created_at`) = {$day}";
+// 		$where_query .= " AND MONTH(`created_at`) = {$month}";
+// 		$where_query .= " AND YEAR(`created_at`) = {$year}";
+// 	} else {
+// 		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+// 		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
+// 		$where_query .= " AND created_at >= '{$from}' AND created_at <= '{$to}'";
+// 	}
+// 	return $where_query;
+// }
 
-function date_range_sell_hold_filter($from, $to)
-{
-	$from = $from ? $from : date('Y-m-d');
-	$to = $to ? $to : date('Y-m-d');
-	$where_query = '';
-	if (($from && ($to == false)) || ($from == $to)) {
-		$day = date('d', strtotime($from));
-		$month = date('m', strtotime($from));
-		$year = date('Y', strtotime($from));
-		$where_query .= " AND DAY(`created_at`) = {$day}";
-		$where_query .= " AND MONTH(`created_at`) = {$month}";
-		$where_query .= " AND YEAR(`created_at`) = {$year}";
-	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
-		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
-		$where_query .= " AND created_at >= '{$from}' AND created_at <= '{$to}'";
-	}
-	return $where_query;
-}
+// function date_range_sell_hold_filter($from, $to)
+// {
+// 	$from = $from ? $from : date('Y-m-d');
+// 	$to = $to ? $to : date('Y-m-d');
+// 	$where_query = '';
+// 	if (($from && ($to == false)) || ($from == $to)) {
+// 		$day = date('d', strtotime($from));
+// 		$month = date('m', strtotime($from));
+// 		$year = date('Y', strtotime($from));
+// 		$where_query .= " AND DAY(`created_at`) = {$day}";
+// 		$where_query .= " AND MONTH(`created_at`) = {$month}";
+// 		$where_query .= " AND YEAR(`created_at`) = {$year}";
+// 	} else {
+// 		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+// 		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
+// 		$where_query .= " AND created_at >= '{$from}' AND created_at <= '{$to}'";
+// 	}
+// 	return $where_query;
+// }
 
 
 function date_range_accounting_filter($from, $to)
@@ -693,25 +693,7 @@ function date_range_accounting_filter($from, $to)
 	return $where_query;
 }
 
-function date_range_sell_payments_filter($from, $to)
-{
-	$from = $from ? $from : date('Y-m-d');
-	$to = $to ? $to : date('Y-m-d');
-	$where_query = '';
-	if (($from && ($to == false)) || ($from == $to)) {
-		$day = date('d', strtotime($from));
-		$month = date('m', strtotime($from));
-		$year = date('Y', strtotime($from));
-		$where_query .= " AND DAY(`payments`.`created_at`) = {$day}";
-		$where_query .= " AND MONTH(`payments`.`created_at`) = {$month}";
-		$where_query .= " AND YEAR(`payments`.`created_at`) = {$year}";
-	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
-		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
-		$where_query .= " AND payments.created_at >= '{$from}' AND payments.created_at <= '{$to}'";
-	}
-	return $where_query;
-}
+
 function date_range_expense_filter($from, $to)
 {
 	$from = $from ? $from : date('Y-m-d');
@@ -732,50 +714,8 @@ function date_range_expense_filter($from, $to)
 	return $where_query;
 }
 
-function date_range_sell_payments_reverse_filter($from, $to)
-{
-	// $from = $from ? $from : date('Y-m-d');
-	// $from = date('Y-m-d H:i:s', strtotime($from.' '. '00:00:00')); 
-	// $where_query = " AND payments.created_at < '{$from}'";
-	// return $where_query;
 
-	$from = $from ? $from : date('Y-m-d');
-	$to = $to ? $to : date('Y-m-d');
-	$where_query = '';
-	if (($from && ($to == false)) || ($from == $to)) {
-		$day = date('d', strtotime($from));
-		$month = date('m', strtotime($from));
-		$year = date('Y', strtotime($from));
-		$where_query .= " AND DAY(`payments`.`created_at`) = {$day}";
-		$where_query .= " AND MONTH(`payments`.`created_at`) = {$month}";
-		$where_query .= " AND YEAR(`payments`.`created_at`) = {$year}";
-	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
-		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
-		$where_query .= " AND payments.created_at >= '{$from}' AND payments.created_at <= '{$to}'";
-	}
-	return $where_query;
-}
 
-function date_range_quotation_filter($from, $to)
-{
-	$from = $from ? $from : date('Y-m-d');
-	$to = $to ? $to : date('Y-m-d');
-	$where_query = '';
-	if (($from && ($to == false)) || ($from == $to)) {
-		$day = date('d', strtotime($from));
-		$month = date('m', strtotime($from));
-		$year = date('Y', strtotime($from));
-		$where_query .= " AND DAY(`quotation_info`.`created_at`) = {$day}";
-		$where_query .= " AND MONTH(`quotation_info`.`created_at`) = {$month}";
-		$where_query .= " AND YEAR(`quotation_info`.`created_at`) = {$year}";
-	} else {
-		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
-		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
-		$where_query .= " AND quotation_info.created_at >= '{$from}' AND quotation_info.created_at <= '{$to}'";
-	}
-	return $where_query;
-}
 
 function unique_transaction_ref_no($type = 'deposit')
 

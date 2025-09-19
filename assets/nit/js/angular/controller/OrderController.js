@@ -11,6 +11,8 @@ angularApp.controller("OrderController", [
             }
         }
         var isdeleted = window.getParameterByName('isdeleted');
+        var from = window.getParameterByName('from');
+        var to = window.getParameterByName('to');
         dt.DataTable({
             processing: true,
             responsive: true,
@@ -21,8 +23,9 @@ angularApp.controller("OrderController", [
             dom: '<"row mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 text-end"f>>rt<"row mt-3"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6 text-end"p>>',
 
             columnDefs: [
-                { targets: [5, 6, 7, 8], orderable: false },
-                { className: "text-center", targets: [0, 1, 3, 4, 5, 6, 7, 8] },
+                { targets: [4, 5, 6, 11, 12, 13, 14], orderable: false },
+                { className: "text-center", targets: [0, 1, 3, 4, 11, 12, 13, 14] },
+                { className: "pl-3", targets: [5, 6, 7, 8, 9] },
                 { visible: false, targets: hideColumsArray },
             ],
             aLengthMenu: [
@@ -32,7 +35,7 @@ angularApp.controller("OrderController", [
             ajax: {
                 url: "../_inc/_order.php",
                 type: "GET",
-                data: { action_type: "GET_TABLE_DATA", isdeleted: isdeleted },
+                data: { action_type: "GET_TABLE_DATA", isdeleted: isdeleted , from: from, to: to},
                 dataSrc: "data"
             },
             aoColumns: [

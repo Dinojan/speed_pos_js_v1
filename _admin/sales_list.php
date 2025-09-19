@@ -3,18 +3,87 @@
 ob_start();
 include realpath(__DIR__ . '/../') . '/_init.php';
 if (!is_loggedin()) {
-    redirect(root_url() . '/index.php?redirect_to=' . url());
+  redirect(root_url() . '/index.php?redirect_to=' . url());
 }
 $document->setTitle(trans('title_sales_list'));
 $document->setController('SalesListController');
 include('src/_top.php');
 ?>
 
-  <!-- Control Sidebar -->
-    <?php include('src/_control_sidebar.php'); ?>
-    <!-- /.control-sidebar -->
-    <!-- Main Footer -->
-    <?php // include('src/_footer.php'); ?>
+<!-- Control Sidebar -->
+<?php include('src/_control_sidebar.php'); ?>
+<!-- /.control-sidebar -->
+<!-- Main Footer -->
+<?php // include('src/_footer.php'); 
+?>
+
+
+<div class="card card-outline card-primary">
+  <div class="card-header">
+    <h3 class="card-title">
+      <?php echo trans('text_sales_list'); ?>
+    </h3>
+    <div class="card-tools">
+
+    </div>
+  </div>
+  <div class="card-body">
+    <?php
+    $hide_colums = "";
+    if (user_group_id() != 1) {
+      if (!has_permission('access', 'read_order_invoice')) {
+        $hide_colums .= "8,";
+      }
+      if (!has_permission('access', 'order_payment')) {
+        $hide_colums .= "9,";
+      }
+    }
+    ?>
+    <div class="table-responsive">
+      <table id="sales-list" class="table table-sm table-bordered table-striped">
+        <thead class="bg-primary">
+          <tr>
+            <th><?php echo trans('label_#'); ?></th>
+            <th><?php echo trans('label_date'); ?></th>
+            <th><?php echo trans('label_invoice_no'); ?></th>
+            <th><?php echo trans('label_bill_/_ref_no'); ?></th>
+            <th><?php echo trans('label_customer'); ?></th>
+            <th><?php echo trans('label_total'); ?></th>
+            <th><?php echo trans('label_discount'); ?></th>
+            <th><?php echo trans('label_final_amount'); ?></th>
+            <th><?php echo trans('label_total_paid_/_advance'); ?></th>
+            <th><?php echo trans('label_outstanding'); ?></th>
+            <th><?php echo trans('label_payment_method'); ?></th>
+            <th><?php echo trans('label_biller'); ?></th>
+            <th><?php echo trans('label_pay'); ?></th>
+            <th><?php echo trans('label_view'); ?></th>
+            <th><?php echo trans('label_delete'); ?></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot class="bg-primary">
+          <tr>
+            <th><?php echo trans('label_#'); ?></th>
+            <th><?php echo trans('label_date'); ?></th>
+            <th><?php echo trans('label_invoice_no'); ?></th>
+            <th><?php echo trans('label_bill_/_ref_no'); ?></th>
+            <th><?php echo trans('label_customer'); ?></th>
+            <th><?php echo trans('label_total'); ?></th>
+            <th><?php echo trans('label_discount'); ?></th>
+            <th><?php echo trans('label_final_amount'); ?></th>
+            <th><?php echo trans('label_total_paid_/_advance'); ?></th>
+            <th><?php echo trans('label_outstanding'); ?></th>
+            <th><?php echo trans('label_payment_method'); ?></th>
+            <th><?php echo trans('label_biller'); ?></th>
+            <th><?php echo trans('label_pay'); ?></th>
+            <th><?php echo trans('label_view'); ?></th>
+            <th><?php echo trans('label_delete'); ?></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
 </div>
 <?php
 include('src/_end.php');

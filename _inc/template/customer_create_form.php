@@ -8,7 +8,7 @@
     </div>
     <div class="form-group">
         <label for="c_mobile"><?= trans('label_mobile'); ?> <i class="text-danger">*</i></label>
-        <input type="text" class="form-control" id="c_mobile" name="c_mobile" placeholder="Mobile" required>
+        <input type="text" class="form-control" id="c_mobile" name="c_mobile" placeholder="Mobile" maxlength="9" required>
     </div>
      <div class="form-group">
         <label for="c_address"><?= trans('label_address'); ?> <i class="text-danger">*</i></label>
