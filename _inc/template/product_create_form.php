@@ -24,7 +24,6 @@
         <select class="form-control select2" id="c_id" name="c_id" required>
             <option value="">-- Select Category --</option>
             <?= set_category_tree_to_select(get_category_tree()); ?>
-
         </select>
     </div>
 
@@ -47,10 +46,17 @@
         <input type="text" class="form-control " id="cost" name="cost" placeholder="Cost price" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value<0){this.value='1';}" onclick="return select()" value="0.00" required="">
 
     </div>
-    <div class="form-group">
+    <div class="form-group d-none">
         <label for="qty"><?= trans('label_quantity'); ?> <i class="text-danger">*</i></label>
         <input type="text" class="form-control " id="qty" name="qty" placeholder="qty" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value<0){this.value='1';}" onclick="return select()" value="1" required="">
 
+    </div>
+    <div class="form-group">
+        <label for="sts"><?php echo trans("label_status") ?><i class="text-danger">*</i></label>
+        <select name="sts" id="sts" class="form-control ">
+            <option value="0"><?php echo trans("label_for_sale")?></option>
+            <option value="1"><?php echo trans("label_not_for_sale")?></option>
+        </select>
     </div>
 
     <div class="row mt-3">

@@ -136,7 +136,7 @@ $query_string = str_replace(array('&'), '?', $query_string);
             <div class="row justify-content-between px-2">
               <?php include("../_inc/template/partials/apply_filter.php"); ?>
               <span></span>
-              <?php if (in_array(current_nav(), array('order', 'customer_profile', 'customer', 'sales_list'))): ?>
+              <?php if (in_array(current_nav(), array('order', 'customer_profile', 'customer', 'sales_list', 'orders_reports', 'due_reports', 'in_stock_summary'))): ?>
                 <?php if (user_group_id() == 1 || has_permission('access', 'filtering')): ?>
 
                   <!-- Date filter -->

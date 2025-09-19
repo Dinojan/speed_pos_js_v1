@@ -75,98 +75,98 @@ angularApp.controller("SalesListController", [
             }
         });
 
-        $(document).delegate("#edit-customer", "click", function (e) {
-            e.stopPropagation();
-            e.preventDefault();
-            var table = dt.DataTable();
-            var $row = $(this).closest("tr");
-            var d = table.row($row).data();
-            if (!d) {
-                d = table.row($row.prev()).data();
-            }
-            if (d) {
-                $scope.customer = d;
-                CustomerEditModal($scope);
-            }
-        });
+        // $(document).delegate("#edit-customer", "click", function (e) {
+        //     e.stopPropagation();
+        //     e.preventDefault();
+        //     var table = dt.DataTable();
+        //     var $row = $(this).closest("tr");
+        //     var d = table.row($row).data();
+        //     if (!d) {
+        //         d = table.row($row.prev()).data();
+        //     }
+        //     if (d) {
+        //         $scope.customer = d;
+        //         CustomerEditModal($scope);
+        //     }
+        // });
 
-        $(document).delegate("#delete-customer", "click", function (e) {
-            e.stopPropagation();
-            e.preventDefault();
+        // $(document).delegate("#delete-customer", "click", function (e) {
+        //     e.stopPropagation();
+        //     e.preventDefault();
 
-            var table = dt.DataTable();
-            var $row = $(this).closest("tr");
-            var d = table.row($row).data();
-            if (!d) {
-                d = table.row($row.prev()).data();
-            }
+        //     var table = dt.DataTable();
+        //     var $row = $(this).closest("tr");
+        //     var d = table.row($row).data();
+        //     if (!d) {
+        //         d = table.row($row.prev()).data();
+        //     }
 
-            if (d) {
-                $scope.Customer = d;
+        //     if (d) {
+        //         $scope.Customer = d;
 
-                var text;
-                var btnTxt;
-                //console.log($scope.Customer.status );
-                if ($scope.Customer.status == 2) {
-                    text = "You need to restore this customer!";
-                    btnTxt = "Yes, Restore it!";
-                } else {
-                    text = "You won't be able to revert this!";
-                    btnTxt = "Yes, Delete it!";
-                }
+        //         var text;
+        //         var btnTxt;
+        //         //console.log($scope.Customer.status );
+        //         if ($scope.Customer.status == 2) {
+        //             text = "You need to restore this customer!";
+        //             btnTxt = "Yes, Restore it!";
+        //         } else {
+        //             text = "You won't be able to revert this!";
+        //             btnTxt = "Yes, Delete it!";
+        //         }
 
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: text,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: btnTxt,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        var formData = new FormData();
-                        formData.append('action_type', 'DELETE');
-                        formData.append('id', $scope.Customer.id);
+        //         Swal.fire({
+        //             title: "Are you sure?",
+        //             text: text,
+        //             icon: "warning",
+        //             showCancelButton: true,
+        //             confirmButtonColor: "#3085d6",
+        //             cancelButtonColor: "#d33",
+        //             confirmButtonText: btnTxt,
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 var formData = new FormData();
+        //                 formData.append('action_type', 'DELETE');
+        //                 formData.append('id', $scope.Customer.id);
 
-                        $http({
-                            url: window.baseUrl + "/_inc/_customer.php",
-                            method: "POST",
-                            data: formData,
-                            transformRequest: angular.identity,
-                            headers: { 'Content-Type': undefined }
-                        }).then(
-                            function (response) {
-                                var alertMsg = response.data.msg;
-                                Swal.fire({
-                                    title: ($scope.Customer.status == 2) ? "Restored!" : "Deleted!",
-                                    text: alertMsg,
-                                    icon: "success"
-                                });
-                                $('.table').DataTable().ajax.reload(null, false);
-                            },
-                            function (response) {
-                                var alertMsg = "";
-                                angular.forEach(response.data, function (value) {
-                                    alertMsg += value + " ";
-                                });
-                                Swal.fire({
-                                    title: "Oops!",
-                                    text: alertMsg,
-                                    icon: "error"
-                                });
-                            }
-                        );
-                    }
-                });
-            }
-        });
+        //                 $http({
+        //                     url: window.baseUrl + "/_inc/_customer.php",
+        //                     method: "POST",
+        //                     data: formData,
+        //                     transformRequest: angular.identity,
+        //                     headers: { 'Content-Type': undefined }
+        //                 }).then(
+        //                     function (response) {
+        //                         var alertMsg = response.data.msg;
+        //                         Swal.fire({
+        //                             title: ($scope.Customer.status == 2) ? "Restored!" : "Deleted!",
+        //                             text: alertMsg,
+        //                             icon: "success"
+        //                         });
+        //                         $('.table').DataTable().ajax.reload(null, false);
+        //                     },
+        //                     function (response) {
+        //                         var alertMsg = "";
+        //                         angular.forEach(response.data, function (value) {
+        //                             alertMsg += value + " ";
+        //                         });
+        //                         Swal.fire({
+        //                             title: "Oops!",
+        //                             text: alertMsg,
+        //                             icon: "error"
+        //                         });
+        //                     }
+        //                 );
+        //             }
+        //         });
+        //     }
+        // });
 
 
 
-        // Optional: method to open modal
-        $scope.openAddCustomerModal = function () {
-            CustomerAddModal($scope);
-        };
+        // // Optional: method to open modal
+        // $scope.openAddCustomerModal = function () {
+        //     CustomerAddModal($scope);
+        // };
     }
 ]);

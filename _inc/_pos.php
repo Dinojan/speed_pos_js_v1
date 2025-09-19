@@ -352,10 +352,7 @@ if (isset($_GET['action_type']) && $_GET['action_type'] == 'GET_POS_ORDERS') {
             $row["row_index"] = $i;
             $row["biller"] = get_the_user($row["created_by"], 'username');
 
-
-
             $row['customer'] = $row['cus_name'] . " (" . format_mobile($row['cus_mobile']) . ")";
-
 
             //if ($row['id'] != 1) {
             $row['view'] = '<button id="edit-customer" class="btn btn-outline-primary btn-sm edit-btn"  title="Edit"><i class="fas fa-eye"></i></button>';

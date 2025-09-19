@@ -3,24 +3,35 @@ class ModelProduct extends Model
 {
 	public function addproduct($data)
 	{
-		$statement = $this->db->prepare("INSERT INTO `product` ( `p_code`, `p_name`, `material`, `c_id`, `s_id`, `wgt`, `cost`,  `qty`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-		$statement->execute(array($data['p_code'], $data['p_name'], $data['material'], $data['c_id'],  $data['s_id'],  $data['wgt'],  $data['cost'],  $data['qty']));
+		$statement = $this->db->prepare("INSERT INTO `product` ( `p_code`, `p_name`, `material`, `c_id`, `s_id`, `wgt`, `cost`, `status`,  `qty`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		$statement->execute(array($data['p_code'], $data['p_name'], $data['material'], $data['c_id'],  $data['s_id'],  $data['wgt'],  $data['cost'], $data['sts'],  $data['qty']));
 
 		return $this->db->lastInsertId();
 	}
 
 	public function editproduct($id, $data)
 	{
-		$statement = $this->db->prepare("UPDATE `product` SET p_code = ?,  `p_name` =?, `material` = ?, `c_id` =?, s_id = ?, `wgt` =?, `cost` =?, `qty` =?  WHERE `id` = ?");
-		$statement->execute(array($data['p_code'],  $data['p_name'], $data['material'],  $data['c_id'],  $data['s_id'],  $data['wgt'],  $data['cost'],  $data['qty'], $id));
+		$statement = $this->db->prepare("UPDATE `product` SET p_code = ?,  `p_name` =?, `material` = ?, `c_id` =?, s_id = ?, `wgt` =?, `cost` =?, `status` =?, `qty` =?  WHERE `id` = ?");
+		$statement->execute(array($data['p_code'],  $data['p_name'], $data['material'],  $data['c_id'],  $data['s_id'],  $data['wgt'],  $data['cost'], $data['sts'],  $data['qty'], $id));
 
 		return $id;
 	}
 
 	public function updateProductStatus($id, $sts)
 	{
-		$statement = $this->db->prepare("UPDATE product SET `status` = ? WHERE id = ?");
-		$statement->execute([$sts, $id]);
+		$statement = $this->db->prepare('SELECT status, prv_status FROM product WHERE id = ?');
+		$statement->execute(array($id));
+		$product = $statement->fetch(PDO::FETCH_ASSOC);
+
+		$new_status = 0;
+		if ($product['status'] == 2) {
+			$new_status = $product['prv_status'];
+		} else {
+			$new_status = $sts;
+		}
+
+		$statement = $this->db->prepare("UPDATE product SET `status` = ?, prv_status = ? WHERE id = ?");
+		$statement->execute([$new_status, $product['status'], $id]);
 		return $id;
 	}
 
@@ -99,4 +110,29 @@ class ModelProduct extends Model
 
 		return $products;
 	}
+
+	// public function getProductBySearch($name_or_barcode)
+	// {
+	// 	$products = [];
+
+	// 	// Wildcard search
+	// 	$searchTerm = "%" . $name_or_barcode . "%";
+
+	// 	$sql = "SELECT * FROM product WHERE (p_name LIKE ? OR p_code LIKE ?)";
+
+	// 	$stmt = $this->db->prepare($sql);
+	// 	$stmt->execute([$searchTerm, $searchTerm]);
+
+	// 	$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	// 	return $products;
+	// }
+
+	// public function addCheckedJewels($data)
+	// {
+	// 	$statement = $this->db->prepare("INSERT INTO `stock_checking`(`p_id`, `p_code`, `p_name`, `p_status`, `checked_count`, `checked_by`) VALUES (?, ?, ?, ?, ?, ?)");
+	// 	$statement->execute([$data['p_id'], $data['p_code'], $data['p_name'], $data['p_status'], $data['che_count'], $data['che_by']]);
+
+	// 	return $this->db->lastInsertId();
+	// }
 }

@@ -403,7 +403,7 @@ angularApp.controller("PosController", [
                 transformRequest: angular.identity
             }).then(
                 function (response) {
-                    Toast.fire({ icon: 'success', title: '"Order has been placed!', text: response.data.msg });
+                    Toast.fire({ icon: 'success', title: 'Order has been placed!', text: response.data.msg });
 
                     $scope.cart = [];
                     $scope.payment = {

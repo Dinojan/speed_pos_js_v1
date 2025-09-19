@@ -99,8 +99,7 @@
                 </div>
                 <div class="text-danger text-center"></div>
             </div>
-            <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
-            <div class="p-0">
+            <div class="p-0 d-none">
                 <p class="my-2 text-md font-weight-bold"><?php echo trans("label_paid_by_advance_invoice") ?></p>
                 <div class="d-flex flex-row position-relative">
                     <div class="col-8 col-md-10 pl-0">
@@ -110,6 +109,7 @@
                 </div>
                 <div class="text-danger text-center"></div>
             </div>
+            <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
         </div>
     </div>
 </form>
