@@ -11,8 +11,8 @@ angularApp.controller("OrderController", [
             }
         }
         var isdeleted = window.getParameterByName('isdeleted');
-        var from = window.getParameterByName('from');
-        var to = window.getParameterByName('to');
+        $scope.from = window.getParameterByName('from');
+        $scope.to = window.getParameterByName('to');
         dt.DataTable({
             processing: true,
             responsive: true,
@@ -35,7 +35,7 @@ angularApp.controller("OrderController", [
             ajax: {
                 url: "../_inc/_order.php",
                 type: "GET",
-                data: { action_type: "GET_TABLE_DATA", isdeleted: isdeleted , from: from, to: to},
+                data: { action_type: "GET_TABLE_DATA", isdeleted: isdeleted , from: $scope.from, to: $scope.to},
                 dataSrc: "data"
             },
             aoColumns: [
@@ -113,7 +113,7 @@ angularApp.controller("OrderController", [
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, Delete it!",
+                    confirmButtonText: $scope.order.order_status === 2 ? "Yes, Restore it!" : "Yes, Delete it!",
                 }).then((result) => {
                     if (result.isConfirmed) {
                         var formData = new FormData();
@@ -130,7 +130,7 @@ angularApp.controller("OrderController", [
                             function (response) {
                                 var alertMsg = response.data.msg;
                                 Swal.fire({
-                                    title: "Deleted!",
+                                    title: $scope.order.order_status === 2 ? "Restored!" : "Deleted!",
                                     text: alertMsg,
                                     icon: "success"
                                 });

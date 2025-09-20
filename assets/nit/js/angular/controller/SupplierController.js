@@ -1,6 +1,6 @@
 angularApp.controller("SupplierController", [
-    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce", "SupplierAddModal", "SupplierEditModal", "SupplierDeleteModal",
-    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, SupplierAddModal, SupplierEditModal, SupplierDeleteModal) {
+    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce", "SupplierAddModal", "SupplierEditModal", "SupplierDeleteModal", "SupplierPaymentModel",
+    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, SupplierAddModal, SupplierEditModal, SupplierDeleteModal, SupplierPaymentModel) {
         var dt = $("#SupplierTable");
         var i;
         var hideColums = dt.data("hide-colums").split(",");
@@ -20,8 +20,8 @@ angularApp.controller("SupplierController", [
             dom: '<"row mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 text-end"f>>rt<"row mt-3"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6 text-end"p>>',
 
             columnDefs: [
-                { targets: [3, 4, 5], orderable: false },
-                { className: "text-center", targets: [0, 2, 3, 4, 5] },
+                { targets: [6, 7, 8], orderable: false },
+                { className: "text-center", targets: [0, 2, 3, 4, 6, 7, 8] },
                 { visible: false, targets: hideColumsArray },
             ],
             aLengthMenu: [
@@ -38,6 +38,9 @@ angularApp.controller("SupplierController", [
                 { data: "row_index" },
                 { data: "s_name" },
                 { data: "s_mobile" },
+                { data: "total_products" },
+                { data: "total_cost" },
+                { data: "total_paid" },
                 { data: "view" },
                 { data: "edit" },
                 { data: "delete" }
@@ -66,18 +69,18 @@ angularApp.controller("SupplierController", [
                 SupplierEditModal($scope);
             }
         });
-          $(document).delegate("#delete-supplier", "click", function (e) {
+        $(document).delegate("#delete-supplier", "click", function (e) {
             e.stopPropagation();
             e.preventDefault();
-           var table = dt.DataTable();
+            var table = dt.DataTable();
             var $row = $(this).closest("tr");
             var d = table.row($row).data();
             if (!d) {
                 d = table.row($row.prev()).data();
             }
             if (d) {
-            $scope.supplier = d;
-            SupplierDeleteModal($scope);
+                $scope.supplier = d;
+                SupplierDeleteModal($scope);
             }
         });
 
@@ -148,5 +151,11 @@ angularApp.controller("SupplierController", [
         $scope.openAddSupplierModal = function () {
             SupplierAddModal($scope);
         };
+
+        $(document).off("click", "#pay-supplier").on("click", "#pay-supplier", function (e) {
+            e.preventDefault();
+            var id = $(this).data("id");
+            SupplierPaymentModel($scope, id);
+        });
     }
 ]);

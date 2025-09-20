@@ -9,10 +9,23 @@ class ModelOrder extends Model
         $id =  $this->db->lastInsertId();
 
         $due = $data['total_amt'] - $data['advance_amt'];
-        $statement = $this->db->prepare("UPDATE `customer` SET `total_due` = total_due + ?  `id`= ?");
+        $statement = $this->db->prepare("UPDATE `customer` SET `total_due` = total_due + ? WHERE `id`= ?");
         $statement->execute(array($due, $cid));
 
-        $paid_amount = $data['advance'];
+        $statement = db()->prepare("
+            INSERT INTO `payments` (`order_id`, `order_no`, `c_id`, `amount`, `note`, `created_by`) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $statement->execute(array(
+            $id,
+            $ref,
+            $cid,
+            $data['advance_amt'],
+            "$ref order advance",
+            user_id()
+        ));
+
+        $paid_amount = $data['advance_amt'];
         if ($account_id = 1 && $paid_amount > 0) {
             $ref_no = unique_transaction_ref_no();
 

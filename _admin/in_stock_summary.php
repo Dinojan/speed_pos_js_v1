@@ -23,6 +23,17 @@ include('src/_top.php');
   </div>
   <div class="card-tools"></div>
   <div class="card-body">
+    <?php
+    $hide_colums = "";
+    if (user_group_id() != 1) {
+      if (!has_permission('access', 'read_order_invoice')) {
+        $hide_colums .= "8,";
+      }
+      if (!has_permission('access', 'order_payment')) {
+        $hide_colums .= "9,";
+      }
+    }
+    ?>
     <div class="table-responsive">
       <table id="checked-jewels-list" class="table table-sm table-bordered table-striped">
         <thead>
