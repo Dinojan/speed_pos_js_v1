@@ -111,28 +111,15 @@ class ModelProduct extends Model
 		return $products;
 	}
 
-	// public function getProductBySearch($name_or_barcode)
-	// {
-	// 	$products = [];
+	// public function getStockCheckingHistory($product_id) {
+	// 	$stmt = $this->db->prepare("SELECT * FROM product WHERE id = ?");
+	// 	$stmt->execute([$product_id]);
+	// 	$stock = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	// 	// Wildcard search
-	// 	$searchTerm = "%" . $name_or_barcode . "%";
+	// 	$stmt = $this->db->prepare("SELECT created_at, checked_by FROM stock_checking WHERE p_id = ? ORDER BY created_at DESC");
+	// 	$stmt->execute([$product_id]);
+	// 	$history = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	// 	$sql = "SELECT * FROM product WHERE (p_name LIKE ? OR p_code LIKE ?)";
-
-	// 	$stmt = $this->db->prepare($sql);
-	// 	$stmt->execute([$searchTerm, $searchTerm]);
-
-	// 	$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-	// 	return $products;
-	// }
-
-	// public function addCheckedJewels($data)
-	// {
-	// 	$statement = $this->db->prepare("INSERT INTO `stock_checking`(`p_id`, `p_code`, `p_name`, `p_status`, `checked_count`, `checked_by`) VALUES (?, ?, ?, ?, ?, ?)");
-	// 	$statement->execute([$data['p_id'], $data['p_code'], $data['p_name'], $data['p_status'], $data['che_count'], $data['che_by']]);
-
-	// 	return $this->db->lastInsertId();
+	// 	return $stock + 
 	// }
 }

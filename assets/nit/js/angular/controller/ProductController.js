@@ -1,6 +1,6 @@
 angularApp.controller("ProductController", [
-    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce", "ProductAddModal", "ProductEditModal",
-    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, ProductAddModal,ProductEditModal ) {//
+    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce", "ProductAddModal", "ProductEditModal", "ProductDetailsModel",
+    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, ProductAddModal, ProductEditModal, ProductDetailsModel) {//
         var dt = $("#ProductTable");
         var i;
         var hideColums = dt.data("hide-colums").split(",");
@@ -22,7 +22,7 @@ angularApp.controller("ProductController", [
 
             columnDefs: [
                 { targets: [8, 9, 10], orderable: false },
-                { className: "text-center", targets: [0, 1, 3, 4, 5, 6, 7, 8 ,9, 10] },
+                { className: "text-center", targets: [0, 1, 3, 4, 5, 6, 7, 8, 9, 10] },
                 { visible: false, targets: hideColumsArray },
             ],
             aLengthMenu: [
@@ -32,7 +32,7 @@ angularApp.controller("ProductController", [
             ajax: {
                 url: "../_inc/_product.php",
                 type: "GET",
-                data: { action_type: "GET_TABLE_DATA",isdeleted:isdeleted },
+                data: { action_type: "GET_TABLE_DATA", isdeleted: isdeleted },
                 dataSrc: "data"
             },
             aoColumns: [
@@ -89,10 +89,10 @@ angularApp.controller("ProductController", [
                 var text;
                 var btnTxt;
                 //console.log($scope.Product.status );
-                if($scope.Product.status == 2){
+                if ($scope.Product.status == 2) {
                     text = "You need to restore this product!";
                     btnTxt = "Yes, Restore it!";
-                } else{
+                } else {
                     text = "You won't be able to revert this!";
                     btnTxt = "Yes, Delete it!";
                 }
@@ -124,7 +124,7 @@ angularApp.controller("ProductController", [
                             function (response) {
                                 var alertMsg = response.data.msg;
                                 Swal.fire({
-                                    title:($scope.Product.status == 2)? "Restored!": "Deleted!",
+                                    title: ($scope.Product.status == 2) ? "Restored!" : "Deleted!",
                                     text: alertMsg,
                                     icon: "success"
                                 });
@@ -153,5 +153,11 @@ angularApp.controller("ProductController", [
         $scope.openAddProductModal = function () {
             ProductAddModal($scope);
         };
+
+        $(document).off("click", "#view-product-details").on("click", "#view-product-details", function (e) {
+            e.preventDefault();
+            var id = $(this).data("id");
+            ProductDetailsModel($scope, id);
+        });
     }
 ]);

@@ -38,24 +38,30 @@ $document->setController('SupplierController');
                         <table id="SupplierTable"  data-hide-colums="<?php echo $hide_colums; ?>" class="table table-sm table-hover mb-0">
                             <thead class="bg-blue">
                                 <tr>
-                                    <th class="w-5">#</th>
-                                    <th class="w-50">Supplier Name</th>
-                                    <th class="w-30">Mobile</th>
-                                    <th class="w-5">View</th>
-                                    <th class="w-5">Edit</th>
-                                    <th class="w-5">Delete</th>
+                                    <th>#</th>
+                                    <th>Supplier Name</th>
+                                    <th>Mobile</th>
+                                    <th>Purchase Jewellery Count</th>
+                                    <th>Purchase Cost</th>
+                                    <th>Paid Amount</th>
+                                    <th>View</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
                             </tbody>
                             <tfoot class="bg-blue">
                                  <tr>
-                                    <th class="w-5">#</th>
-                                    <th class="w-50">Supplier Name</th>
-                                    <th class="w-30">Mobile</th>
-                                    <th class="w-5">View</th>
-                                    <th class="w-5">Edit</th>
-                                    <th class="w-5">Delete</th>
+                                    <th>#</th>
+                                    <th>Supplier Name</th>
+                                    <th>Mobile</th>
+                                    <th>Purchase Jewellery Count</th>
+                                    <th>Purchase Cost</th>
+                                    <th>Paid Amount</th>
+                                    <th>View</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
                                 </tr>
                             </tfoot>
                         </table>

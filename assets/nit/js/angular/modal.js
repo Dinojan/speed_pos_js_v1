@@ -1064,6 +1064,58 @@ angularApp.factory("ProductEditModal", [
     }
 ]);
 
+//StockCheckingModel
+angularApp.factory("ProductDetailsModel", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (API_URL, window, $, $http, $sce, $rootScope, $compile, $timeout) {
+        return function ($scope, id) {
+            const modalId = "ProductDetailsModel";
+
+            // Ensure modal can access PosController data
+            // $scope.held_orders_count = $scope.count;
+            // $scope.modalPayment = $scope.payment;
+            // $scope.modalCus = $scope.cus;
+
+            // Step 1: Load modal HTML from server
+            $http.get(window.baseUrl + `/_inc/_product.php?action_type=GET_DETAILS&product=${id}`).then(function (response) {
+                const formHtml = response.data;
+
+                // Remove existing modal if any
+                $(`#${modalId}`).remove();
+
+                // Setup modal scope variables
+                $scope.modalTitle = "Jewelry Details";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-sm";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                // Compile modal
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+
+                // Show modal after DOM ready
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+
+                    // Initialize select2 if exists
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+            });
+        };
+    }
+]);
+
 // CustomerAddModel
 angularApp.factory("CustomerAddModal", [
     "API_URL",
@@ -1878,5 +1930,146 @@ angularApp.factory("OrderHeldModel", [
             // Watch payment changes to recalc automatically
             $scope.$watch('[modalPayment.advance, modalPayment.received, modalPayment.total_discount]', $scope.calc, true);
         };
+    }
+]);
+
+//StockCheckingModel
+angularApp.factory("StockCheckingModel", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (API_URL, window, $, $http, $sce, $rootScope, $compile, $timeout) {
+        return function ($scope, id) {
+            const modalId = "StockCheckingModel";
+
+            // Ensure modal can access PosController data
+            // $scope.held_orders_count = $scope.count;
+            // $scope.modalPayment = $scope.payment;
+            // $scope.modalCus = $scope.cus;
+
+            // Step 1: Load modal HTML from server
+            $http.get(window.baseUrl + `/_inc/_product.php?action_type=CHECKED_HISTORY&product=${id}`).then(function (response) {
+                const formHtml = response.data;
+
+                // Remove existing modal if any
+                $(`#${modalId}`).remove();
+
+                // Setup modal scope variables
+                $scope.modalTitle = "Stock Checking History";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-md";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                // Compile modal
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+
+                // Show modal after DOM ready
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+
+                    // Initialize select2 if exists
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+            });
+        };
+    }
+]);
+
+
+//SupplierPaymentModel
+angularApp.factory("SupplierPaymentModel", [
+    "API_URL",
+    "window",
+    "jQuery",
+    "$http",
+    "$sce",
+    "$rootScope",
+    "$compile",
+    "$timeout",
+    function (API_URL, window, $, $http, $sce, $rootScope, $compile, $timeout) {
+        return function ($scope, id) {
+            const modalId = "SupplierPaymentModel";
+            $http({
+                url: window.baseUrl + `/_inc/_supplier.php?supplier=${id}&action_type=PAY_SUPPLIER_FORM`,
+                method: "POST",
+                data: $('#supplier-payment-form').serialize()
+            }).then(function (response) {
+                const formHtml = response.data;
+
+                // Remove existing modal if any
+                $(`#${modalId}`).remove();
+
+                // Setup modal scope variables
+                $scope.modalTitle = "Supplier Payment";
+                $scope.modalId = modalId;
+                $scope.modalSize = "modal-md";
+                $scope.modalBody = $sce.trustAsHtml(formHtml);
+
+                // Compile modal
+                const modalTemplate = bsModal($scope);
+                const modalElement = $compile(modalTemplate)($scope);
+                angular.element("body").append(modalElement);
+
+                // Show modal
+                $timeout(function () {
+                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
+                    $scope.modalInstance.show();
+
+                    // Initialize select2
+                    $('.select2').select2({
+                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    });
+                });
+            });
+
+            // Payment submit
+            $(document).off("click", "#supplier_payment_submit").on("click", "#supplier_payment_submit", function (e) {
+                e.preventDefault();
+                const paymentAmount = $('#supplier_payment').val();
+                if (!paymentAmount || paymentAmount === '') {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: "Please enter the payment amount"
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You are about to pay the supplier!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#218838",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, Pay!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $http({
+                                url: window.baseUrl + `/_inc/_supplier.php?supplier=${id}`,
+                                method: "POST",
+                                data: $('#supplier-payment-form').serialize()
+                            }).then(function (response) {
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: 'Success!',
+                                    text: response.data.msg
+                                });
+
+                                $scope.modalInstance.hide();
+                            });
+                        }
+                    });
+                }
+            });
+        }
     }
 ]);

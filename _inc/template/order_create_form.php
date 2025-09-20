@@ -5,7 +5,7 @@
         <label for="s_id"><?= trans('label_customer'); ?> <i class="text-danger">*</i></label>
         <select class="form-control select2" id="c_id" name="c_id" required>
             <option value="">-- Select Customer --</option>
-            <?php foreach (get_all_customers(1) as $cus) { ?>
+            <?php foreach (get_all_customers(0) as $cus) { ?>
                 <option value="<?= $cus['id'] ?>"><?= $cus['c_name'] ?> (<?= $cus['c_mobile'] ?>)</option>
             <?php } ?>
         </select>

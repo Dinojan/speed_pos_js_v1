@@ -78,9 +78,9 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         // validate_existance($request);
         $ref = new_ref_no();
         // check customer
-        if (!isset($request->post['c_id']) && $request->post['c_id'] != null) {
+        if (!isset($request->post['c_id']) || $request->post['c_id'] == null) {
             $statement = db()->prepare("INSERT INTO `customer` ( `c_name`, `c_mobile`, `c_address`) VALUES (?, ?, ?)");
-            $statement->execute(array($data['cus_name'], $data['cus_mobile'], $data['cus_address']));
+            $statement->execute(array($request->post['cus_name'], $request->post['cus_mobile'], $request->post['cus_address']));
             $cid = db()->lastInsertId();
         } else {
             $cid = $request->post['c_id'];
@@ -141,13 +141,78 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         }
         $id = $request->post['id'];
         $checkorder = $order_model->getorder($id);
-        if ($checkorder['order_status'] != 0) {
+        if ($checkorder['order_status'] != 0 && $checkorder['order_status'] != 2) {
             throw new Exception(trans('error_can_not_delete_this_order'));
         }
 
-        $order = $order_model->deleteorder($id);
+        $new_status = 0;
+        if ($checkorder['order_status'] == 2) {
+            $new_status = 0;
+        } else {
+            $new_status = 2;
+        }
+
+        $statement = db()->prepare("UPDATE orders SET `order_status` = ? WHERE id = ?");
+        $statement->execute([$new_status, $id]);
+
+        if ($new_status == 0) {
+            $ref = $checkorder['ref_no'];
+            $paid_amount = $checkorder['total_paid'];
+            if ($account_id = 1 && $paid_amount > 0) {
+                $ref_no = unique_transaction_ref_no();
+
+                $source_id = 1;
+                $title = 'Deposit for order restore';
+                $details = 'Customer name: ' . $checkorder['cus_name'];
+                $image = 'NULL';
+                $deposit_amount = $paid_amount;
+                $transaction_type = 'deposit';
+
+                $statement = db()->prepare("INSERT INTO `bank_transaction_info` (store_id, account_id, source_id, ref_no, invoice_id, transaction_type, title, details, image, created_by) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $statement->execute(array(store_id(), $account_id, $source_id, $ref_no, $ref, $transaction_type, $title, $details, $image, user_id()));
+                $info_id = db()->lastInsertId();
+
+                $statement = db()->prepare("INSERT INTO `bank_transaction_price` (store_id, info_id, ref_no, amount) VALUES (?, ?, ?, ?)");
+                $statement->execute(array(store_id(), $info_id, $ref_no, $deposit_amount));
+
+                $statement = db()->prepare("UPDATE `bank_account_to_store` SET `deposit` = `deposit` + {$deposit_amount} WHERE `store_id` = ? AND `account_id` = ?");
+                $statement->execute(array(store_id(), $account_id));
+
+                $statement = db()->prepare("UPDATE `bank_accounts` SET `total_deposit` = `total_deposit` + {$deposit_amount} WHERE `id` = ?");
+                $statement->execute(array($account_id));
+            }
+        } else if ($new_status == 2) {
+            $ref = $checkorder['ref_no'];
+            $paid_amount = $checkorder['total_paid'];
+            if ($account_id = 1 && $paid_amount > 0) {
+                $ref_no = unique_transaction_ref_no();
+
+                $source_id = 1;
+                $title = 'Withdral for order delete';
+                $details = 'Customer name: ' . $checkorder['cus_name'];
+                $image = 'NULL';
+                $deposit_amount = $paid_amount;
+                $transaction_type = 'withdraw';
+
+                $statement = db()->prepare("INSERT INTO `bank_transaction_info` (store_id, account_id, source_id, ref_no, invoice_id, transaction_type, title, details, image, created_by) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $statement->execute(array(store_id(), $account_id, $source_id, $ref_no, $ref, $transaction_type, $title, $details, $image, user_id()));
+                $info_id = db()->lastInsertId();
+
+                $statement = db()->prepare("INSERT INTO `bank_transaction_price` (store_id, info_id, ref_no, amount) VALUES (?, ?, ?, ?)");
+                $statement->execute(array(store_id(), $info_id, $ref_no, $deposit_amount));
+
+                $statement = db()->prepare("UPDATE `bank_account_to_store` SET `withdraw` = `withdraw` + {$deposit_amount} WHERE `store_id` = ? AND `account_id` = ?");
+                $statement->execute(array(store_id(), $account_id));
+
+                $statement = db()->prepare("UPDATE `bank_accounts` SET `total_withdraw` = `total_withdraw` + {$deposit_amount} WHERE `id` = ?");
+                $statement->execute(array($account_id));
+            }
+        }
+
+        // $order_model->updateorder($id, $request->post);
+        // $order = $order_model->deleteorder($id);
         header('Content-Type: application/json');
-        echo json_encode(array('msg' => trans('text_delete_success'), 'id' => $id));
+        echo json_encode(array('msg' => trans($new_status == 2 ? "text_delete_success!" : "text_restore_success!"), 'id' => $id));
         exit();
     } catch (Exception $e) {
 
@@ -196,11 +261,11 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
 
 
 
-        // if(isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2){
-        //     $where .= " AND status = 2";
-        // }else {
-        //      $where .= " AND status != 2";
-        // }
+        if (isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2) {
+            $where .= " AND order_status = 2";
+        } else {
+            $where .= " AND order_status != 2";
+        }
 
         $statement = db()->prepare("SELECT * FROM orders $where");
         $statement->execute();
@@ -233,10 +298,13 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             // } else {
             //     $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
             // }
-            // if ($row['status'] == 2) {
-            //  $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
-            //  } else {
-            $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+            if ($row['order_status'] == 2) {
+                $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
+            } else if ($row['order_status'] == 0) {
+                $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+            } else {
+                $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete" disabled><i class="fas fa-trash-alt"></i></button>';
+            }
 
             //  }
             //     $row['delete'] = '<button class="btn btn-outline-danger btn-sm delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';

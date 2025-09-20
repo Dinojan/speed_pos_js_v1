@@ -57,7 +57,7 @@
                 <!-- Inventory menu -->
                 <?php if (user_group_id() == 1 || has_permission('access', 'read_category') || has_permission('access', 'read_supplier') || has_permission('access', 'read_product')): ?>
                     <li
-                        class="nav-item  <?php echo current_nav() == 'category' || current_nav() == 'product' || current_nav() == 'supplier' || current_nav() == 'supplier_profile' ? ' menu-open' : null; ?>">
+                        class="nav-item  <?php echo current_nav() == 'category' || current_nav() == 'product' || current_nav() == 'supplier' || current_nav() == 'supplier' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-boxes text-sm"></i>
                             <p><?= trans('menu_inventory') ?>
@@ -80,6 +80,7 @@
                                 <li class="nav-item ">
                                     <a href="supplier.php"
                                         class="nav-link <?php echo current_nav() == 'supplier' || current_nav() == 'supplier_profile' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-truck-loading text-sm"></i>
                                         <p><?= trans('menu_supplier') ?></p>
                                     </a>
@@ -104,7 +105,7 @@
                 <!-- Stock checking -->
                 <?php if (user_group_id() == 1 || has_permission('access', 'read_stock_checking') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
                     <li
-                        class="nav-item  <?php echo current_nav() == 'stock_checking' || current_nav() == 'stock_checking_group' || current_nav() == 'password' ? ' menu-open' : null; ?>">
+                        class="nav-item  <?php echo current_nav() == 'check_stock' || current_nav() == 'in_stock_summary' || current_nav() == 'missing_stock' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-search text-sm"></i>
                             <p><?= trans('menu_stock_checking') ?>
@@ -259,55 +260,55 @@
                                     <?php endif; ?>
                                 </ul>
                                 <?php if (user_group_id() == 1 || has_permission('access', 'receipt_template')): ?>
-                                <li class="nav-item">
-                                    <a href="receipt_template.php?template_id=<?php echo get_preference('receipt_template') ? get_preference('receipt_template') : 1; ?>"
-                                        class="nav-link  <?php echo current_nav() == 'receipt_template' ? 'active' : null; ?>">
-                                        <span class="line"><i class="fas fa-minus"></i></span>
-                                        <i class="fas fa-file-invoice-dollar nav-icon text-sm"></i>
-                                        <p>
-                                            <?php echo trans('menu_receipt_template'); ?>
-                                        </p>
+                            <li class="nav-item">
+                                <a href="receipt_template.php?template_id=<?php echo get_preference('receipt_template') ? get_preference('receipt_template') : 1; ?>"
+                                    class="nav-link  <?php echo current_nav() == 'receipt_template' ? 'active' : null; ?>">
+                                    <span class="line"><i class="fas fa-minus"></i></span>
+                                    <i class="fas fa-file-invoice-dollar nav-icon text-sm"></i>
+                                    <p>
+                                        <?php echo trans('menu_receipt_template'); ?>
+                                    </p>
 
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_currency')): ?>
-                                <li class="nav-item">
-                                    <a href="currency.php"
-                                        class="nav-link  <?php echo current_nav() == 'currency' ? ' active' : null; ?>">
-                                        <span class="line"><i class="fas fa-minus"></i></span>
-                                        <i class="fas fa-money-bill nav-icon text-sm"></i>
-                                        <p><?= trans('menu_currency') ?></p>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                        <?php if (user_group_id() == 1 || has_permission('access', 'read_currency')): ?>
+                            <li class="nav-item">
+                                <a href="currency.php"
+                                    class="nav-link  <?php echo current_nav() == 'currency' ? ' active' : null; ?>">
+                                    <span class="line"><i class="fas fa-minus"></i></span>
+                                    <i class="fas fa-money-bill nav-icon text-sm"></i>
+                                    <p><?= trans('menu_currency') ?></p>
 
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_pmethod')): ?>
-                                <li class="nav-item">
-                                    <a href="pmethod.php"
-                                        class="nav-link  <?php echo current_nav() == 'pmethod' ? ' active' : null; ?>">
-                                        <span class="line"><i class="fas fa-minus"></i></span>
-                                        <i class="fas fa-money-bill-alt nav-icon text-sm"></i>
-                                        <p>
-                                            <?php echo trans('menu_pmethod'); ?>
-                                        </p>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                        <?php if (user_group_id() == 1 || has_permission('access', 'read_pmethod')): ?>
+                            <li class="nav-item">
+                                <a href="pmethod.php"
+                                    class="nav-link  <?php echo current_nav() == 'pmethod' ? ' active' : null; ?>">
+                                    <span class="line"><i class="fas fa-minus"></i></span>
+                                    <i class="fas fa-money-bill-alt nav-icon text-sm"></i>
+                                    <p>
+                                        <?php echo trans('menu_pmethod'); ?>
+                                    </p>
 
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_language')): ?>
-                                <li class="nav-item">
-                                    <a href="language.php?lang=en"
-                                        class="nav-link  <?php echo current_nav() == 'language' ? ' active' : null; ?>">
-                                        <span class="line"><i class="fas fa-minus"></i></span>
-                                        <i class="fas fa-language nav-icon text-sm"></i>
-                                        <p>
-                                            <?php echo trans('menu_language'); ?>
-                                        </p>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                        <?php if (user_group_id() == 1 || has_permission('access', 'read_language')): ?>
+                            <li class="nav-item">
+                                <a href="language.php?lang=en"
+                                    class="nav-link  <?php echo current_nav() == 'language' ? ' active' : null; ?>">
+                                    <span class="line"><i class="fas fa-minus"></i></span>
+                                    <i class="fas fa-language nav-icon text-sm"></i>
+                                    <p>
+                                        <?php echo trans('menu_language'); ?>
+                                    </p>
 
-                                    </a>
-                                </li>
-                            <?php endif; ?>
+                                </a>
+                            </li>
+                        <?php endif; ?>
 
                         </ul>
                     </li>
@@ -349,7 +350,7 @@
                 <!-- // sales  -->
                 <?php if (user_group_id() == 1 || has_permission('access', 'read_sales') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
                     <li
-                        class="nav-item  <?php echo current_nav() == 'sales' || current_nav() == 'sales_group' || current_nav() == 'password' ? ' menu-open' : null; ?>">
+                        class="nav-item  <?php echo current_nav() == 'sales_list' || current_nav() == 'sales_summary' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-chart-line text-sm"></i>
                             <p><?= trans('menu_sales') ?>
@@ -382,17 +383,21 @@
                                 </li>
                             <?php endif; ?>
 
-                            <!-- <?php // if (user_group_id() == 1 || has_permission('access', 'read_sales_return')): ?>
+                            <!-- <?php // if (user_group_id() == 1 || has_permission('access', 'read_sales_return')): 
+                                    ?>
                                 <li class="nav-item">
                                     <a href="sales_return.php"
-                                        class="nav-link  <?php // echo current_nav() == 'sales_return' ? ' active' : null; ?>">
+                                        class="nav-link  <?php // echo current_nav() == 'sales_return' ? ' active' : null; 
+                                                            ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-undo text-sm"></i>
-                                        <p><?php // echo trans('menu_sales_return') ?></p>
+                                        <p><?php // echo trans('menu_sales_return') 
+                                            ?></p>
 
                                     </a>
                                 </li>
-                            <?php // endif; ?> -->
+                            <?php // endif; 
+                            ?> -->
 
                             <?php if (user_group_id() == 1 || has_permission('access', 'read_sales_summary')): ?>
                                 <li class="nav-item">
@@ -411,7 +416,7 @@
                 <!-- // report  -->
                 <?php if (user_group_id() == 1 || has_permission('access', 'read_report') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
                     <li
-                        class="nav-item  <?php echo current_nav() == 'report' || current_nav() == 'report_group' || current_nav() == 'password' ? ' menu-open' : null; ?>">
+                        class="nav-item  <?php echo current_nav() == 'orders_reports' || current_nav() == 'due_reports' || current_nav() == 'stock_reports' || current_nav() == 'missing_reports' || current_nav() == 'cash_book' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-file-alt text-sm"></i>
                             <p><?= trans('menu_report') ?>

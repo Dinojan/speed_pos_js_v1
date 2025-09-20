@@ -5,7 +5,7 @@ include realpath(__DIR__ . '/../') . '/_init.php';
 if (!is_loggedin()) {
     redirect(root_url() . '/index.php?redirect_to=' . url());
 }
-$document->setTitle(trans('title_check_jewelries_stock'));
+$document->setTitle(trans('title_check_jewellery_stock'));
 $document->setController('CheckStockController');
 include('src/_top.php');
 ?>
@@ -57,10 +57,21 @@ include('src/_top.php');
 
 <div class="card card-outline card-primary">
     <div class="card-header">
-        <h5 class="text-black"><?php echo trans("label_checked_jewelries") ?></h5>
+        <h5 class="text-black"><?php echo trans("label_checked_jewellery") ?></h5>
     </div>
     <div class="card-tools"></div>
     <div class="card-body">
+        <?php
+        $hide_colums = "";
+        if (user_group_id() != 1) {
+            if (!has_permission('access', 'read_order_invoice')) {
+                $hide_colums .= "8,";
+            }
+            if (!has_permission('access', 'order_payment')) {
+                $hide_colums .= "9,";
+            }
+        }
+        ?>
         <div class="table-responsive">
             <table id="checked-jewels-list" class="table table-sm table-bordered table-striped">
                 <thead>
