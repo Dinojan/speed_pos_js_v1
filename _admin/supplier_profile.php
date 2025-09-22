@@ -9,15 +9,16 @@ if (user_group_id() != 1 && !has_permission('access', 'read_supplier')) {
 }
 $document->setTitle(trans('title_suppliers'));
 $document->setController('SupplierProfileController');
-if (isset($request->get['id']) && $request->get['id'] != null) {
-    $the_supplier = get_the_supplier($request->get['id']);
+if (isset($request->get['supplier']) && $request->get['supplier'] != null) {
+    $the_supplier = get_the_supplier($request->get['supplier']);
     if (!$the_supplier) {
         redirect(root_url() . '/' . ADMINDIRNAME . '/supplier.php');
     }
     $p_count = 0;
     $statement = db()->prepare("SELECT * FROM `product` WHERE `s_id` = ?");
-    $statement->execute([$request->get['id']]);
+    $statement->execute([$request->get['supplier']]);
     $p_count = $statement->rowCount();
+    $due_to_payment = get_sum('product', 'cost', 's_id', $request->get['supplier']) -  $the_supplier['total_paid'];
 } else {
     redirect(root_url() . '/' . ADMINDIRNAME . '/supplier.php');
 }
@@ -37,25 +38,21 @@ include('src/_top.php');
                         alt="avatar">
                 </div>
 
-                <h3 class="profile-username text-center"><?php
-                echo $the_supplier['s_name']
-
-
-                    ?></h3>
+                <h3 class="profile-username text-center"><?php echo $the_supplier['s_name'] ?></h3>
 
                 <p class="text-muted text-center"><?php echo trans('text_since'); ?>:
-                    <?php echo $the_supplier['created_at'] ?>
+                    <?php echo date('d F, Y', strtotime($the_supplier['created_at'])); ?>
                 </p>
 
                 <ul class="list-group list-group-unbordered mb-3">
                     <li class="list-group-item">
                         <b> <?php echo trans('label_mobile_phone'); ?></b> <a
-                            class="float-right"><?php echo $the_supplier['s_mobile'] ?></a>
+                            class="float-right"><?php echo format_mobile($the_supplier['s_mobile']) ?></a>
                     </li>
 
                     <li class="list-group-item">
-                        <b> <?php echo trans('total_due'); ?></b> <a
-                            class="float-right"><?php echo $the_supplier['due'] ?></a>
+                        <b> <?php echo trans('due_to_pay'); ?></b> <a
+                            class="float-right"><?php echo 'Rs. ' . number_format($due_to_payment, 2) ?></a>
                     </li>
 
                     <li class="list-group-item">
@@ -82,7 +79,8 @@ include('src/_top.php');
                     <div class="col-8">
 
                         <!-- <h4 class="info-box-text text-green">
-                                                <?php //echo trans('label_balance'); ?>
+                                                <?php //echo trans('label_balance'); 
+                                                ?>
                                             </h4> -->
 
                         <!-- <span id="balance" class="info-box-number">
@@ -94,7 +92,7 @@ include('src/_top.php');
                             <?php echo trans('label_due'); ?>
                         </h4>
                         <span id="due" class="info-box-number">
-                            <?php echo $the_supplier['due'] ?>
+                            <?php echo 'Rs. ' . number_format($due_to_payment, 2) ?>
                         </span>
                         <hr style="margin-top:0;">
 
@@ -112,7 +110,7 @@ include('src/_top.php');
                 <div class="card card-outline card-primary">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <?php echo trans('text_invoice_list'); ?>
+                            <?php echo trans('text_jewellary_list'); ?>
                         </h3>
                         <div class="card-tools">
 
@@ -132,36 +130,46 @@ include('src/_top.php');
                         ?>
                         <div class="table-responsive">
                             <!-- Invoice List Start-->
-                            <table id="invoice-invoice-list" class="table table-sm table-bordered table-striped"
+                            <table id="supplier-jewels-list" class="table table-sm table-bordered table-striped"
                                 data-id="" data-hide-colums="<?php echo $hide_colums; ?>">
-                                <thead class="bg-primary">
+                                <thead class="bg-blue">
                                     <tr>
-                                        <th><?php echo trans('label_date'); ?></th>
-                                        <th><?php echo trans('label_invoice_id'); ?></th>
-                                        <th><?php echo trans('label_note'); ?></th>
-                                        <th><?php echo trans('label_items'); ?></th>
-                                        <th><?php echo trans('label_invoice_amount'); ?></th>
-                                        <th><?php echo trans('label_prev_due'); ?></th>
-                                        <th><?php echo trans('label_payable'); ?></th>
-                                        <th><?php echo trans('label_paid'); ?></th>
-                                        <th><?php echo trans('label_due'); ?></th>
-                                        <th><?php echo trans('label_view'); ?></th>
-                                        <th><?php echo trans('label_pay'); ?></th>
+                                        <th class="w-5">#</th>
+                                        <th class="w-10"><?= trans("label_product_code"); ?></th>
+                                        <th class="w-20"><?= trans("label_name"); ?></th>
+                                        <th class="w-15"><?= trans("label_category"); ?></th>
+                                        <th class="w-20"><?= trans("label_supplier"); ?></th>
+                                        <th class="w-5"><?= trans("label_weight"); ?></th>
+                                        <th class="w-5"><?= trans("label_cost"); ?></th>
+                                        <th class="w-5"><?= trans("label_status"); ?></th>
+                                        <th class="w-5"><?= trans("label_view"); ?></th>
+                                        <th class="w-5"><?= trans("label_edit"); ?></th>
+                                        <th class="w-5">
+                                            <?= (isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2)
+                                                ? trans("label_restore")
+                                                : trans("label_delete"); ?>
+                                        </th>
                                     </tr>
                                 </thead>
-                                <tfoot>
-                                    <tr class="bg-primary">
-                                        <th><?php echo trans('label_date'); ?></th>
-                                        <th><?php echo trans('label_invoice_id'); ?></th>
-                                        <th><?php echo trans('label_note'); ?></th>
-                                        <th><?php echo trans('label_items'); ?></th>
-                                        <th><?php echo trans('label_invoice_amount'); ?></th>
-                                        <th><?php echo trans('label_prev_due'); ?></th>
-                                        <th><?php echo trans('label_payable'); ?></th>
-                                        <th><?php echo trans('label_paid'); ?></th>
-                                        <th><?php echo trans('label_due'); ?></th>
-                                        <th><?php echo trans('label_view'); ?></th>
-                                        <th><?php echo trans('label_pay'); ?></th>
+                                <tbody>
+                                </tbody>
+                                <tfoot class="bg-blue">
+                                    <tr>
+                                        <th class="w-5">#</th>
+                                        <th class="w-10"><?= trans("label_product_code"); ?></th>
+                                        <th class="w-20"><?= trans("label_name"); ?></th>
+                                        <th class="w-15"><?= trans("label_category"); ?></th>
+                                        <th class="w-20"><?= trans("label_supplier"); ?></th>
+                                        <th class="w-5"><?= trans("label_weight"); ?></th>
+                                        <th class="w-5"><?= trans("label_cost"); ?></th>
+                                        <th class="w-5"><?= trans("label_status"); ?></th>
+                                        <th class="w-5"><?= trans("label_view"); ?></th>
+                                        <th class="w-5"><?= trans("label_edit"); ?></th>
+                                        <th class="w-5">
+                                            <?= (isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2)
+                                                ? trans("label_restore")
+                                                : trans("label_delete"); ?>
+                                        </th>
                                     </tr>
                                 </tfoot>
                             </table>

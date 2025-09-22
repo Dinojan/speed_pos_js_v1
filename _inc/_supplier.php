@@ -211,7 +211,7 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             }
 
             // $row['view'] = '<button id="view-supplier" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-eye"></i></button>';
-            $row['view'] = '<a href="supplier_profile.php?id=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+            $row['view'] = '<a href="supplier_profile.php?supplier=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
                     <i class="fas fa-eye"></i>
                  </a>';
             //if ($row['id'] != 1) {
