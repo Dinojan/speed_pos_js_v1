@@ -1985,7 +1985,6 @@ angularApp.factory("StockCheckingModel", [
     }
 ]);
 
-
 //SupplierPaymentModel
 angularApp.factory("SupplierPaymentModel", [
     "API_URL",

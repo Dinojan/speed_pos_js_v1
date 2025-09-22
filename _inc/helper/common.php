@@ -574,22 +574,22 @@ function barcode_symbology($generator, $type = 'code39')
 
 function date_range_filter($from, $to, $table = '')
 {
-    $from = $from ? $from : date('Y-m-d');
-    $to = $to ? $to : date('Y-m-d');
-    $where_query = '';
-    if (($from && ($to == false)) || ($from == $to)) {
-        $day = date('d', strtotime($from));
-        $month = date('m', strtotime($from));
-        $year = date('Y', strtotime($from));
-        $where_query .= " AND DAY($table`created_at`) = {$day}";
-        $where_query .= " AND MONTH($table`created_at`) = {$month}";
-        $where_query .= " AND YEAR($table`created_at`) = {$year}";
-    } else {
-        $from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
-        $to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
-        $where_query .= " AND $table`created_at` >= '{$from}' AND $table`created_at` <= '{$to}'";
-    }
-    return $where_query;
+	$from = $from ? $from : date('Y-m-d');
+	$to = $to ? $to : date('Y-m-d');
+	$where_query = '';
+	if (($from && ($to == false)) || ($from == $to)) {
+		$day = date('d', strtotime($from));
+		$month = date('m', strtotime($from));
+		$year = date('Y', strtotime($from));
+		$where_query .= " AND DAY($table`created_at`) = {$day}";
+		$where_query .= " AND MONTH($table`created_at`) = {$month}";
+		$where_query .= " AND YEAR($table`created_at`) = {$year}";
+	} else {
+		$from = date('Y-m-d H:i:s', strtotime($from . ' ' . '00:00:00'));
+		$to = date('Y-m-d H:i:s', strtotime($to . ' ' . '23:59:59'));
+		$where_query .= " AND $table`created_at` >= '{$from}' AND $table`created_at` <= '{$to}'";
+	}
+	return $where_query;
 }
 
 // function date_range_filter($from, $to)
@@ -765,4 +765,110 @@ function format_mobile($number)
 	} else {
 		return $number;
 	}
+}
+
+
+function get_count($table_name, $column = null, $column_value = null, $status = null, $today = false)
+{
+	$db = db();
+
+	$sql = "SELECT COUNT(*) as total FROM {$table_name}";
+	$conditions = [];
+	$params = [];
+
+	if (!is_null($column) && !is_null($column_value)) {
+		$conditions[] = "{$column} = ?";
+		$params[] = $column_value;
+	}
+
+	if (!is_null($status)) {
+		$conditions[] = "status = ?";
+		$params[] = $status;
+	}
+
+	if ($today) {
+		$conditions[] = "DATE(created_at) = CURDATE()";
+	}
+
+	if (!empty($conditions)) {
+		$sql .= " WHERE " . implode(" AND ", $conditions);
+	}
+
+	$statement = $db->prepare($sql);
+	$statement->execute($params);
+
+	$result = $statement->fetch(PDO::FETCH_ASSOC);
+	return $result['total'];
+}
+
+
+// function get_sum($table_name, $sum_column, $filter_column = null, $filter_value = null, $status = null, $today = false)
+// {
+// 	$db = db();
+
+// 	$sql = "SELECT SUM({$sum_column}) as total FROM {$table_name}";
+// 	$conditions = [];
+// 	$params = [];
+
+// 	if (!is_null($filter_column) && !is_null($filter_value)) {
+// 		$conditions[] = "{$filter_column} = ?";
+// 		$params[] = $filter_value;
+// 	}
+
+// 	if (!is_null($status)) {
+// 		$conditions[] = "status = ?";
+// 		$params[] = $status;
+// 	}
+
+// 	if ($today) {
+// 		$conditions[] = "DATE(created_at) = CURDATE()";
+// 	}
+
+// 	if (!empty($conditions)) {
+// 		$sql .= " WHERE " . implode(" AND ", $conditions);
+// 	}
+
+// 	$statement = $db->prepare($sql);
+// 	$statement->execute($params);
+
+// 	$result = $statement->fetch(PDO::FETCH_ASSOC);
+// 	return $result['total'] ?? 0;
+// }
+
+function get_sum($table_name, $sum_column, $filter_column = null, $filter_value = null, $status = null, $today = false)
+{
+	$db = db();
+
+	$sql = "SELECT SUM({$sum_column}) as total FROM {$table_name}";
+	$conditions = [];
+	$params = [];
+
+	// Generic filter
+	if (!is_null($filter_column)) {
+		if (is_null($filter_value)) {
+			$conditions[] = "{$filter_column} IS NOT NULL AND {$filter_column} != ''";
+		} else {
+			$conditions[] = "{$filter_column} = ?";
+			$params[] = $filter_value;
+		}
+	}
+
+	if (!is_null($status)) {
+		$conditions[] = "status = ?";
+		$params[] = $status;
+	}
+
+	if ($today) {
+		$conditions[] = "DATE(created_at) = CURDATE()";
+	}
+
+	if (!empty($conditions)) {
+		$sql .= " WHERE " . implode(" AND ", $conditions);
+	}
+
+	$statement = $db->prepare($sql);
+	$statement->execute($params);
+
+	$result = $statement->fetch(PDO::FETCH_ASSOC);
+	return $result['total'] ?? 0;
 }
