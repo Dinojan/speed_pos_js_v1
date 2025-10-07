@@ -250,35 +250,87 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
                 $rowNumber = $prefix === '' ? (string) $counter : $prefix . '.' . $counter;
 
                 // 1️⃣ Get total weight of products in this category
-                $stmtProd = $pdo->prepare("SELECT COALESCE(SUM(wgt * qty),0) as total_wgt, COALESCE(SUM(qty),0) as total_pcs FROM product WHERE c_id = ? AND status != 2");
+                $stmtProd = $pdo->prepare("SELECT COALESCE(SUM(wgt * qty),0) as total_wgt, COALESCE(SUM(qty),0) as total_pcs FROM product WHERE c_id = ? AND status = 0");
                 $stmtProd->execute([$row['id']]);
                 $productData = $stmtProd->fetch(PDO::FETCH_ASSOC);
+
+                $children = getCategoryTree($row['id'], $rowNumber);
+                $row['children'] = $children;
+
+
 
                 $row['sl'] = $rowNumber;
                 $row['wgt'] = (float)$productData['total_wgt'];
                 $row['pcs'] = (int)$productData['total_pcs'];
                 // Recursively get children
                 $children = getCategoryTree($row['id'], $rowNumber);
+                $fullPath = getCategoryPath($row['id']);
+                $material = getMaterial($row['id']);
 
+                // Encode full path as JSON string for JS
+                $fullPathJs = json_encode($fullPath);
+
+
+                $row['add_new_item'] = '<button type="button" class="btn btn-sm font-weight-bold text-primary" ng-click="openAddCategoryModal(' . htmlspecialchars(json_encode($row)) . ')"> <i class="fas fa-plus"></i> ' . trans("button_add_category") . '</button>';
                 // Only leaf categories get Add Product button
                 if (empty($children)) {
-                    $fullPath = getCategoryPath($row['id']); // string
-                    $material = getMaterial($row['id']);    // integer
-
-                    // Encode full path as JSON string for JS
-                    $fullPathJs = json_encode($fullPath);
-
-                    $row['add_new'] = '<button type="button" class="btn btn-tool" ng-click=\'openAddProductModal('
+                    $row['add_new_cat'] = '<button type="button" class="btn btn-sm font-weight-bold text-primary" ng-click=\'openAddProductModal('
                         . htmlspecialchars(json_encode($row)) . ', '
                         . $fullPathJs . ', '
                         . $material . ')\'>'
                         . '<i class="fas fa-plus"></i> ' . trans("button_add_product") . '</button>';
                 } else {
-                    $row['add_new'] = '<button type="button" class="btn btn-tool" ng-click="openAddCategoryModal(' . htmlspecialchars(json_encode($row)) . ')"> <i class="fas fa-plus"></i> ' . trans("button_add_category") . '</button>';
+                    $row['add_new_cat'] = '';
                     $row['children'] = $children;
                 }
-                $row['edit'] = '<a href="#" class="btn btn-success btn-edit btn-sm"  data-id="' . $row['id'] . '"><i class="fas fa-edit"></i> </a>';
-                $row['delete'] = '<a href="#" class="btn btn-danger btn-del btn-sm" data-id="' . $row['id'] . '"><i class="fas fa-trash"></i> </a>';
+
+                // Fetch products
+                $stmtP = $pdo->prepare("SELECT * FROM product WHERE c_id = ? AND status = ?");
+                $stmtP->execute([$row['id'], 0]);
+                $products = $stmtP->fetchAll(PDO::FETCH_ASSOC);
+                $p_index = 0;
+                foreach ($products as &$prod) {
+                    $p_index++;
+                    $prod['row_index'] = $p_index;
+
+                    $prod['category'] = get_the_category($prod['c_id'])['c_name'];
+                    $prod['supplier'] = get_the_supplier($prod['s_id'])['s_name'] . " (" . format_mobile(get_the_supplier($prod['s_id'])['s_mobile']) . ")";
+
+                    $prod['view'] = '<button class="btn btn-outline-info btn-sm view-btn" title="View" data-id="' . $prod['id'] . '"><i class="fas fa-eye"></i></button>';
+
+                    if ($prod['status'] == 2 || $prod['status'] == 3) {
+                        $prod['edit'] = '<button class="btn btn-outline-success btn-sm edit-btn" title="Edit" disabled><i class="fas fa-edit"></i></button>';
+                    } else {
+                        $prod['edit'] = '<button class="btn btn-outline-success btn-sm edit-btn" title="Edit"><i class="fas fa-edit"></i></button>';
+                    }
+
+                    if ($prod['status'] == 3) {
+                        $prod['delete'] = '<button id="delete-product" class="btn btn-sm delete-btn delete-product" title="Delete"  data-id="'. $prod['id'] .'" disabled><i class="fas fa-trash-alt"></i></button>';
+                    } else if ($prod['status'] == 2) {
+                        $prod['delete'] = '<button id="delete-product" class="btn btn-sm delete-btn text-anger delete-product disabled"  data-id="'. $prod['id'] .'" title="Delete"><i class="fas fa-undo"></i></button>';
+                    } else {
+                        $prod['delete'] = '<button id="delete-product" class="btn btn-sm delete-btn text-danger delete-product"  data-id="'. $prod['id'] .'" title="Delete"><i class="fas fa-trash-alt"></i></button>';
+                    }
+
+                    // Status badge
+                    if ($prod['status'] == 0) $prod['sts'] = '<span class="badge bg-success p-1">For sale</span>';
+                    else if ($prod['status'] == 2) $prod['sts'] = '<span class="badge bg-danger p-1">Deleted</span>';
+                    else if ($prod['status'] == 3) $prod['sts'] = '<span class="badge bg-secondary p-1">Sold</span>';
+                    else $prod['sts'] = '<span class="badge bg-warning p-1">Not for sale</span>';
+                }
+
+                $row['products'] = $products;
+
+                $row['edit'] = '<a href="#" class="btn btn-edit btn-sm font-weight-bold text-success" ng-click="cat_edit('.$row['id'].')"   data-id="' . $row['id'] . '"><i class="fas fa-edit"></i> </a>';
+                // Check if this category has children or products
+                $hasChildren = !empty($children);
+                $hasProducts = !empty($products);
+
+                if ($hasChildren || $hasProducts) {
+                    $row['delete'] = '<a href="javascript:void(0)" class="btn cat-del btn-sm font-weight-bold text-danger disabled" data-id="' . $row['id'] . '" onclick="javascript:void(0)"><i class="fas fa-trash"></i> </a>';
+                } else {
+                    $row['delete'] = '<a href="javascript:void(0)" ng-click="cat_del('.$row['id'].')" class="btn cat-del btn-sm font-weight-bold text-danger" data-id="' . $row['id'] . '"><i class="fas fa-trash"></i> </a>';
+                }
 
                 // 2️⃣ Recursively get children categories
                 $children = getCategoryTree($row['id'], $rowNumber);

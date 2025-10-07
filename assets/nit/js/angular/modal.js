@@ -3,7 +3,7 @@ function bsModal($scope) {
   <div class="modal fade" id="${$scope.modalId}" tabindex="-1" role="dialog" aria-labelledby="${$scope.modalId}Label" aria-hidden="true">
     <div class="modal-dialog ${$scope.modalSize}" role="document">
       <div class="modal-content">
-        <div class="modal-header bg-primary text-white p-2">
+        <div class="modal-header text-white p-2">
           <h5 class="modal-title" id="${$scope.modalId}Label">${$scope.modalTitle}</h5>
           <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -435,6 +435,7 @@ angularApp.factory("categoryAddModal", [
         return function ($scope, data = {}) {
             $scope.p_id = data.id;
             const modalId = "categoryAddModal";
+
             // Step 1: Load modal form from server
             $http.get(window.baseUrl + "/_inc/_category.php?action_type=CREATE").then(function (response) {
                 const formHtml = response.data;
@@ -448,20 +449,28 @@ angularApp.factory("categoryAddModal", [
                 const modalTemplate = bsModal($scope);
                 const modalElement = $compile(modalTemplate)($scope);
                 angular.element("body").append(modalElement);
+
                 $timeout(function () {
-                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
-                    $scope.modalInstance.show();
-                    $('.select2').select2({
-                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    const modalEl = document.getElementById(modalId);
+                    $scope.modalInstance = new bootstrap.Modal(modalEl);
+
+                    // Move ALL modal setup inside the shown event
+                    $(modalEl).on("shown.bs.modal", function () {
+                        // Initialize Select2
+                        $('.select2').select2({
+                            dropdownParent: $('#' + modalId).find('.modal-content')
+                        });
+                        // Focus on first input
+                        const firstInput = $("#cat_name");
+                        firstInput.trigger("focus").select();
                     });
+
+                    $scope.modalInstance.show();
                 });
-
-
-
             });
+
             $(document).off("click", "#create_category_submit").on("click", "#create_category_submit", function (e) {
                 e.preventDefault();
-
 
                 // Serialize form to array first
                 var formArray = $('#create-category-form').serializeArray();
@@ -473,7 +482,6 @@ angularApp.factory("categoryAddModal", [
                 // Add custom fields
                 formDataObj.p_id = $scope.p_id;
                 var serializedData = $.param(formDataObj);
-                var $tag = $(this);
 
                 $http({
                     url: window.baseUrl + "/_inc/_category.php",
@@ -492,20 +500,20 @@ angularApp.factory("categoryAddModal", [
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
                         }
+                        $rootScope.$broadcast("PRODUCT_LIST_REFRESH");
 
                     }, function (response) {
                         var alertMsg = "";
                         window.angular.forEach(response.data, function (value) {
                             alertMsg += value + " ";
                         });
-                        ;
-                        //window.toastr.warning(alertMsg, "Warning!");
                         Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
                     });
             });
         };
     }
 ]);
+
 // categoryEditModal
 angularApp.factory("categoryEditModal", [
     "API_URL",
@@ -566,7 +574,8 @@ angularApp.factory("categoryEditModal", [
                     function (response) {
                         var alertMsg = response.data.msg;
                         Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('#categoryTable').DataTable().ajax.reload(null, false);
+                        $rootScope.$broadcast("PRODUCT_LIST_REFRESH");
+                        // $('#categoryTable').DataTable().ajax.reload(null, false);
 
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
@@ -646,10 +655,12 @@ angularApp.factory("categoryDeleteModal", [
                     function (response) {
                         var alertMsg = response.data.msg;
                         Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('#categoryTable').DataTable().ajax.reload(null, false);
+                        $rootScope.$broadcast("PRODUCT_LIST_REFRESH");
+                        // $('#categoryTable').DataTable().ajax.reload(null, false);
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
                         }
+
 
                     }, function (response) {
                         var alertMsg = "";
@@ -1110,7 +1121,11 @@ angularApp.factory("ProductAddModal", [
             $(document).off("click", "#create_product_submit").on("click", "#create_product_submit", function (e) {
                 e.preventDefault();
 
-                // Serialize form to array first
+                let $btn = $(this);
+                if ($btn.prop("disabled")) return; // already clicked
+                $btn.prop("disabled", true); // disable
+
+                // Serialize form
                 var formArray = $('#create-product-form').serializeArray();
                 var formDataObj = {};
                 $.each(formArray, function (_, field) {
@@ -1126,10 +1141,8 @@ angularApp.factory("ProductAddModal", [
                 formDataObj.c_id = $scope.categoryId;
                 formDataObj.material = $scope.material;
 
-                // Convert back to query string (serialized)
                 var serializedData = $.param(formDataObj);
 
-                // Send via Angular $http
                 $http({
                     url: window.baseUrl + "/_inc/_product.php",
                     method: "POST",
@@ -1138,24 +1151,21 @@ angularApp.factory("ProductAddModal", [
                 }).then(
                     function (response) {
                         Toast.fire({ icon: 'success', title: 'Success!', text: response.data.msg });
-                        // Reset form
-                        $('#create-product-form')[0].reset();
+                        // $('#create-product-form')[0].reset();
                         $("#page-1").removeClass("d-none");
                         $("#page-2").addClass("d-none");
                         $("#product_add").show();
                         $("#create_product_submit").hide();
                         updateProgress(1);
 
-                        // Increment code for next product
                         let lastCode = $scope.code;
                         let num = parseInt(lastCode.replace(/^NJV/, '')) + 1;
                         $scope.code = 'NJV' + num;
-
-                        // Update modal display with new code
                         $(".text-center h5.text-success").text('NJ Serial ID: ' + $scope.code);
-
-                        // Focus first input
                         $("#page-1").find("input, textarea").first().focus();
+
+                        $rootScope.$broadcast("PRODUCT_LIST_REFRESH");
+                        $btn.prop("disabled", false); // enable again after success
                     },
                     function (response) {
                         let alertMsg = "";
@@ -1163,9 +1173,12 @@ angularApp.factory("ProductAddModal", [
                             alertMsg += value + " ";
                         });
                         Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
+
+                        $btn.prop("disabled", false); // re-enable if error
                     }
                 );
             });
+
         };
     }
 ]);
@@ -1623,12 +1636,13 @@ angularApp.factory("OrderAddModel", [
     ) {
         return function ($scope) {
             const modalId = "OrderAddModel";
+            const type = $scope.currentURL === "ac_bill" ? 1 : 0;
             // Step 1: Load modal form from server
-            $http.get(window.baseUrl + "/_inc/_order.php?action_type=CREATE").then(function (response) {
+            $http.get(window.baseUrl + "/_inc/_order.php?action_type=CREATE&type=" + type).then(function (response) {
                 const formHtml = response.data;
 
                 $(`#${modalId}`).remove();
-                $scope.modalTitle = "Add Order";
+                $scope.modalTitle = type === 0 ? "Add Order" : "Add AC Bill";
                 $scope.modalId = modalId;
                 $scope.modalSize = "modal-md";
                 $scope.modalBody = $sce.trustAsHtml(formHtml);
@@ -1698,8 +1712,7 @@ angularApp.factory("OrderAddModel", [
                     function (response) {
                         var alertMsg = response.data.msg;
                         Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('.table').DataTable().ajax.reload(null, false);
-
+                        $('#orderTable').DataTable().ajax.reload(null, false);
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
                         }
@@ -1739,11 +1752,13 @@ angularApp.factory("OrderEditModel", [
     ) {
         return function ($scope) {
             const modalId = "OrderEditModel";
+            const type = $scope.currentURL === "ac_bill" ? 1 : 0;
+
             // Step 1: Load modal form from server
-            $http.get(window.baseUrl + "/_inc/_order.php?action_type=EDIT&id=" + $scope.order.id).then(function (response) {
+            $http.get(window.baseUrl + "/_inc/_order.php?action_type=EDIT&id=" + $scope.order.id + "&type=" + type).then(function (response) {
                 const formHtml = response.data;
                 $(`#${modalId}`).remove();
-                $scope.modalTitle = "Edit order";
+                $scope.modalTitle = type === 0 ? "Edit Order" : "Edit AC Bill";
                 $scope.modalId = modalId;
                 $scope.modalSize = "modal-md";
                 $scope.modalBody = $sce.trustAsHtml(formHtml);
@@ -1777,7 +1792,7 @@ angularApp.factory("OrderEditModel", [
                     function (response) {
                         var alertMsg = response.data.msg;
                         Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('.table').DataTable().ajax.reload(null, false);
+                        $('#orderTable').DataTable().ajax.reload(null, false);
 
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
@@ -1857,14 +1872,13 @@ angularApp.factory("OrderPayModel", [
                     dataType: "json"
                 }).then(
                     function (response) {
-                        var alertMsg = response.data.msg;
-                        Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('.table').DataTable().ajax.reload(null, false);
-
+                        $('#orderTable').DataTable().ajax.reload(null, false);
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
                         }
 
+                        var alertMsg = response.data.msg;
+                        Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
                     }, function (response) {
                         var alertMsg = "";
                         window.angular.forEach(response.data, function (value) {

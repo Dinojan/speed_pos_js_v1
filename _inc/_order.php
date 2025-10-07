@@ -8,7 +8,7 @@ if (!is_loggedin()) {
 }
 $order_model = registry()->get('loader')->model('order'); // call modal file
 
-function validate_request_data($request)
+function validate_request_data($request, $type = 0)
 {
     if (!validateString($request->post['cus_name'])) {
         throw new Exception(trans('error_order_name'));
@@ -20,6 +20,12 @@ function validate_request_data($request)
 
     if (empty($request->post['cus_address'])) {
         throw new Exception(trans('error_order_address'));
+    }
+
+    if ($type == 1) {
+        if (empty($request->post['bill_no'])) {
+            throw new Exception(trans('error_AC_bill'));
+        }
     }
 
     if (empty($request->post['order_details'])) {
@@ -65,14 +71,25 @@ function new_ref_no()
 // CREATE order 
 if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action_type']) && $request->post['action_type'] == 'CREATE') {
     try {
-
+        $type = $request->post['type'];
         // Check create permission
         if (user_group_id() != 1 && !has_permission('access', 'create_order')) {
             throw new Exception(trans('error_create_permission'));
         }
 
         // Validate post data
-        validate_request_data($request);
+        validate_request_data($request, $type);
+
+        $bill = $request->post['bill_no'];
+
+        if ($bill) {
+            $statement = db()->prepare("SELECT bill_no FROM `orders` WHERE bill_no = ?");
+            $statement->execute([$bill]);
+
+            if ($statement->rowCount() > 0) {
+                throw new Exception(trans("bill no already exist"));
+            }
+        }
 
         // Validate existance
         // validate_existance($request);
@@ -86,7 +103,7 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
             $cid = $request->post['c_id'];
         }
         // add role
-        $order_id = $order_model->addorder($ref, $cid, $request->post);
+        $order_id = $order_model->addorder($ref, $cid, $request->post, $type);
 
         header('Content-Type: application/json');
         echo json_encode(array('msg' => trans('text_successful_created'), 'id' => $order_id));
@@ -108,6 +125,17 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
         }
         if (empty($request->post['id'])) {
             throw new Exception(trans('error_order_id'));
+        }
+
+        $bill = $request->post['bill_no'];
+
+        if ($bill) {
+            $statement = db()->prepare("SELECT bill_no FROM `orders` WHERE bill_no = ? AND id != ?");
+            $statement->execute([$bill, $request->post['id']]);
+
+            if ($statement->rowCount() > 0) {
+                throw new Exception(trans("bill no already exist"));
+            }
         }
 
         $id = $request->post['id'];
@@ -224,12 +252,14 @@ if ($request->server['REQUEST_METHOD'] == 'POST' && isset($request->post['action
 }
 // add form
 if (isset($request->get['action_type']) && $request->get['action_type'] == 'CREATE') {
+    $type = $request->get['type'];
     include 'template/order_create_form.php';
     exit();
 }
 //edit form
 if (isset($request->get['action_type']) && $request->get['action_type'] == 'EDIT') {
     try {
+        $type = $request->get['type'];
         if (empty($request->get['id'])) {
             throw new Exception(trans('error_order_id'));
         }
@@ -259,6 +289,11 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
         $to = to();
         $where .= date_range_filter($from, $to);
 
+        if (isset($request->get['type']) && $request->get['type'] == 0) {
+            $where .= ' AND type = 0';
+        } else {
+            $where .= ' AND type = 1';
+        }
 
 
         if (isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2) {

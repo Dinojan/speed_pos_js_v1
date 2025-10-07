@@ -24,7 +24,7 @@ class _system{
                 'sidebar_collapse' => '',
                 // 'sidebar_mini_md' => 'sidebar-mini-md',
                 // 'sidebar_mini_xs' => 'sidebar-mini-xs',
-                'text_sm' => 'text-sm',
+                // 'text_sm' => 'text-sm',
                 'accent_color' => 'accent-primary',
         
             ],
@@ -39,7 +39,7 @@ class _system{
                 'navbar_expand' => 'navbar-expand',
                 'border_bottom_0' => '',
                 'dropdown_legacy' => 'dropdown-legacy',
-                'text_sm' => 'text-sm',
+                // 'text_sm' => 'text-sm',
                 'nav_bg' => 'navbar-dark',
             ],
             'side_nav_class' => [
@@ -49,7 +49,7 @@ class _system{
                 'nav_child_indent' => 'nav-child-indent',
                 'nav_collapse_hide_child' => '',
                 'sidebar_no_expand' => '',
-                'sidebar_txt_sm' => 'text-sm',
+                // 'sidebar_txt_sm' => 'text-sm',
         
             ],
             'asideClass' => [

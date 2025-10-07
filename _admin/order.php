@@ -7,7 +7,9 @@ $document->setTitle('Order');
 $document->setController('OrderController');
 ?>
 <?php include 'src/_top.php'; ?>
-
+<script>
+    var currentURL = '<?= current_nav() ?>'
+</script>
 <div class="row">
     <div class="col-lg-12">
         <div class="card card-primary card-outline" style="height: auto; width: auto; transition: 0.15s;">

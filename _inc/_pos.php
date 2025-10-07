@@ -47,7 +47,7 @@ if (isset($request->get['action_type']) && $request->get['action_type'] == 'HOLD
 
 function gererateUniqueId()
 {
-    $prepix = "SPJ";
+    $prepix = "NJV-SALE";
     $statement = db()->prepare("SELECT * FROM invoice_info ORDER BY id DESC LIMIT 1");
     $statement->execute();
     $row = $statement->fetch(PDO::FETCH_ASSOC);

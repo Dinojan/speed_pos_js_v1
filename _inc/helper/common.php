@@ -768,9 +768,15 @@ function format_mobile($number)
 }
 
 
-function get_count($table_name, $column = null, $column_value = null, $status = null, $today = false)
+function get_count($table_name, $column = null, $column_value = null, $status = null, $today = false, $type = null)
 {
 	$db = db();
+
+	// allow only safe tables
+	$allowed_tables = ['orders', 'customer', 'product', 'invoice_info'];
+	if (!in_array($table_name, $allowed_tables)) {
+		throw new Exception("Invalid table name");
+	}
 
 	$sql = "SELECT COUNT(*) as total FROM {$table_name}";
 	$conditions = [];
@@ -787,7 +793,12 @@ function get_count($table_name, $column = null, $column_value = null, $status = 
 	}
 
 	if ($today) {
-		$conditions[] = "DATE(created_at) = CURDATE()";
+		$conditions[] = "created_at >= CURDATE() AND created_at < CURDATE() + INTERVAL 1 DAY";
+	}
+
+	if (!is_null($type)) {
+		$conditions[] = "type = ?";
+		$params[] = $type;
 	}
 
 	if (!empty($conditions)) {
@@ -798,8 +809,9 @@ function get_count($table_name, $column = null, $column_value = null, $status = 
 	$statement->execute($params);
 
 	$result = $statement->fetch(PDO::FETCH_ASSOC);
-	return $result['total'];
+	return (int) $result['total'];
 }
+
 
 
 // function get_sum($table_name, $sum_column, $filter_column = null, $filter_value = null, $status = null, $today = false)
@@ -835,9 +847,23 @@ function get_count($table_name, $column = null, $column_value = null, $status = 
 // 	return $result['total'] ?? 0;
 // }
 
-function get_sum($table_name, $sum_column, $filter_column = null, $filter_value = null, $status = null, $today = false)
+function get_sum($table_name, $sum_column, $filter_column = null, $filter_value = null, $status = null, $today = false, $type = null)
 {
 	$db = db();
+
+	// safe whitelist
+	$allowed_tables = ['orders', 'customer', 'product', 'invoice_info'];
+	$allowed_columns = ['wgt', 'total_amt', 'total_paid', 'outstanding', 'total_payable', 'material', 'order_status'];
+
+	if (!in_array($table_name, $allowed_tables)) {
+		throw new Exception("Invalid table name");
+	}
+	if (!in_array($sum_column, $allowed_columns)) {
+		throw new Exception("Invalid sum column");
+	}
+	if ($filter_column && !in_array($filter_column, $allowed_columns)) {
+		throw new Exception("Invalid filter column");
+	}
 
 	$sql = "SELECT SUM({$sum_column}) as total FROM {$table_name}";
 	$conditions = [];
@@ -859,7 +885,12 @@ function get_sum($table_name, $sum_column, $filter_column = null, $filter_value 
 	}
 
 	if ($today) {
-		$conditions[] = "DATE(created_at) = CURDATE()";
+		$conditions[] = "created_at >= CURDATE() AND created_at < CURDATE() + INTERVAL 1 DAY";
+	}
+
+	if (!is_null($type)) {
+		$conditions[] = "type = ?";
+		$params[] = $type;
 	}
 
 	if (!empty($conditions)) {
@@ -870,8 +901,9 @@ function get_sum($table_name, $sum_column, $filter_column = null, $filter_value 
 	$statement->execute($params);
 
 	$result = $statement->fetch(PDO::FETCH_ASSOC);
-	return $result['total'] ?? 0;
+	return (float) ($result['total'] ?? 0);
 }
+
 
 function getCategoryPath($categoryId)
 {

@@ -304,13 +304,25 @@ if (isset($_GET['action_type']) && $_GET['action_type'] == 'GET_POS_PRODUCT') {
         $product_model = registry()->get('loader')->model('product');
         $barcode = $_GET['barcode'] ?? null;
         $nameOrBarcode = $_GET['nameOrBarcode'] ?? null;
-
+        
         if (isset($_GET['c_id']) && $_GET['c_id'] != "") {
             $products = $product_model->getProductsCategoryWise($_GET['c_id']);
         } elseif ($barcode || $nameOrBarcode) {
             $products = $product_model->getProductsBySearch($barcode, $nameOrBarcode);
         } else {
             $products = $product_model->getProductsCategoryWise();
+        }
+
+        foreach ($products as &$p) {
+            $statement = db()->prepare("SELECT c_name FROM category WHERE id = ?");
+            $statement->execute([$p['material']]);
+            $p['material_name'] = $statement->fetch(PDO::FETCH_ASSOC)['c_name'] ?? '';
+
+            $statement = db()->prepare("SELECT c_name FROM category WHERE id = ?");
+            $statement->execute([$p['c_id']]);
+            $p['category_name'] = $statement->fetch(PDO::FETCH_ASSOC)['c_name'] ?? '';
+
+            $p['supplier'] = get_the_supplier($p['s_id']) ?? '';
         }
 
         header('Content-Type: application/json');
@@ -349,7 +361,12 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $row['category'] = get_the_category($row['c_id'])['c_name'];
             $row['supplier'] = get_the_supplier($row['s_id'])['s_name'] . " (" . format_mobile(get_the_supplier($row['s_id'])['s_mobile']) . ")";
 
-
+            $note = $row['note'];
+            if ($note) {
+                $row['note'] = $note;
+            } else {
+                $row['note'] = '-';
+            }
 
             $row['view'] = '<button id="view-product-details" class="btn btn-outline-info btn-sm view-btn" title="View"  data-id="' . $row['id'] . '"><i class="fas fa-eye"></i></button>';
 
@@ -417,8 +434,6 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $row['category'] = get_the_category($row['c_id'])['c_name'];
             $row['supplier'] = get_the_supplier($row['s_id'])['s_name'] . " (" . format_mobile(get_the_supplier($row['s_id'])['s_mobile']) . ")";
 
-
-
             $row['view'] = '<button id="view-product-details" class="btn btn-outline-info btn-sm view-btn" title="View"  data-id="' . $row['id'] . '"><i class="fas fa-eye"></i></button>';
 
             //if ($row['id'] != 1) {
@@ -458,6 +473,7 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
         exit();
     }
 }
+
 
 if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] == "GET_STOCKS") {
     try {

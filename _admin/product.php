@@ -67,9 +67,10 @@ $document->setController('ProductController');
                                     <th class="w-10">Product code</th>
                                     <th class="w-20">Name</th>
                                     <th class="w-15">Category</th>
-                                    <th class="w-20">Supplier</th>
+                                    <!-- <th class="w-20">Supplier</th> -->
                                     <th class="w-5">Weight</th>
                                     <th class="w-5">Cost</th>
+                                    <th class="w-5">note</th>
                                     <th class="w-5">Status</th>
                                     <th class="w-5">View</th>
                                     <th class="w-5">Edit</th>
@@ -84,9 +85,10 @@ $document->setController('ProductController');
                                     <th class="w-10">Product code</th>
                                     <th class="w-20">Name</th>
                                     <th class="w-15">Category</th>
-                                    <th class="w-20">Supplier</th>
+                                    <!-- <th class="w-20">Supplier</th> -->
                                     <th class="w-5">Weight</th>
                                     <th class="w-5">Cost</th>
+                                    <th class="w-5">note</th>
                                     <th class="w-5">Status</th>
                                     <th class="w-5">View</th>
                                     <th class="w-5">Edit</th>

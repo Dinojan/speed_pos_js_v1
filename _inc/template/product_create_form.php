@@ -88,14 +88,17 @@
             <input type="text" class="form-control typeable " id="karate" name="karate" placeholder="Karate" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" onkeyup="if(this.value<0){this.value='1';}" onclick="return select()" value="0.00" required="">
 
         </div>
-        <select class="form-control select2" id="s_id" name="s_id" required>
-            <option value="">-- Select Supplier --</option>
-            <?php foreach (get_suppliers() as $sup) { ?>
-                <option value="<?php echo $sup['id'] ?>" <?php echo ($sup['id'] == 1) ? 'selected' : ''; ?>>
-                    <?php echo $sup['s_name'] ?> (<?php echo $sup['s_mobile'] ?>)
-                </option>
-            <?php } ?>
-        </select>
+        <div class="form-group">
+            <label for="s_id"><?php echo trans('label_supplier'); ?><i class="text-danger">*</i></label>
+            <select class="form-control select2" id="s_id" name="s_id" required>
+                <option value="">-- Select Supplier --</option>
+                <?php foreach (get_suppliers() as $sup) { ?>
+                    <option value="<?php echo $sup['id'] ?>" <?php echo ($sup['id'] == 1) ? 'selected' : ''; ?>>
+                        <?php echo $sup['s_name'] ?> (<?php echo $sup['s_mobile'] ?>)
+                    </option>
+                <?php } ?>
+            </select>
+        </div>
 
         <div class="form-group">
             <label for="purchase"><?php echo trans('label_purchase'); ?> <i class="text-danger">*</i></label>

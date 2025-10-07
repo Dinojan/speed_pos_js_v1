@@ -56,8 +56,7 @@ $the_order = $order_model->getorder($order_id);
                             rows="8"
                             style="width:100%; padding:0.5rem;"
                             placeholder="Enter any note"
-                            ng-model="note"
-                            ></textarea>
+                            ng-model="note"></textarea>
                     </div>
 
                     <div bind-html-compile="rawPaymentMethodHtml"></div>
@@ -67,7 +66,12 @@ $the_order = $order_model->getorder($order_id);
             <!-- Billing Details -->
             <div class="col-lg-6 col-md-12 col-sm-12 cart-details bootboox-container mt-3">
                 <div class="table-responsive mt-30">
-                    <div class="w-40"><?php echo trans('label_order_ID: ') . $the_order['ref_no'] ?></div>
+                    <div class="w-40 d-flex flex-row justify-content-between">
+                        <?php echo trans('label_order_ID: ') . $the_order['ref_no']; ?>
+                        <?php if (!empty($the_order['bill_no'])): ?>
+                            <span><?php echo trans('label_bill_no: ') . $the_order['bill_no']; ?></span>
+                        <?php endif; ?>
+                    </div>
                     <hr style="margin: 0.4rem 0;">
                     <div class="w-40"><?php echo trans('label_customer_name: ') . $the_order['cus_name'] ?></div>
                     <table class="table table-bordered table-striped table-condensed" style="width: 100%; margin-top: 0.5rem;">
@@ -80,10 +84,12 @@ $the_order = $order_model->getorder($order_id);
                                 <td class="w-50" style="padding-left: 2rem;"><?php echo trans('label_total_amount'); ?></td>
                                 <td class="w-50" style="padding-left: 2rem;"><?= number_format($the_order["total_amt"], 2) ?></td>
                             </tr>
-                            <tr class="" style="padding: 0 0.5rem;">
-                                <td class="w-50" style="padding-left: 2rem;"><?php echo trans('label_advance'); ?></td>
-                                <td class="w-50" style="padding-left: 2rem;"><?= number_format($the_order["advance_amt"], 2) ?></td>
-                            </tr>
+                            <?php if ($the_order['type'] == 0): ?>
+                                <tr class="" style="padding: 0 0.5rem;">
+                                    <td class="w-50" style="padding-left: 2rem;"><?php echo trans('label_advance'); ?></td>
+                                    <td class="w-50" style="padding-left: 2rem;"><?= number_format($the_order["advance_amt"], 2) ?></td>
+                                </tr>
+                            <?php endif ?>
                             <tr class="" style="padding: 0 0.5rem;">
                                 <td class="w-50" style="padding-left: 2rem;"><?php echo trans('label_total_paid'); ?></td>
                                 <td class="w-50" style="padding-left: 2rem;"><?= number_format($the_order["total_paid"], 2) ?></td>

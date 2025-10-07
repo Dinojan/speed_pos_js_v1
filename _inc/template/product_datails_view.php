@@ -31,6 +31,10 @@
                     <th class="col-6 text-right pr-2 py-2 border-bottom">Rs. <?php echo number_format($product['cost'], 2) ?></th>
                 </tr>
                 <tr>
+                    <th class="col-6 pl-2 py-2 border-bottom"><?php echo trans("label_note") ?></th>
+                    <th class="col-6 text-right pr-2 py-2 border-bottom"><?php echo $product['note'] ?  $product['note'] : '-' ?></th>
+                </tr>
+                <tr>
                     <th class="col-6 pl-2 py-2 border-bottom" style="vertical-align: middle;"><?php echo trans("label_created_at") ?></th>
                     <th class="col-6 text-right pr-2 py-2 border-bottom">
                         <div>

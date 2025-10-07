@@ -7,7 +7,7 @@
             <label for="c_name">
                 <?= trans('label_category_name'); ?> <i class="text-danger">*</i>
             </label>
-            <input type="text" class="form-control" id="c_name" name="c_name" placeholder="Category Name" required>
+            <input type="text" class="form-control" id="cat_name" name="c_name" placeholder="Category Name" required>
         </div>
     </div>
 

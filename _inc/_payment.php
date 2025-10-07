@@ -16,7 +16,7 @@ function validate_request_data($request)
     }
 
     if (!validateString($request->post['cus_id'])) {
-        throw new Exception(trans('error_cus_id'));
+        throw new Exception(trans('error_customer_id'));
     }
 
     if (empty($request->post['order_no'])) {

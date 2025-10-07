@@ -101,25 +101,25 @@ $query_string = str_replace(array('&'), '?', $query_string);
 
 </head>
 
-<body class="<?= style_class('body_class') . " " . $body_class ?>   <?php echo (current_nav() != 'pos') ? 'sidebar-mini' : '' ?> layout-fixed skin-green pace-primary" <?php echo (current_nav() == 'pos') ? 'style="min-height: 100vh;"' : '' ?>>
+<body class="<?= style_class('body_class') . " " . $body_class ?>   <?php echo (current_nav() != 'sale' ) ? 'sidebar-mini' : '' ?> layout-fixed skin-green pace-primary" <?php echo (current_nav() == 'sale') ? 'style="min-height: 100vh;"' : '' ?>>
   <!--begin::App Wrapper-->
   <div class="app-wrapper1" ng-controller="<?= $document->getController(); ?>">
     <!-- Preloader -->
     <?php include('src/_preloader.php'); ?>
     <!-- Navbar -->
-    <?php if (current_nav() != 'pos') {
+    <?php if (current_nav() != 'sale') {
       include('src/_nav.php');
     } ?>
     <!-- /.navbar -->
     <!-- Main Sidebar Container -->
-    <?php if (current_nav() != 'pos') {
+    <?php if (current_nav() != 'sale') {
       include('src/_aside.php');
     } ?>
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
-      <?php if (current_nav() != 'pos') { ?>
+      <?php if (current_nav() != 'sale') { ?>
         <div class="content-header">
           <div class="container-fluid ">
             <div class="row mb-2">
@@ -136,7 +136,7 @@ $query_string = str_replace(array('&'), '?', $query_string);
             <div class="row justify-content-between px-2">
               <?php include("../_inc/template/partials/apply_filter.php"); ?>
               <span></span>
-              <?php if (in_array(current_nav(), array('order', 'customer_profile', 'customer', 'sales_list', 'orders_reports', 'due_reports', 'in_stock_summary', 'missing_stock'))): ?>
+              <?php if (in_array(current_nav(), array('order', 'customer_profile', 'customer', 'sales_list', 'orders_reports', 'due_reports', 'in_stock_summary', 'missing_stock', 'ac_bill'))): ?>
                 <?php if (user_group_id() == 1 || has_permission('access', 'filtering')): ?>
 
                   <!-- Date filter -->
@@ -150,5 +150,5 @@ $query_string = str_replace(array('&'), '?', $query_string);
       <!-- /.content-header -->
 
       <!-- Main content -->
-      <section class="<?php echo (current_nav() != 'pos') ? 'content ' : '' ?>">
-        <div class="<?php echo (current_nav() != 'pos') ? 'container-fluid ' : '' ?>">
+      <section class="<?php echo (current_nav() != 'sale') ? 'content ' : '' ?>">
+        <div class="<?php echo (current_nav() != 'sale') ? 'container-fluid ' : '' ?>">

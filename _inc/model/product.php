@@ -3,8 +3,8 @@ class ModelProduct extends Model
 {
 	public function addproduct($data)
 	{
-		$statement = $this->db->prepare("INSERT INTO `product` ( `p_code`, `p_name`, `material`, `c_id`, `s_id`, `karate`, `cost`, `wgt`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-		$statement->execute(array($data['code'], $data['name'], $data['material'], $data['c_id'],  $data['s_id'],  $data['karate'],  $data['purchase'], $data['cwgt']));
+		$statement = $this->db->prepare("INSERT INTO `product` ( `p_code`, `p_name`, `material`, `c_id`, `s_id`, `karate`, `cost`, `wgt`, `note`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		$statement->execute(array($data['code'], $data['name'], $data['material'], $data['c_id'],  $data['s_id'],  $data['karate'],  $data['purchase'], $data['cwgt'], $data['any_note']));
 
 		return $this->db->lastInsertId();
 	}
@@ -114,45 +114,42 @@ class ModelProduct extends Model
 	public function getProductsCategoryWise($c_id = null, $sts = 0)
 	{
 		$products = [];
+		$where = "WHERE status = '" . $sts . "'";
 
 		// Prepare WHERE clause
-		if ($c_id === null) {
-			$where = "WHERE status = ?";
-			$execute = [$sts];
-		} else {
-			$where = "WHERE c_id = ? AND status = ?";
-			$execute = [$c_id, $sts];
+		if ($c_id != null) {
+			$where .= " AND c_id = '" . $c_id . "'";
 		}
 
 		// Fetch products
 		$stmt = $this->db->prepare("SELECT * FROM product $where");
-		$stmt->execute($execute);
+		$stmt->execute();
 		$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		// Fetch latest material_price and name for each product
-		foreach ($products as &$product) {
-			if ($product['material'] == 2 && in_array($product['karate'], [22, 24])) {
-				// For m_id 2 with karate 22 or 24
-				$stmt = $this->db->prepare("
-                SELECT m_name, price FROM material_price
-                WHERE m_id = ? AND karate = ?
-                ORDER BY created_at DESC LIMIT 1
-            ");
-				$stmt->execute([$product['material'], $product['karate']]);
-			} else {
-				// For other materials
-				$stmt = $this->db->prepare("
-                SELECT m_name, price FROM material_price
-                WHERE m_id = ?
-                ORDER BY created_at DESC LIMIT 1
-            ");
-				$stmt->execute([$product['material']]);
-			}
+		// // Fetch latest material_price and name for each product
+		// foreach ($products as &$product) {
+		// 	if ($product['material'] == 2 && in_array($product['karate'], [22, 24])) {
+		// 		// For m_id 2 with karate 22 or 24
+		// 		$stmt = $this->db->prepare("
+        //         SELECT id, m_name, price FROM material_price
+        //         WHERE m_id = ? AND karate = ?
+        //         ORDER BY created_at DESC LIMIT 1
+        //     ");
+		// 		$stmt->execute([$product['material'], $product['karate']]);
+		// 	} else {
+		// 		// For other materials
+		// 		$stmt = $this->db->prepare("
+        //         SELECT id, m_name, price FROM material_price
+        //         WHERE m_id = ?
+        //         ORDER BY created_at DESC LIMIT 1
+        //     ");
+		// 		$stmt->execute([$product['material']]);
+		// 	}
 
-			$materialData = $stmt->fetch(PDO::FETCH_ASSOC);
-			$product['material_name'] = $materialData['m_name'];
-			$product['material_price'] = $materialData['price'];
-		}
+		// 	$materialData = $stmt->fetch(PDO::FETCH_ASSOC);
+		// 	$product['material_name'] = $materialData['m_name'];
+		// 	$product['material_price'] = $materialData['price'];
+		// }
 
 		// Recursive fetch child categories
 		if ($c_id !== null) {
