@@ -2,6 +2,7 @@
 // pos v2
 ob_start();
 include realpath(__DIR__ . '/../') . '/_init.php';
+redirect(root_url() . '/_admin/orders_reports.php');
 if (!is_loggedin()) {
     redirect(root_url() . '/index.php?redirect_to=' . url());
 }

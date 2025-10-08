@@ -28,9 +28,10 @@ angularApp.controller("StockReportsController", [
             order: [[0, "asc"]],
             dom: '<"row mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 text-end"f>>rt<"row mt-3"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6 text-end"p>>',
             columnDefs: [
-                { targets: [10, 11], orderable: false },
-                { className: "text-center", targets: [0, 1, 3, 4, 5, 8, 9, 10, 11] },
-                { className: "pl-3", targets: [2, 6, 7] },
+                { targets: [], orderable: false },
+                { className: "text-center", targets: [0, 1, 2, 4, 5, 8, 9] },
+                { className: "pl-3", targets: [3, 6, 7] },
+                // { className: "text-lg", targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
                 // {
                 //     className: "text-capitalize", targets: [10], render: function (data) {
                 //         if (!data) return '';
@@ -57,16 +58,17 @@ angularApp.controller("StockReportsController", [
             aoColumns: [
                 { data: "row_index" },
                 { data: "p_code" },
+                { data: "bill_no" },
                 { data: "p_name" },
                 { data: "mat" },
                 { data: "karate" },
                 { data: "category" },
-                { data: "supplier" },
+                // { data: "supplier" },
                 { data: "cost" },
                 { data: "wgt" },
-                { data: "qty" },
-                { data: "sts" },
-                { data: "view" }
+                // { data: "qty" },
+                { data: "sts" }
+                // { data: "view" }
             ],
 
             drawCallback: function () {

@@ -22,24 +22,8 @@ $document->setController('AddProductController');
                 <!-- /.card-tools -->
             </div>
             <!-- /.card-header -->
-            <div class="card-body">
-                <!-- <div class="table-responsive">
-                    <div class="card-body p-0">
-                        <table id="categoryTable" class="table table-hover mb-0">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Category Name</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                              
-                            </tbody>
-                        </table>
-                    </div>
-                </div> -->
-                <div id="category-tree">
-
-                </div>
+            <div class="card-body pr-1">
+                <div id="category-tree"></div>
             </div>
             <!-- /.card-body -->
         </div>

@@ -10,6 +10,12 @@ if (!is_loggedin()) {
 }
 $product_model = registry()->get('loader')->model('product'); // call modal file
 
+function get_bill_no($p_id) {
+    $statement = db()->prepare("SELECT s.bill_no FROM sales_item si JOIN sales_info s ON si.sales_id = s.id WHERE si.p_id = $p_id");
+    $statement->execute();
+    return $statement->fetch(PDO::FETCH_ASSOC);
+}
+
 // stock checking history model
 if (isset($request->get['action_type']) && $request->get['action_type'] == 'CHECKED_HISTORY') {
     try {
@@ -504,6 +510,9 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
                 $karate = $row["karate"];
                 $row["karate"] = $karate . " k";
             }
+
+            $bill = get_bill_no($row['id']);
+            $row['bill_no'] = $bill ? $bill['bill_no'] : "-";
 
             if ($row['status'] == 0) {
                 $row['sts'] = '<span class="badge bg-success p-1">For sale</span>';

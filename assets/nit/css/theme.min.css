@@ -2017,10 +2017,10 @@ pre code {
     background-color: rgba(0, 0, 0, .05)
 }
 
-/* .table-hover tbody tr:hover {
+.table-hover tbody tr:hover {
     color           : #212529;
     background-color: rgba(0, 0, 0, .075)
-} */
+}
 
 .table-primary,
 .table-primary>td,

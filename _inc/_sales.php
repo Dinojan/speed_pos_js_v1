@@ -11,8 +11,8 @@ $product_model = registry()->get('loader')->model('product');
 
 function gererateUniqueId()
 {
-    $prepix = "NJV-SALE";
-    $statement = db()->prepare("SELECT * FROM invoice_info ORDER BY id DESC LIMIT 1");
+    $prepix = "NJV_SALE_";
+    $statement = db()->prepare("SELECT * FROM sales_info ORDER BY id DESC LIMIT 1");
     $statement->execute();
     $row = $statement->fetch(PDO::FETCH_ASSOC);
     if ($row) {

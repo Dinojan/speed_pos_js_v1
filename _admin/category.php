@@ -1,5 +1,6 @@
 <?php
 include("../_init.php");
+redirect(root_url() . '/_admin/add_product.php');
 if (!is_loggedin()) {
     redirect(root_url() . '/index.php?redirect_to=' . url());
 }
