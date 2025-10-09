@@ -114,8 +114,11 @@ include('src/_top.php');
 <div>
     <div class="fixed-top">
         <nav class="navbar navbar-dark bg-dark px-lg-4">
-            <a class="btn btn-dark" href="../_admin/dashboard.php"><i class="fas fa-home"></i></a>
-            <a href="">SPEED POS >>> <small><?php echo store('name') ?></small></a>
+            <div class="d-flex">
+                <a class="btn btn-dark" href="../_admin/dashboard.php"><i class="fas fa-home"></i></a>
+                <a class="btn btn-dark" href="../_admin/return.php"><i class="fas fa-undo"></i></a>
+            </div>
+            <a href=""><?php echo store('name') ?></a>
             <div>
                 <button class="btn btn-dark">
                     <a class="text-white" data-widget="fullscreen" id="fullscreen-trigger" href="#" role="button">
@@ -137,7 +140,7 @@ include('src/_top.php');
             <form action="" class="card mb-0" style="height: 88vh;" onsubmit="return false" method="post">
                 <input type="hidden" id="action_type" name="action_type" value="CREATE">
                 <div class="card-header pl-2 bg-primary m-0">
-                    <h5 class="p-2"><i class="fas fa-tags"></i> <?= trans("label_current_order") ?></h5>
+                    <h5 class="p-2"><i class="fas fa-cash-register mr-2"></i> <?= trans("label_current_sale") ?></h5>
                 </div>
                 <div class="card-body position-relative" style="max-height: calc(93vh-27.2vh); overflow-y:auto;">
                     <div id="invoice-item-list" class="table-responsive position-relative">
@@ -182,8 +185,8 @@ include('src/_top.php');
                             </tr>
                             <tr class="bg-success text-white font-weight-bold">
                                 <td class="border-right border-light d-flex flex-row justify-content-between">
-                                    <span class="col-8"><?= trans("label_total_items:") ?> {{ getTotalItems() }} of ({{ cart.length }})</span>
-                                    <span class="col-4 d-flex justify-content-between">
+                                    <span class="col-4 col-lg-8"><?= trans("label_total_items:") ?> {{ getTotalItems() }} of ({{ cart.length }})</span>
+                                    <span class="col-8 col-lg-4 d-flex justify-content-between">
                                         <span class="col-4"><?= trans("label_final:") ?></span>
                                         <span class="col-8 text-right">{{ getTotal() | number:2 }}</span></span>
                                 </td>

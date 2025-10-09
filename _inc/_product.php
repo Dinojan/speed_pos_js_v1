@@ -515,13 +515,13 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $row['bill_no'] = $bill ? $bill['bill_no'] : "-";
 
             if ($row['status'] == 0) {
-                $row['sts'] = '<span class="badge bg-success p-1">For sale</span>';
+                $row['sts'] = '<span class="badge bg-success p-1 my-2">For sale</span>';
             } else if ($row['status'] == 2) {
-                $row['sts'] = '<span class="badge bg-danger p-1">Deleted</span>';
+                $row['sts'] = '<span class="badge bg-danger p-1 my-2">Deleted</span>';
             } else if ($row['status'] == 3) {
-                $row['sts'] = '<span class="badge bg-secondary p-1">Sold</span>';
+                $row['sts'] = '<span class="badge bg-secondary p-1 my-2">Sold</span>';
             } else {
-                $row['sts'] = '<span class="badge bg-warning p-1">Not for sale</span>';
+                $row['sts'] = '<span class="badge bg-warning p-1 my-2">Not for sale</span>';
             }
 
             $row["mat"] = get_the_category($row['material'])['c_name'];

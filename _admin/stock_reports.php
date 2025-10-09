@@ -75,7 +75,7 @@ include('src/_top.php');
         }
         ?>
         <div class="table-responsive">
-            <table id="stock-report" class="table table-bordered table-striped table-hover" data-hide-colums="<?php echo $hide_colums; ?>">
+            <table id="stock-report" class="table table-sm table-bordered table-striped table-hover" data-hide-colums="<?php echo $hide_colums; ?>">
                 <thead class="bg-primary">
                     <tr>
                         <th><?php echo trans("label_#") ?></th>

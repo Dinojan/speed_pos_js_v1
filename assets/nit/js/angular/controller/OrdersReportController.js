@@ -42,7 +42,8 @@ angularApp.controller("OrdersReportController", [
                 data: {
                     action_type: "GET_TABLE_DATA",
                     from: $scope.from,
-                    to: $scope.to
+                    to: $scope.to,
+                    type: '0'
                 },
                 dataSrc: "data"
             },

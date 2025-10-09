@@ -42,9 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action_type']) && $_GET
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($result && $result['status'] == 0) {
-            throw new Exception("Reference or bill number already held");
-        } else if ($result) {
             throw new Exception("Reference or bill number already exist");
+        } else if ($result) {
+            throw new Exception("Reference or bill number already returned");
         }
 
 

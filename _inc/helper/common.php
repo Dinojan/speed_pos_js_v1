@@ -853,7 +853,7 @@ function get_sum($table_name, $sum_column, $filter_column = null, $filter_value 
 
 	// safe whitelist
 	$allowed_tables = ['orders', 'customer', 'product', 'invoice_info'];
-	$allowed_columns = ['wgt', 'total_amt', 'total_paid', 'outstanding', 'total_payable', 'material', 'order_status'];
+	$allowed_columns = ['wgt', 'total_amt', 'total_paid', 'outstanding', 'total_payable', 'material', 'order_status', 'cost', 's_id'];
 
 	if (!in_array($table_name, $allowed_tables)) {
 		throw new Exception("Invalid table name");

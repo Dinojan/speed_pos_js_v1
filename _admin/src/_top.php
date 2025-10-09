@@ -22,6 +22,9 @@ if (!empty($request->get)) {
   $query_string = '?filter=yes';
 }
 $query_string = str_replace(array('&'), '?', $query_string);
+
+// Check if current navigation is sale or return
+$hide_layout = (current_nav() == 'sale' || current_nav() == 'return' || current_nav() == 'pos');
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $document->langTag($active_lang); ?>" ng-app="NITAgApp">
@@ -97,29 +100,32 @@ $query_string = str_replace(array('&'), '?', $query_string);
     var logo = '../assets/nit/img/logo.png';
     var user = '';
     var current_nav = "<?php echo current_nav() ?>";
+    var hide_layout = <?php echo $hide_layout ? 'true' : 'false'; ?>;
   </script>
 
 </head>
 
-<body class="<?= style_class('body_class') . " " . $body_class ?>   <?php echo (current_nav() != 'sale' ) ? 'sidebar-mini' : '' ?> layout-fixed skin-green pace-primary" <?php echo (current_nav() == 'sale') ? 'style="min-height: 100vh;"' : '' ?>>
+<body class="<?= style_class('body_class') . " " . $body_class ?>   <?php echo (!$hide_layout) ? 'sidebar-mini' : '' ?> layout-fixed skin-green pace-primary" <?php echo ($hide_layout) ? 'style="min-height: 100vh;"' : '' ?>>
   <!--begin::App Wrapper-->
   <div class="app-wrapper1" ng-controller="<?= $document->getController(); ?>">
     <!-- Preloader -->
     <?php include('src/_preloader.php'); ?>
+    
     <!-- Navbar -->
-    <?php if (current_nav() != 'sale') {
+    <?php if (!$hide_layout) {
       include('src/_nav.php');
     } ?>
     <!-- /.navbar -->
+    
     <!-- Main Sidebar Container -->
-    <?php if (current_nav() != 'sale') {
+    <?php if (!$hide_layout) {
       include('src/_aside.php');
     } ?>
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
-      <?php if (current_nav() != 'sale') { ?>
+      <?php if (!$hide_layout) { ?>
         <div class="content-header">
           <div class="container-fluid ">
             <div class="row mb-2">
@@ -150,5 +156,5 @@ $query_string = str_replace(array('&'), '?', $query_string);
       <!-- /.content-header -->
 
       <!-- Main content -->
-      <section class="<?php echo (current_nav() != 'sale') ? 'content ' : '' ?>">
-        <div class="<?php echo (current_nav() != 'sale') ? 'container-fluid ' : '' ?>">
+      <section class="<?php echo (!$hide_layout) ? 'content ' : '' ?>">
+        <div class="<?php echo (!$hide_layout) ? 'container-fluid ' : '' ?>">
