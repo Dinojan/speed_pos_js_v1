@@ -12,6 +12,12 @@ angularApp.controller("StockCheckingController", [
         $scope.TotalCheckedItems = 0;
         $scope.checkedItems = [];
         $scope.uncheckedItems = [];
+        $scope.scannerActive = false;
+        $scope.isScanning = false;
+        $scope.currentFacingMode = 'environment';
+        $scope.flashOn = false;
+        $scope.cameraAttempts = 0;
+        $scope.maxCameraAttempts = 3;
 
         $scope.loadTableData = function () {
             $http({
@@ -31,7 +37,6 @@ angularApp.controller("StockCheckingController", [
                 $scope.renderDynamicTables($scope.checkedItems, $scope.uncheckedItems);
             });
         };
-
 
         $scope.renderDynamicTables = function (checkedData, uncheckedData) {
             if ($.fn.DataTable.isDataTable("#slectedItems")) $("#slectedItems").DataTable().destroy();
@@ -155,8 +160,349 @@ angularApp.controller("StockCheckingController", [
             $('.buttons-pdf').removeClass('btn-secondary').addClass('btn-outline-danger btn-sm');
         }
 
-        // 🔹 Initial data load
-        $scope.loadTableData();
+
+        // Scanner Functions
+        $scope.startScanner = function () {
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                const errorMsg = 'Camera API not supported in this browser. Please use Chrome, Firefox, or Safari.';
+                $scope.showCameraError(errorMsg);
+                return;
+            }
+
+            const scannerContainer = document.getElementById('scanner-container');
+            const video = document.getElementById('scanner-video');
+
+            if (!scannerContainer || !video) {
+                return;
+            }
+            
+            scannerContainer.style.display = 'flex';
+
+            // const scannerOverlay = document.getElementById('scanner-overlay');
+            // if (scannerOverlay) {
+            //     scannerOverlay.classList.remove('scanning-animation');
+            // }
+
+            $scope.scannerActive = true;
+            $scope.isScanning = true;
+            $scope.cameraAttempts = 0;
+
+            document.getElementById('camera-error').style.display = 'none';
+
+            $scope.detectAndStartCamera();
+
+        };
+
+        $scope.detectAndStartCamera = function () {
+            $scope.cameraAttempts++;
+
+            const cameraConfigs = [
+                { name: "Rear Camera", constraints: { video: { facingMode: "environment" } } },
+                { name: "Front Camera", constraints: { video: { facingMode: "user" } } },
+                { name: "Any Camera", constraints: { video: true } },
+            ];
+
+            const configIndex = Math.min($scope.cameraAttempts - 1, cameraConfigs.length - 1);
+            const config = cameraConfigs[configIndex];
+
+            navigator.mediaDevices.getUserMedia(config.constraints)
+                .then(function (stream) {
+                    $scope.handleCameraSuccess(stream);
+                })
+                .catch(function (error) {
+
+                    if ($scope.cameraAttempts < 3 && configIndex < cameraConfigs.length - 1) {
+                        setTimeout(() => $scope.detectAndStartCamera(), 500);
+                    } else {
+                        $scope.handleCameraError(error);
+                    }
+                });
+        };
+
+        $scope.handleCameraSuccess = function (stream) {
+            const video = document.getElementById('scanner-video');
+            if (!video) return;
+
+            video.srcObject = stream;
+
+            video.onloadedmetadata = function () {
+                video.play().then(() => {
+
+                    // Start both barcode and QR code scanners
+                    $scope.startBarcodeScanner();
+                    $scope.startQRCodeScanner();
+
+                }).catch(err => {
+                    $scope.showCameraError('Failed to start video playback: ' + err.message);
+                });
+            };
+
+            video.onerror = function (err) {
+                $scope.showCameraError('Video error occurred');
+            };
+        };
+
+        // Barcode Scanner (QuaggaJS)
+        $scope.startBarcodeScanner = function () {
+            if (typeof Quagga === 'undefined') {
+                return;
+            }
+
+            try {
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: document.querySelector('#scanner-video'),
+                        constraints: {
+                            facingMode: $scope.currentFacingMode
+                        }
+                    },
+                    decoder: {
+                        readers: [
+                            "code_128_reader",
+                            "ean_reader",
+                            "ean_8_reader",
+                            "code_39_reader",
+                            "code_39_vin_reader",
+                            "codabar_reader",
+                            "upc_reader",
+                            "upc_e_reader",
+                            "i2of5_reader",
+                            "2of5_reader",
+                            "code_93_reader"
+                        ]
+                    },
+                    locator: {
+                        patchSize: "medium",
+                        halfSample: true
+                    },
+                    locate: true,
+                    numOfWorkers: 2
+                }, function (err) {
+                    if (err) {
+                        return;
+                    }
+
+                    Quagga.start();
+
+                    Quagga.onDetected(function (result) {
+                        if (result && result.codeResult && result.codeResult.code) {
+                            const code = result.codeResult.code;
+                            $scope.$apply(function () {
+                                $scope.handleScannedCode(code, 'barcode');
+                            });
+                        }
+                    });
+                });
+            } catch (error) {
+                Toast.fire({
+                    icon: 'Error',
+                    title: "Opps!",
+                    text: 'Error starting barcode scanner:' + error
+                })
+            }
+        };
+
+        // QR Code Scanner (jsQR)
+        $scope.startQRCodeScanner = function () {
+            if (typeof jsQR === 'undefined') {
+                return;
+            }
+            $scope.qrScanningActive = true;
+            $scope.scanQRCode();
+        };
+
+        $scope.scanQRCode = function () {
+            if (!$scope.qrScanningActive || !$scope.isScanning) return;
+
+            const video = document.getElementById('scanner-video');
+            const canvas = document.getElementById('scanner-canvas');
+            const context = canvas.getContext('2d');
+
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                // Set canvas dimensions to match video
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                // Draw video frame to canvas
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Get image data from canvas
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+                // Scan for QR code
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+
+                if (code) {
+                    $scope.$apply(function () {
+                        $scope.handleScannedCode(code.data, 'qr_code');
+                    });
+                    return; // Stop scanning after detection
+                }
+            }
+
+            // Continue scanning
+            if ($scope.qrScanningActive && $scope.isScanning) {
+                requestAnimationFrame(() => $scope.scanQRCode());
+            }
+        };
+
+        $scope.handleScannedCode = function (code, type) {
+
+            $scope.stopScanner();
+
+            // Fill input with scanned code
+            const searchInput = document.getElementById('serach_input');
+            if (searchInput) {
+                searchInput.value = code;
+                searchInput.focus();
+            }
+
+            // Show success message with type
+            if (typeof Toast !== 'undefined') {
+                Toast.fire({
+                    icon: 'success',
+                    title: `${type === 'qr_code' ? 'QR Code' : 'Barcode'} Scanned!`,
+                    text: 'Detected: ' + code
+                });
+            }
+
+            // Auto-submit after a brief delay
+            setTimeout(function () {
+                $scope.searchItem();
+
+                // Clear the input after submission to prepare for next scan
+                setTimeout(function () {
+                    if (searchInput) {
+                        searchInput.value = '';
+                    }
+                }, 500);
+
+            }, 1000);
+            $scope.startScanner();
+        };
+
+        $scope.stopScanner = function () {
+            $scope.isScanning = false;
+            $scope.qrScanningActive = false;
+
+            // Stop Quagga barcode scanner
+            if (typeof Quagga !== 'undefined') {
+                try {
+                    Quagga.offDetected();
+                    Quagga.stop();
+                } catch (e) {
+                    Toast.fire({
+                        icon: 'Error',
+                        title: "Opps!",
+                        text: 'Error stopping Quagga:' + e
+                    })
+                }
+            }
+
+            // Stop video stream
+            const video = document.getElementById('scanner-video');
+            if (video && video.srcObject) {
+                const tracks = video.srcObject.getTracks();
+                tracks.forEach(track => {
+                    track.stop();
+                });
+                video.srcObject = null;
+            }
+
+            const scannerContainer = document.getElementById('scanner-container');
+            if (scannerContainer) {
+                scannerContainer.style.display = 'none';
+            }
+
+            // const scannerOverlay = document.getElementById('scanner-overlay');
+            // if (scannerOverlay) {
+            //     scannerOverlay.classList.remove('scanning-animation');
+            // }
+
+            $scope.scannerActive = false;
+            $scope.flashOn = false;
+
+            document.getElementById('camera-error').style.display = 'none';
+        };
+
+        // $scope.switchCamera = function () {
+        //     $scope.currentFacingMode = $scope.currentFacingMode === 'environment' ? 'user' : 'environment';
+        //     $scope.stopScanner();
+        //     setTimeout(() => {
+        //         $scope.$apply(function () {
+        //             $scope.startScanner();
+        //         });
+        //     }, 1000);
+        // };
+
+        // Check camera availability on page load
+        $scope.checkCameraAvailability = function () {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+                Toast.fire({
+                    icon: 'Error',
+                    title: "Opps!",
+                    text: 'Camera enumeration not supported'
+                })
+                return;
+            }
+
+            navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+                    if (videoDevices.length === 0) {
+                        Toast.fire({
+                            icon: 'Error',
+                            title: "Opps!",
+                            text: 'No cameras detected on this device'
+                        })
+                    }
+                })
+                .catch(err => {
+                    Toast.fire({
+                        icon: 'Error',
+                        title: 'Opps!',
+                        text: 'Error enumerating devices:' + err
+                    })
+                });
+        };
+
+        $scope.initScanner = function () {
+            // Check camera availability
+            $scope.checkCameraAvailability();
+
+            $(document).on("click", "#btn-scan", function () {
+                $scope.$apply(function () {
+                    $scope.startScanner();
+                });
+            });
+
+            $(document).on("click", "#scanner-close", function () {
+                $scope.$apply(function () {
+                    $scope.stopScanner();
+                });
+            });
+
+            // $(document).on("click", "#switch-camera", function () {
+            //     $scope.$apply(function () {
+            //         $scope.switchCamera();
+            //     });
+            // });
+
+            // $(document).on("click", "#scanner-container", function (e) {
+            //     if (e.target.id === 'scanner-container') {
+            //         $scope.$apply(function () {
+            //             $scope.stopScanner();
+            //         });
+            //     }
+            // });
+        };
+
 
         $scope.searchItem = function () {
             $http({
@@ -182,8 +528,6 @@ angularApp.controller("StockCheckingController", [
                     window.angular.forEach(response.data, function (value) {
                         alertMsg += value + " ";
                     });
-                    ;
-                    //window.toastr.warning(alertMsg, "Warning!");
                     Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
                 });
         }
@@ -205,12 +549,6 @@ angularApp.controller("StockCheckingController", [
             }
 
             const proceedClear = function () {
-                // $scope.uncheckedItems = [];
-                // $scope.checkedItems = [];
-                // $scope.totalItems = 0;
-                // $scope.TotalCheckedItems = 0;
-                // $scope.renderDynamicTables($scope.checkedItems, $scope.uncheckedItems);
-
                 $http({
                     method: 'POST',
                     url: '../_inc/_stock_checking.php?action_type=CLEAR_SELECTED_ITEMS'
@@ -238,11 +576,8 @@ angularApp.controller("StockCheckingController", [
             }
         };
 
-
         $(document).ready(function () {
             const inputElem = $('#serach_input');
-
-            // const blockedChars = /["\/\*\+,\.`~!@#$%^&()={}[\];:'"|\\<>?]/;
 
             const blockedKeys = [
                 'NumLock', 'ScrollLock', 'PrintScreen', 'Pause', 'Insert',
@@ -253,12 +588,6 @@ angularApp.controller("StockCheckingController", [
 
             $(document).on('keydown', function (event) {
                 const key = event.key;
-
-                // Block certain characters
-                // if (blockedChars.test(key)) {
-                //     event.preventDefault();
-                //     return false;
-                // }
 
                 // Ignore blocked keys
                 if (!blockedKeys.includes(key)) {
@@ -283,5 +612,9 @@ angularApp.controller("StockCheckingController", [
                 }
             });
         });
+
+        // 🔹 Initialize the application
+        $scope.loadTableData();
+        $scope.initScanner();
     }
 ]);

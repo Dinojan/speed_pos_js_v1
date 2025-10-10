@@ -103,6 +103,8 @@ $hide_layout = (current_nav() == 'sale' || current_nav() == 'return' || current_
     var hide_layout = <?php echo $hide_layout ? 'true' : 'false'; ?>;
   </script>
 
+<!-- QR/Barcode scanner libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 
 <body class="<?= style_class('body_class') . " " . $body_class ?>   <?php echo (!$hide_layout) ? 'sidebar-mini' : '' ?> layout-fixed skin-green pace-primary" <?php echo ($hide_layout) ? 'style="min-height: 100vh;"' : '' ?>>
@@ -110,13 +112,13 @@ $hide_layout = (current_nav() == 'sale' || current_nav() == 'return' || current_
   <div class="app-wrapper1" ng-controller="<?= $document->getController(); ?>">
     <!-- Preloader -->
     <?php include('src/_preloader.php'); ?>
-    
+
     <!-- Navbar -->
     <?php if (!$hide_layout) {
       include('src/_nav.php');
     } ?>
     <!-- /.navbar -->
-    
+
     <!-- Main Sidebar Container -->
     <?php if (!$hide_layout) {
       include('src/_aside.php');

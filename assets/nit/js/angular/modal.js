@@ -944,6 +944,101 @@ angularApp.factory("ProductAddModal", [
     ) {
         return function ($scope, data = {}) {
             const modalId = "ProductAddModal";
+            // QR Code generation and printing function
+            function generateAndPrintQRCode(serialId, wgt = 8) {
+                // Create QR code using a simple library or API
+                const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(serialId)}`;
+
+                // Create a hidden iframe for printing
+                const printFrame = document.createElement('iframe');
+                printFrame.style.display = 'none';
+                printFrame.onload = function () {
+                    const printDocument = printFrame.contentWindow.document;
+
+                    printDocument.open();
+                    printDocument.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>QR Code - ${serialId}</title>
+                            <style>
+                                body { 
+                                    font-family: Arial, sans-serif; 
+                                    text-align: center; 
+                                    padding: 20px;
+                                    margin: 0;
+                                    height: 74px;
+                                    width: 230px;
+                                }
+                                .qr-container {
+                                    display: flex;
+                                    flex-direction: row;
+                                    gap: 5px;
+                                    align-items: center;
+                                    justify-content: space-between;
+                                    height: 74px;
+                                    width: 110px;
+                                    padding: 0 5px;
+                                }
+
+                                .qr-code {
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 5px;
+                                    align-items: center;
+                                    justify-content: cenetr;
+                                    width: 50px;
+                                }
+                                .serial-id {
+                                    font-size: 10px;
+                                    font-weight: bold;
+                                }
+                                @media print {
+                                    body { margin: 0; padding: 0; }
+                                    .qr-container { height: 100%; page-break-after: avoid; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="qr-container">
+                                <div class="qr-code">
+                                    <img style="border: 1px solid #000; padding: 2px;" width="50px" height="50px" src="${qrCodeUrl}" alt="QR Code for ${serialId}" />
+                                    <div class="serial-id">${serialId}</div>
+                                </div>
+                                <div class="qr-code" style="border-left:1px solid #000; height: 100%;">
+                                    <div class="serial-id" style="position: relative; top:calc(50% - 5px);">Wgt: ${wgt}g</div>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                    `);
+                    printDocument.close();
+
+                    // Wait for image to load then print
+                    const img = printDocument.querySelector('img');
+                    img.onload = function () {
+                        printFrame.contentWindow.focus();
+                        printFrame.contentWindow.print();
+
+                        // Clean up after printing
+                        setTimeout(() => {
+                            document.body.removeChild(printFrame);
+                        }, 1000);
+                    };
+
+                    // Fallback in case onload doesn't fire
+                    setTimeout(() => {
+                        if (!img.complete) {
+                            printFrame.contentWindow.focus();
+                            printFrame.contentWindow.print();
+                            setTimeout(() => document.body.removeChild(printFrame), 1000);
+                        }
+                    }, 500);
+                };
+
+                document.body.appendChild(printFrame);
+            }
+
             // Step 1: Load modal form from server
             $http.get(window.baseUrl + "/_inc/_product.php?action_type=CREATE").then(function (response) {
                 const formHtml = response.data;
@@ -1166,6 +1261,10 @@ angularApp.factory("ProductAddModal", [
 
                         $rootScope.$broadcast("PRODUCT_LIST_REFRESH");
                         $btn.prop("disabled", false); // enable again after success
+
+                        $timeout(function () {
+                            generateAndPrintQRCode(lastCode);
+                        }, 500);
                     },
                     function (response) {
                         let alertMsg = "";
