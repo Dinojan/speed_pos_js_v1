@@ -10,7 +10,8 @@ if (!is_loggedin()) {
 }
 $product_model = registry()->get('loader')->model('product'); // call modal file
 
-function get_bill_no($p_id) {
+function get_bill_no($p_id)
+{
     $statement = db()->prepare("SELECT s.bill_no FROM sales_item si JOIN sales_info s ON si.sales_id = s.id WHERE si.p_id = $p_id");
     $statement->execute();
     return $statement->fetch(PDO::FETCH_ASSOC);
@@ -310,7 +311,7 @@ if (isset($_GET['action_type']) && $_GET['action_type'] == 'GET_POS_PRODUCT') {
         $product_model = registry()->get('loader')->model('product');
         $barcode = $_GET['barcode'] ?? null;
         $nameOrBarcode = $_GET['nameOrBarcode'] ?? null;
-        
+
         if (isset($_GET['c_id']) && $_GET['c_id'] != "") {
             $products = $product_model->getProductsCategoryWise($_GET['c_id']);
         } elseif ($barcode || $nameOrBarcode) {
@@ -739,5 +740,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && $_GET['action_type'] == "GET_NEW_REF_
         header('HTTP/1.1 500 Internal Server Error');
         echo json_encode(['error' => $e->getMessage()]);
         exit;
+    }
+}
+
+// Permenent delete
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+
+    if (isset($input['action_type']) && $input['action_type'] == "DELETE_MULTIPLE") {
+        try {
+            $pdo = db();
+
+            $ids = isset($input['ids']) ? $input['ids'] : [];
+
+            if (empty($ids)) {
+                throw new Exception("No products selected for deletion");
+            }
+
+            // Build placeholders for prepared statement
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+            // Delete query
+            $stmt = $pdo->prepare("DELETE FROM product WHERE id IN ($placeholders)");
+            $stmt->execute($ids);
+
+            // Respond
+            header('Content-Type: application/json');
+            echo json_encode([
+                'status' => 'success',
+                'deletedCount' => $stmt->rowCount(),
+                'message' => $stmt->rowCount() . ' products deleted successfully'
+            ]);
+            exit;
+        } catch (Exception $e) {
+            header('HTTP/1.1 500 Internal Server Error');
+            echo json_encode(['error' => $e->getMessage()]);
+            exit;
+        }
     }
 }
