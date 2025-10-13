@@ -21,7 +21,7 @@ include('src/_top.php');
 
 <div class="card card-outline card-primary">
   <div class="card-header">
-    <h3 class="card-title">
+    <h3 class="card-title text-lg font-weight-bold">
       <?php echo trans('text_order_report'); ?>
     </h3>
     <div class="card-tools">
@@ -41,7 +41,7 @@ include('src/_top.php');
     }
     ?>
     <div class="table-responsive">
-      <table id="order-report" class="table table-sm table-bordered table-striped" data-hide-colums="<?php echo $hide_colums; ?>">
+      <table id="order-report" class="table  table-bordered table-striped" data-hide-colums="<?php echo $hide_colums; ?>">
         <thead class="bg-primary">
           <tr>
             <th><?php echo trans("label_#") ?></th>

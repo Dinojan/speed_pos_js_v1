@@ -2,30 +2,30 @@
     <input type="hidden" id="action_type" name="action_type" value="CREATE">
 
     <!-- Category Name -->
-    <div class="col-lg-6">
+    <div class="col-12">
         <div class="form-group">
             <label for="c_name">
                 <?= trans('label_category_name'); ?> <i class="text-danger">*</i>
             </label>
-            <input type="text" class="form-control" id="c_name" name="c_name" placeholder="Category Name" required>
+            <input type="text" class="form-control" id="cat_name" name="c_name" placeholder="Category Name" required>
         </div>
     </div>
 
     <!-- Parent Category -->
-    <div class="col-lg-6">
+    <!-- <div class="col-lg-6">
         <div class="form-group">
             <label for="p_id">
-                <?= trans('label_parent_category'); ?> <i class="text-danger">*</i>
+                <?php // echo trans('label_parent_category'); ?> <i class="text-danger">*</i>
             </label>
             <select name="p_id" id="p_id" class="form-control select2 w-100" required>
-                <option value=""><?= trans('label_select_one'); ?></option>
-                <?= set_category_tree_to_select(get_category_tree()); ?>
+                <option value=""><?php // echo trans('label_select_one'); ?></option>
+                <?php // echo set_category_tree_to_select(get_category_tree()); ?>
                 <?php //foreach (get_all_categories(1) as $cat): ?>
-                    <!-- <option value="<?= $cat['id'] ?>"><?= $cat['c_name']; ?></option> -->
+                    <option value="<?php // echo $cat['id'] ?>"><?php // echo $cat['c_name']; ?></option>
                 <?php //endforeach; ?>
             </select>
         </div>
-    </div>
+    </div> -->
 
     <!-- Buttons -->
     <div class="col-12 text-center">

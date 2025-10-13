@@ -196,14 +196,14 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $row["row_index"] = $i;
             $row['user_count'] = $usergroup_model->totalUser($row['group_id']);
             if ($row['group_id'] != 1) {
-                $row['edit'] = '<button id="edit-user-group" class="btn btn-outline-success btn-sm edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
+                $row['edit'] = '<button id="edit-user-group" class="btn btn-outline-success btn-lg edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
             } else {
-                $row['edit'] = '<button id="edit-user-group" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
+                $row['edit'] = '<button id="edit-user-group" class="btn btn-outline-success btn-lg edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
             }
             if ($row['group_id'] != 1) {
-                $row['delete'] = '<button id="delete-user-group" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+                $row['delete'] = '<button id="delete-user-group" class="btn btn-outline-danger btn-lg delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
             } else {
-                $row['delete'] = '<button class="btn btn-outline-danger btn-sm delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
+                $row['delete'] = '<button class="btn btn-outline-danger btn-lg delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
             }
 
         }

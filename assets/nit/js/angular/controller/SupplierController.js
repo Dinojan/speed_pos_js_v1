@@ -47,11 +47,11 @@ angularApp.controller("SupplierController", [
             ],
 
             drawCallback: function () {
-                $('.buttons-print').removeClass('btn-secondary').addClass('btn-outline-primary btn-sm');
-                $('.buttons-copy').removeClass('btn-secondary').addClass('btn-outline-dark btn-sm');
-                $('.buttons-excel').removeClass('btn-secondary').addClass('btn-outline-success btn-sm');
-                $('.buttons-csv').removeClass('btn-secondary').addClass('btn-outline-success btn-sm');
-                $('.buttons-pdf').removeClass('btn-secondary').addClass('btn-outline-danger btn-sm');
+                $('.buttons-print').removeClass('btn-secondary').addClass('btn-outline-primary btn-lg');
+                $('.buttons-copy').removeClass('btn-secondary').addClass('btn-outline-dark btn-lg');
+                $('.buttons-excel').removeClass('btn-secondary').addClass('btn-outline-success btn-lg');
+                $('.buttons-csv').removeClass('btn-secondary').addClass('btn-outline-success btn-lg');
+                $('.buttons-pdf').removeClass('btn-secondary').addClass('btn-outline-danger btn-lg');
             }
         });
 

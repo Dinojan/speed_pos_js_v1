@@ -20,7 +20,7 @@ include('src/_top.php');
 
 <div class="card card-outline card-primary">
   <div class="card-header">
-    <h3 class="card-title">
+    <h3 class="card-title text-lg font-weight-bold">
       <?php echo trans('text_sales_list'); ?>
     </h3>
     <div class="card-tools">
@@ -40,7 +40,7 @@ include('src/_top.php');
     }
     ?>
     <div class="table-responsive">
-      <table id="sales-list" class="table table-sm table-bordered table-striped">
+      <table id="sales-list" class="table  table-bordered table-striped">
         <thead class="bg-primary">
           <tr>
             <th><?php echo trans('label_#'); ?></th>

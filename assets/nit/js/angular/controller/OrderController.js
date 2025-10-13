@@ -1,6 +1,6 @@
 angularApp.controller("OrderController", [
-    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce","OrderPayModel", "OrderAddModel", "OrderEditModel",
-    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce,OrderPayModel, OrderAddModel, OrderEditModel,) {
+    "$scope", "API_URL", "window", "jQuery", "$compile", "$uibModal", "$http", "$sce", "OrderPayModel", "OrderAddModel", "OrderEditModel",
+    function ($scope, API_URL, window, $, $compile, $uibModal, $http, $sce, OrderPayModel, OrderAddModel, OrderEditModel,) {
         var dt = $("#orderTable");
         var i;
         var hideColums = dt.data("hide-colums").split(",");
@@ -35,7 +35,7 @@ angularApp.controller("OrderController", [
             ajax: {
                 url: "../_inc/_order.php",
                 type: "GET",
-                data: { action_type: "GET_TABLE_DATA", isdeleted: isdeleted , from: $scope.from, to: $scope.to},
+                data: { action_type: "GET_TABLE_DATA", isdeleted: isdeleted, from: $scope.from, to: $scope.to, type: '0' },
                 dataSrc: "data"
             },
             aoColumns: [
@@ -57,11 +57,11 @@ angularApp.controller("OrderController", [
             ],
 
             drawCallback: function () {
-                $('.buttons-print').removeClass('btn-secondary').addClass('btn-outline-primary btn-sm');
-                $('.buttons-copy').removeClass('btn-secondary').addClass('btn-outline-dark btn-sm');
-                $('.buttons-excel').removeClass('btn-secondary').addClass('btn-outline-success btn-sm');
-                $('.buttons-csv').removeClass('btn-secondary').addClass('btn-outline-success btn-sm');
-                $('.buttons-pdf').removeClass('btn-secondary').addClass('btn-outline-danger btn-sm');
+                $('.buttons-print').removeClass('btn-secondary').addClass('btn-outline-primary btn-lg');
+                $('.buttons-copy').removeClass('btn-secondary').addClass('btn-outline-dark btn-lg');
+                $('.buttons-excel').removeClass('btn-secondary').addClass('btn-outline-success btn-lg');
+                $('.buttons-csv').removeClass('btn-secondary').addClass('btn-outline-success btn-lg');
+                $('.buttons-pdf').removeClass('btn-secondary').addClass('btn-outline-danger btn-lg');
             }
         });
         $(document).delegate("#pay-order", "click", function (e) {
@@ -90,6 +90,7 @@ angularApp.controller("OrderController", [
             }
             if (d) {
                 $scope.order = d;
+                $scope.currentURL = window.currentURL;
                 OrderEditModel($scope);
             }
         });
@@ -157,6 +158,7 @@ angularApp.controller("OrderController", [
 
         // Optional: method to open modal
         $scope.openAddorderModal = function () {
+            $scope.currentURL = window.currentURL;
             OrderAddModel($scope);
         };
     }

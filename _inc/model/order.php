@@ -1,10 +1,10 @@
 <?php
 class ModelOrder extends Model
 {
-    public function addorder($ref, $cid, $data)
+    public function addorder($ref, $cid, $data, $type)
     {
-        $statement = $this->db->prepare("INSERT INTO `orders` (`ref_no`,`cus_id`,`cus_name`,`cus_mobile`,`cus_address`,`order_details`,`total_amt`,`advance_amt`,total_paid,created_by) VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,?)");
-        $statement->execute(array($ref, $cid, $data['cus_name'], $data['cus_mobile'], $data['cus_address'], $data['order_details'], $data['total_amt'], $data['advance_amt'], $data['advance_amt'], user_id()));
+        $statement = $this->db->prepare("INSERT INTO `orders` (`ref_no`, bill_no, `cus_id`,`cus_name`,`cus_mobile`,`cus_address`,`order_details`,`total_amt`,`advance_amt`, total_paid, type, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,?)");
+        $statement->execute(array($ref, $data['bill_no'], $cid, $data['cus_name'], $data['cus_mobile'], $data['cus_address'], $data['order_details'], $data['total_amt'], $data['advance_amt'], $data['advance_amt'], $type, user_id()));
 
         $id =  $this->db->lastInsertId();
 
@@ -73,7 +73,8 @@ class ModelOrder extends Model
         // Update order fields
         $statement = $this->db->prepare("
         UPDATE `orders` 
-        SET cus_name      = ?,  
+        SET bill_no       = ?,
+            cus_name      = ?,  
             cus_mobile    = ?, 
             cus_address   = ?, 
             order_details = ?, 
@@ -83,13 +84,14 @@ class ModelOrder extends Model
         WHERE `id` = ?
     ");
         $statement->execute([
+            $data['bill_no'],
             $data['cus_name'],
             $data['cus_mobile'],
             $data['cus_address'],
             $data['order_details'],
             $data['total_amt'],
             $newAdvance,
-            $diff,   // only difference added to total_paid
+            $diff,      // only difference added to total_paid
             $id
         ]);
 

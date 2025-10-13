@@ -22,6 +22,9 @@ if (!empty($request->get)) {
   $query_string = '?filter=yes';
 }
 $query_string = str_replace(array('&'), '?', $query_string);
+
+// Check if current navigation is sale or return
+$hide_layout = (current_nav() == 'sale' || current_nav() == 'return' || current_nav() == 'pos');
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $document->langTag($active_lang); ?>" ng-app="NITAgApp">
@@ -97,29 +100,47 @@ $query_string = str_replace(array('&'), '?', $query_string);
     var logo = '../assets/nit/img/logo.png';
     var user = '';
     var current_nav = "<?php echo current_nav() ?>";
+    var hide_layout = <?php echo $hide_layout ? 'true' : 'false'; ?>;
   </script>
 
+  <style>
+    .content-wrapper {
+      font-size: 20px;
+    }
+    .table tbody tr {
+      font-size: 20px !important;
+    }
+    .table thead tr,
+    .table tfoot tr {
+      font-size: 1rem !important;
+    }
+  </style>
+
+  <!-- QR/Barcode scanner libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 
-<body class="<?= style_class('body_class') . " " . $body_class ?>   <?php echo (current_nav() != 'pos') ? 'sidebar-mini' : '' ?> layout-fixed skin-green pace-primary" <?php echo (current_nav() == 'pos') ? 'style="min-height: 100vh;"' : '' ?>>
+<body class="<?= style_class('body_class') . " " . $body_class ?>   <?php echo (!$hide_layout) ? 'sidebar-mini' : '' ?> layout-fixed skin-green pace-primary" <?php echo ($hide_layout) ? 'style="min-height: 100vh;"' : '' ?>>
   <!--begin::App Wrapper-->
   <div class="app-wrapper1" ng-controller="<?= $document->getController(); ?>">
     <!-- Preloader -->
     <?php include('src/_preloader.php'); ?>
+
     <!-- Navbar -->
-    <?php if (current_nav() != 'pos') {
+    <?php if (!$hide_layout) {
       include('src/_nav.php');
     } ?>
     <!-- /.navbar -->
+
     <!-- Main Sidebar Container -->
-    <?php if (current_nav() != 'pos') {
+    <?php if (!$hide_layout) {
       include('src/_aside.php');
     } ?>
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
-      <?php if (current_nav() != 'pos') { ?>
+      <?php if (!$hide_layout) { ?>
         <div class="content-header">
           <div class="container-fluid ">
             <div class="row mb-2">
@@ -136,11 +157,11 @@ $query_string = str_replace(array('&'), '?', $query_string);
             <div class="row justify-content-between px-2">
               <?php include("../_inc/template/partials/apply_filter.php"); ?>
               <span></span>
-              <?php if (in_array(current_nav(), array('order', 'customer_profile', 'customer', 'sales_list', 'orders_reports', 'due_reports', 'in_stock_summary', 'missing_stock'))): ?>
+              <?php if (in_array(current_nav(), array('order', 'customer_profile', 'customer', 'sales_list', 'orders_reports', 'due_reports', 'in_stock_summary', 'missing_stock', 'ac_bill'))): ?>
                 <?php if (user_group_id() == 1 || has_permission('access', 'filtering')): ?>
 
                   <!-- Date filter -->
-                  <a class="btn btn-primary btn-sm" href="#dateFilterModal" data-toggle="modal" data-target="#dateFilterModal" role="button"><i class="far fa-calendar-alt mr-1"></i> Date Filter</a>
+                  <a class="btn btn-primary btn-lg" href="#dateFilterModal" data-toggle="modal" data-target="#dateFilterModal" role="button"><i class="far fa-calendar-alt mr-1"></i> Date Filter</a>
                 <?php endif; ?>
               <?php endif; ?>
             </div>
@@ -150,5 +171,5 @@ $query_string = str_replace(array('&'), '?', $query_string);
       <!-- /.content-header -->
 
       <!-- Main content -->
-      <section class="<?php echo (current_nav() != 'pos') ? 'content ' : '' ?>">
-        <div class="<?php echo (current_nav() != 'pos') ? 'container-fluid ' : '' ?>">
+      <section class="<?php echo (!$hide_layout) ? 'content ' : '' ?>">
+        <div class="<?php echo (!$hide_layout) ? 'container-fluid ' : '' ?>">

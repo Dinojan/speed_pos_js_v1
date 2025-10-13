@@ -3,7 +3,7 @@ function bsModal($scope) {
   <div class="modal fade" id="${$scope.modalId}" tabindex="-1" role="dialog" aria-labelledby="${$scope.modalId}Label" aria-hidden="true">
     <div class="modal-dialog ${$scope.modalSize}" role="document">
       <div class="modal-content">
-        <div class="modal-header bg-primary text-white p-2">
+        <div class="modal-header text-white p-2">
           <h5 class="modal-title" id="${$scope.modalId}Label">${$scope.modalTitle}</h5>
           <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -432,8 +432,10 @@ angularApp.factory("categoryAddModal", [
         $compile,
         $timeout
     ) {
-        return function ($scope) {
+        return function ($scope, data = {}) {
+            $scope.p_id = data.id;
             const modalId = "categoryAddModal";
+
             // Step 1: Load modal form from server
             $http.get(window.baseUrl + "/_inc/_category.php?action_type=CREATE").then(function (response) {
                 const formHtml = response.data;
@@ -447,26 +449,44 @@ angularApp.factory("categoryAddModal", [
                 const modalTemplate = bsModal($scope);
                 const modalElement = $compile(modalTemplate)($scope);
                 angular.element("body").append(modalElement);
+
                 $timeout(function () {
-                    $scope.modalInstance = new bootstrap.Modal(document.getElementById(modalId));
-                    $scope.modalInstance.show();
-                    $('.select2').select2({
-                        dropdownParent: $('#' + modalId).find('.modal-content')
+                    const modalEl = document.getElementById(modalId);
+                    $scope.modalInstance = new bootstrap.Modal(modalEl);
+
+                    // Move ALL modal setup inside the shown event
+                    $(modalEl).on("shown.bs.modal", function () {
+                        // Initialize Select2
+                        $('.select2').select2({
+                            dropdownParent: $('#' + modalId).find('.modal-content')
+                        });
+                        // Focus on first input
+                        const firstInput = $("#cat_name");
+                        firstInput.trigger("focus").select();
                     });
+
+                    $scope.modalInstance.show();
                 });
-
-
-
             });
+
             $(document).off("click", "#create_category_submit").on("click", "#create_category_submit", function (e) {
                 e.preventDefault();
 
-                var $tag = $(this);
+                // Serialize form to array first
+                var formArray = $('#create-category-form').serializeArray();
+                var formDataObj = {};
+                $.each(formArray, function (_, field) {
+                    formDataObj[field.name] = field.value;
+                });
+
+                // Add custom fields
+                formDataObj.p_id = $scope.p_id;
+                var serializedData = $.param(formDataObj);
 
                 $http({
                     url: window.baseUrl + "/_inc/_category.php",
                     method: "POST",
-                    data: $('#create-category-form').serialize(),
+                    data: serializedData,
                     cache: false,
                     processData: false,
                     contentType: false,
@@ -480,20 +500,20 @@ angularApp.factory("categoryAddModal", [
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
                         }
+                        $rootScope.$broadcast("PRODUCT_LIST_REFRESH");
 
                     }, function (response) {
                         var alertMsg = "";
                         window.angular.forEach(response.data, function (value) {
                             alertMsg += value + " ";
                         });
-                        ;
-                        //window.toastr.warning(alertMsg, "Warning!");
                         Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
                     });
             });
         };
     }
 ]);
+
 // categoryEditModal
 angularApp.factory("categoryEditModal", [
     "API_URL",
@@ -554,7 +574,8 @@ angularApp.factory("categoryEditModal", [
                     function (response) {
                         var alertMsg = response.data.msg;
                         Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('#categoryTable').DataTable().ajax.reload(null, false);
+                        $rootScope.$broadcast("PRODUCT_LIST_REFRESH");
+                        // $('#categoryTable').DataTable().ajax.reload(null, false);
 
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
@@ -634,10 +655,12 @@ angularApp.factory("categoryDeleteModal", [
                     function (response) {
                         var alertMsg = response.data.msg;
                         Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('#categoryTable').DataTable().ajax.reload(null, false);
+                        $rootScope.$broadcast("PRODUCT_LIST_REFRESH");
+                        // $('#categoryTable').DataTable().ajax.reload(null, false);
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
                         }
+
 
                     }, function (response) {
                         var alertMsg = "";
@@ -919,11 +942,115 @@ angularApp.factory("ProductAddModal", [
         $compile,
         $timeout, SupplierAddModal
     ) {
-        return function ($scope) {
+        return function ($scope, data = {}) {
             const modalId = "ProductAddModal";
+            // QR Code generation and printing function
+            function generateAndPrintQRCode(serialId, wgt = 8) {
+                // Create QR code using a simple library or API
+                const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(serialId)}`;
+
+                // Create a hidden iframe for printing
+                const printFrame = document.createElement('iframe');
+                printFrame.style.display = 'none';
+                printFrame.onload = function () {
+                    const printDocument = printFrame.contentWindow.document;
+
+                    printDocument.open();
+                    printDocument.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>QR Code - ${serialId}</title>
+                            <style>
+                                body { 
+                                    font-family: Arial, sans-serif; 
+                                    text-align: center; 
+                                    padding: 20px;
+                                    margin: 0;
+                                    height: 74px;
+                                    width: 230px;
+                                }
+                                .qr-container {
+                                    display: flex;
+                                    flex-direction: row;
+                                    gap: 5px;
+                                    align-items: center;
+                                    justify-content: space-between;
+                                    height: 74px;
+                                    width: 110px;
+                                    padding: 0 5px;
+                                }
+
+                                .qr-code {
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 5px;
+                                    align-items: center;
+                                    justify-content: cenetr;
+                                    width: 50px;
+                                }
+                                .serial-id {
+                                    font-size: 10px;
+                                    font-weight: bold;
+                                }
+                                @media print {
+                                    body { margin: 0; padding: 0; }
+                                    .qr-container { height: 100%; page-break-after: avoid; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="qr-container">
+                                <div class="qr-code">
+                                    <img style="border: 1px solid #000; padding: 2px;" width="50px" height="50px" src="${qrCodeUrl}" alt="QR Code for ${serialId}" />
+                                    <div class="serial-id">${serialId}</div>
+                                </div>
+                                <div class="qr-code" style="border-left:1px solid #000; height: 100%;">
+                                    <div class="serial-id" style="position: relative; top:calc(50% - 5px);">Wgt: ${wgt}g</div>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                    `);
+                    printDocument.close();
+
+                    // Wait for image to load then print
+                    const img = printDocument.querySelector('img');
+                    img.onload = function () {
+                        printFrame.contentWindow.focus();
+                        printFrame.contentWindow.print();
+
+                        // Clean up after printing
+                        setTimeout(() => {
+                            document.body.removeChild(printFrame);
+                        }, 1000);
+                    };
+
+                    // Fallback in case onload doesn't fire
+                    setTimeout(() => {
+                        if (!img.complete) {
+                            printFrame.contentWindow.focus();
+                            printFrame.contentWindow.print();
+                            setTimeout(() => document.body.removeChild(printFrame), 1000);
+                        }
+                    }, 500);
+                };
+
+                document.body.appendChild(printFrame);
+            }
+
             // Step 1: Load modal form from server
             $http.get(window.baseUrl + "/_inc/_product.php?action_type=CREATE").then(function (response) {
                 const formHtml = response.data;
+
+                $scope.path = data.categoryPath;
+                $scope.categoryName = data.categoryName;
+                $scope.categoryId = data.id;
+                $scope.material = data.material;
+
+                $scope.code = data.productCode;
+                // $scope.serialId = data.productCode.replace(/^NJV/, '');
+
 
                 $(`#${modalId}`).remove();
                 $scope.modalTitle = "Add Product";
@@ -948,39 +1075,209 @@ angularApp.factory("ProductAddModal", [
             $rootScope.suplierAddModal = function () {
                 SupplierAddModal($scope);
             }
+
+            // Hide page-2 and Create button initially
+            $("#page-2").addClass("d-none");
+            $("#create_product_submit").hide();
+
+            // When modal is shown → reset view and focus first input
+            $(document).on('shown.bs.modal', '#ProductAddModal', function () {
+                $("#page-1").removeClass("d-none");
+                $("#page-2").addClass("d-none");
+                $("#product_add").show();
+                $("#create_product_submit").hide();
+                $("#create-product-form")[0].reset();
+                $("#page-1").find("input, textarea").first().focus();
+            });
+
+            // Auto-select value when field focused
+            $(document).on("focus", "#create-product-form input, #create-product-form textarea", function () {
+                $(this).select();
+            });
+
+            // Enter key navigation
+            $(document).on("keydown", "#create-product-form input, #create-product-form textarea", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+
+                    let $fields = $(this).closest("#create-product-form")
+                        .find("input, textarea")
+                        .filter(":visible");
+                    let index = $fields.index(this);
+
+                    if (index + 1 < $fields.length) {
+                        $fields.eq(index + 1).focus();
+                    } else {
+                        // End of current page
+                        if ($("#page-1").is(":visible")) {
+                            goToPage2();
+                        } else {
+                            $("#create_product_submit").trigger("click");
+                        }
+                    }
+                }
+            });
+
+            $(document).ready(function () {
+                $("#s_id").val("1").trigger('change');
+            });
+
+            // Next button click → go to page-2
+            $(document).on("click", "#product_add", function () {
+                goToPage2();
+            });
+
+            // Reset button or ESC → clear + close modal
+            $(document).on("click", "#create_product_reset", function () {
+                resetAndClose();
+            });
+
+            $(document).on("keydown", function (e) {
+                if (e.key === "Escape") {
+                    resetAndClose();
+                }
+            });
+
+            // Reset progress when modal opens
+            $(document).on('shown.bs.modal', '#ProductAddModal', function () {
+                updateProgress(1);
+            });
+
+            // Next button → Page 2
+            function goToPage2() {
+                $("#page-1").addClass("d-none");
+                $("#page-2").removeClass("d-none");
+                $("#product_add").hide();
+                $("#create_product_submit").show();
+                $("#page-2").find("input, textarea").first().focus();
+                updateProgress(2);
+            }
+
+            // Reset → Back to Page 1
+            function resetAndClose() {
+                $("#create-product-form")[0].reset();
+                $("#page-1").removeClass("d-none");
+                $("#page-2").addClass("d-none");
+                $("#product_add").show();
+                $("#create_product_submit").hide();
+                updateProgress(1);
+
+                let modalEl = $("#ProductAddModal");
+                if (modalEl.length) {
+                    let modalInstance = bootstrap.Modal.getInstance(modalEl[0]);
+                    if (modalInstance) modalInstance.hide();
+                }
+            }
+
+            function updateProgress(page) {
+                if (page === 1) {
+                    $("#form-progress")
+                        .css("width", "50%")
+                        .attr("aria-valuenow", 50);
+                    $(".nav-dot").removeClass("active");
+                    $(".nav-dot[data-page='1']").addClass("active");
+                } else if (page === 2) {
+                    $("#form-progress")
+                        .css("width", "100%")
+                        .attr("aria-valuenow", 100);
+                    $(".nav-dot").removeClass("active");
+                    $(".nav-dot[data-page='2']").addClass("active");
+                }
+            }
+
+
+            // Click dots manually
+            $(document).on("click", ".nav-dot", function () {
+                let page = $(this).data("page");
+                if (page === 1) {
+                    $("#page-1").removeClass("d-none");
+                    $("#page-2").addClass("d-none");
+                    $("#product_add").show();
+                    $("#create_product_submit").hide();
+                    $("#page-1").find("input, textarea").first().focus();
+                    updateProgress(1);
+                } else if (page === 2) {
+                    goToPage2();
+                }
+            });
+
+            function formatWeight(value) {
+                let num = parseFloat(value);
+
+                // Remove trailing zeros
+                if (Number.isInteger(num)) {
+                    return num + "g"
+                } else if (Math.round(num * 10) === num * 10) {
+                    return num.toFixed(1) + "g";
+                } else {
+                    return num + "g";
+                }
+            }
             $(document).off("click", "#create_product_submit").on("click", "#create_product_submit", function (e) {
                 e.preventDefault();
 
-                var $tag = $(this);
+                let $btn = $(this);
+                if ($btn.prop("disabled")) return; // already clicked
+                $btn.prop("disabled", true); // disable
+
+                // Serialize form
+                var formArray = $('#create-product-form').serializeArray();
+                var formDataObj = {};
+                $.each(formArray, function (_, field) {
+                    formDataObj[field.name] = field.value;
+                });
+
+                // Format weight
+                let formatted = formatWeight($("#cwgt").val());
+
+                // Add custom fields
+                formDataObj.name = $scope.categoryName + ' ' + formatted;
+                formDataObj.code = $scope.code;
+                formDataObj.c_id = $scope.categoryId;
+                formDataObj.material = $scope.material;
+
+                var serializedData = $.param(formDataObj);
 
                 $http({
                     url: window.baseUrl + "/_inc/_product.php",
                     method: "POST",
-                    data: $('#create-product-form').serialize(),
-                    cache: false,
-                    processData: false,
-                    contentType: false,
-                    dataType: "json"
+                    data: serializedData,
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                 }).then(
                     function (response) {
-                        var alertMsg = response.data.msg;
-                        Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('.table').DataTable().ajax.reload(null, false);
+                        Toast.fire({ icon: 'success', title: 'Success!', text: response.data.msg });
+                        // $('#create-product-form')[0].reset();
+                        $("#page-1").removeClass("d-none");
+                        $("#page-2").addClass("d-none");
+                        $("#product_add").show();
+                        $("#create_product_submit").hide();
+                        updateProgress(1);
 
-                        if ($scope.modalInstance) {
-                            $scope.modalInstance.hide();
-                        }
+                        let lastCode = $scope.code;
+                        let num = parseInt(lastCode.replace(/^NJV/, '')) + 1;
+                        $scope.code = 'NJV' + num;
+                        $(".text-center h5.text-success").text('NJ Serial ID: ' + $scope.code);
+                        $("#page-1").find("input, textarea").first().focus();
 
-                    }, function (response) {
-                        var alertMsg = "";
+                        $rootScope.$broadcast("PRODUCT_LIST_REFRESH");
+                        $btn.prop("disabled", false); // enable again after success
+
+                        $timeout(function () {
+                            generateAndPrintQRCode(lastCode);
+                        }, 500);
+                    },
+                    function (response) {
+                        let alertMsg = "";
                         window.angular.forEach(response.data, function (value) {
                             alertMsg += value + " ";
                         });
-                        ;
-                        //window.toastr.warning(alertMsg, "Warning!");
                         Toast.fire({ icon: 'error', title: 'Oops!', text: alertMsg });
-                    });
+
+                        $btn.prop("disabled", false); // re-enable if error
+                    }
+                );
             });
+
         };
     }
 ]);
@@ -1438,12 +1735,13 @@ angularApp.factory("OrderAddModel", [
     ) {
         return function ($scope) {
             const modalId = "OrderAddModel";
+            const type = $scope.currentURL === "ac_bill" ? 1 : 0;
             // Step 1: Load modal form from server
-            $http.get(window.baseUrl + "/_inc/_order.php?action_type=CREATE").then(function (response) {
+            $http.get(window.baseUrl + "/_inc/_order.php?action_type=CREATE&type=" + type).then(function (response) {
                 const formHtml = response.data;
 
                 $(`#${modalId}`).remove();
-                $scope.modalTitle = "Add Order";
+                $scope.modalTitle = type === 0 ? "Add Order" : "Add AC Bill";
                 $scope.modalId = modalId;
                 $scope.modalSize = "modal-md";
                 $scope.modalBody = $sce.trustAsHtml(formHtml);
@@ -1513,8 +1811,7 @@ angularApp.factory("OrderAddModel", [
                     function (response) {
                         var alertMsg = response.data.msg;
                         Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('.table').DataTable().ajax.reload(null, false);
-
+                        $('#orderTable').DataTable().ajax.reload(null, false);
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
                         }
@@ -1554,11 +1851,13 @@ angularApp.factory("OrderEditModel", [
     ) {
         return function ($scope) {
             const modalId = "OrderEditModel";
+            const type = $scope.currentURL === "ac_bill" ? 1 : 0;
+
             // Step 1: Load modal form from server
-            $http.get(window.baseUrl + "/_inc/_order.php?action_type=EDIT&id=" + $scope.order.id).then(function (response) {
+            $http.get(window.baseUrl + "/_inc/_order.php?action_type=EDIT&id=" + $scope.order.id + "&type=" + type).then(function (response) {
                 const formHtml = response.data;
                 $(`#${modalId}`).remove();
-                $scope.modalTitle = "Edit order";
+                $scope.modalTitle = type === 0 ? "Edit Order" : "Edit AC Bill";
                 $scope.modalId = modalId;
                 $scope.modalSize = "modal-md";
                 $scope.modalBody = $sce.trustAsHtml(formHtml);
@@ -1592,7 +1891,7 @@ angularApp.factory("OrderEditModel", [
                     function (response) {
                         var alertMsg = response.data.msg;
                         Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('.table').DataTable().ajax.reload(null, false);
+                        $('#orderTable').DataTable().ajax.reload(null, false);
 
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
@@ -1672,14 +1971,13 @@ angularApp.factory("OrderPayModel", [
                     dataType: "json"
                 }).then(
                     function (response) {
-                        var alertMsg = response.data.msg;
-                        Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
-                        $('.table').DataTable().ajax.reload(null, false);
-
+                        $('#orderTable').DataTable().ajax.reload(null, false);
                         if ($scope.modalInstance) {
                             $scope.modalInstance.hide();
                         }
 
+                        var alertMsg = response.data.msg;
+                        Toast.fire({ icon: 'success', title: 'Success!', text: alertMsg });
                     }, function (response) {
                         var alertMsg = "";
                         window.angular.forEach(response.data, function (value) {

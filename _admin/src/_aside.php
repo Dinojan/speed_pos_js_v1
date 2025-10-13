@@ -1,8 +1,8 @@
-<aside class="main-sidebar  elevation-4 <?= style_class('asideClass') ?>">
+<aside class="main-sidebar  elevation-4 <?php echo style_class('asideClass') ?>">
     <!-- Brand Logo -->
-    <a href="dashboard.php" class="brand-link <?= style_class('brandLogo') ?>">
+    <a href="dashboard.php" class="brand-link <?php echo style_class('brandLogo') ?>">
         <img src="../assets/nit/img/icon.png" alt="logo" class="brand-image elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light font-weight-bold">SPEED POS <Small>v.1.0.0</Small></span>
+        <span class="brand-text font-weight-light font-weight-bold">SPEED POS <Small>V <?php echo $appConfig['Version'] ?></Small></span>
     </a>
 
     <!-- Sidebar -->
@@ -16,13 +16,13 @@
                 <a href="javascript:void(0)" class="d-block text-light ">
                     <?php echo ucfirst(limit_char($user->getUserName(), 15)); ?>
                 </a>
-                <small class="text-light"><?= $user->getRole() ?></small>
+                <small class="text-light"><?php echo $user->getRole() ?></small>
             </div>
         </div>
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column <?= style_class('side_nav_class') ?>"
+            <ul class="nav nav-pills nav-sidebar flex-column <?php echo style_class('side_nav_class') ?>"
                 data-widget="treeview" role="menu" data-accordion="false">
                 <li class="nav-item ">
                     <div class="form-inline mt-2">
@@ -47,45 +47,61 @@
                         <p><?php echo trans('menu_dashboard') ?></p>
                     </a>
                 </li>
-                <li class="nav-item ">
-                    <a href="pos.php" class="nav-link <?php echo current_nav() == 'pos' ? ' active' : null; ?>">
+                <!-- <li class="nav-item ">
+                    <a href="pos.php" class="nav-link <?php // echo current_nav() == 'pos' ? ' active' : null; 
+                                                        ?>">
                         <i class="nav-icon fas fa-cash-register text-sm"></i>
-                        <p><?php echo trans('menu_pos') ?></p>
+                        <p><?php // echo trans('menu_pos') 
+                            ?></p>
+                    </a>
+                </li> -->
+
+                <li class="nav-item ">
+                    <a href="sale.php" class="nav-link <?php echo current_nav() == 'sale' ? ' active' : null; ?>">
+                        <i class="nav-icon fas fa-cash-register text-sm"></i>
+                        <p><?php echo trans('menu_sale') ?></p>
+                    </a>
+                </li>
+
+                <li class="nav-item ">
+                    <a href="return.php" class="nav-link <?php echo current_nav() == 'return' ? ' active' : null; ?>">
+                        <i class="fas fa-undo nav-icon text-sm"></i>
+                        <p><?php echo trans('menu_return') ?></p>
                     </a>
                 </li>
 
                 <!-- Inventory menu -->
-                <?php if (user_group_id() == 1 || has_permission('access', 'read_category') || has_permission('access', 'read_supplier') || has_permission('access', 'read_product')): ?>
+                <?php if (user_group_id() == 1 || has_permission('access', 'read_category') || has_permission('access', 'read_supplier') || has_permission('access', 'read_product') || has_permission('access', 'check_product')) : ?>
                     <li
-                        class="nav-item  <?php echo current_nav() == 'category' || current_nav() == 'product' || current_nav() == 'supplier' || current_nav() == 'supplier' ? ' menu-open' : null; ?>">
+                        class="nav-item  <?php echo current_nav() == 'category' || current_nav() == 'product' || current_nav() == 'supplier' || current_nav() == 'add_product' || current_nav() == 'stock_checking' || current_nav() == 'stock_assinging' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-boxes text-sm"></i>
-                            <p><?= trans('menu_inventory') ?>
+                            <p><?php echo trans('menu_inventory') ?>
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <?php if (user_group_id() == 1 || has_permission('access', 'read_category')): ?>
                                 <li class="nav-item">
-                                    <a href="category.php"
-                                        class="nav-link  <?php echo current_nav() == 'category' ? ' active' : null; ?>">
+                                    <a href="add_product.php"
+                                        class="nav-link  <?php echo current_nav() == 'add_product' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="fas fa-shapes nav-icon text-sm"></i>
-                                        <p><?= trans('menu_category') ?></p>
+                                        <p><?php echo trans('menu_category') ?></p>
 
                                     </a>
                                 </li>
                             <?php endif; ?>
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_supplier')): ?>
+                            <!-- <?php // if (user_group_id() == 1 || has_permission('access', 'read_supplier')): ?>
                                 <li class="nav-item ">
                                     <a href="supplier.php"
                                         class="nav-link <?php echo current_nav() == 'supplier' || current_nav() == 'supplier_profile' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-truck-loading text-sm"></i>
-                                        <p><?= trans('menu_supplier') ?></p>
+                                        <p><?php // echo trans('menu_supplier') ?></p>
                                     </a>
                                 </li>
-                            <?php endif; ?>
+                            <?php // endif; ?> -->
 
                             <?php if (user_group_id() == 1 || has_permission('access', 'read_product')): ?>
                                 <li class="nav-item">
@@ -93,7 +109,19 @@
                                         class="nav-link  <?php echo current_nav() == 'product' || current_nav() == 'product_details' || current_nav() == 'product_edit' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="fab fa-product-hunt nav-icon text-sm"></i>
-                                        <p><?= trans('menu_product') ?></p>
+                                        <p><?php echo trans('menu_product') ?></p>
+
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (user_group_id() == 1 || has_permission('access', 'check_product')): ?>
+                                <li class="nav-item">
+                                    <a href="stock_assinging.php"
+                                        class="nav-link  <?php echo current_nav() == 'menu_stock_checking' || current_nav() == 'stock_assinging' ? ' active' : null; ?>">
+                                        <span class="line"><i class="fas fa-minus"></i></span>
+                                        <i class="fas fa-boxes nav-icon text-sm"></i>
+                                        <p><?php echo trans('menu_stock_checking') ?></p>
 
                                     </a>
                                 </li>
@@ -105,10 +133,10 @@
                 <!-- Stock checking -->
                 <?php if (user_group_id() == 1 || has_permission('access', 'read_stock_checking') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
                     <li
-                        class="nav-item  <?php echo current_nav() == 'check_stock' || current_nav() == 'in_stock_summary' || current_nav() == 'missing_stock' ? ' menu-open' : null; ?>">
+                        class="nav-item d-none <?php echo current_nav() == 'check_stock' || current_nav() == 'in_stock_summary' || current_nav() == 'missing_stock' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-search text-sm"></i>
-                            <p><?= trans('menu_stock_checking') ?>
+                            <p><?php echo trans('menu_stock_checking') ?>
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
@@ -120,7 +148,7 @@
                                         class="nav-link  <?php echo current_nav() == 'check_stock' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-clipboard-check text-sm"></i>
-                                        <p><?= trans('menu_check_stock') ?></p>
+                                        <p><?php echo trans('menu_check_stock') ?></p>
 
                                     </a>
                                 </li>
@@ -132,7 +160,7 @@
                                         class="nav-link  <?php echo current_nav() == 'in_stock_summary' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-boxes text-sm"></i>
-                                        <p><?= trans('menu_in_stock_summary') ?></p>
+                                        <p><?php echo trans('menu_in_stock_summary') ?></p>
 
                                     </a>
                                 </li>
@@ -144,7 +172,7 @@
                                         class="nav-link  <?php echo current_nav() == 'missing_stock' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-exclamation-triangle text-sm"></i>
-                                        <p><?= trans('menu_missing_stock') ?></p>
+                                        <p><?php echo trans('menu_missing_stock') ?></p>
 
                                     </a>
                                 </li>
@@ -162,7 +190,7 @@
                         <a href="customer.php"
                             class="nav-link <?php echo current_nav() == 'customer' || current_nav() == 'customer_profile' ? ' active' : null; ?>">
                             <i class="nav-icon fas fa-walking text-sm"></i>
-                            <p><?= trans('menu_customer') ?></p>
+                            <p><?php echo trans('menu_customer') ?></p>
                         </a>
                     </li>
                 <?php endif; ?>
@@ -172,7 +200,7 @@
                         class="nav-item  <?php echo current_nav() == 'user' || current_nav() == 'user_group' || current_nav() == 'password' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-user-friends text-sm"></i>
-                            <p><?= trans('menu_users') ?>
+                            <p><?php echo trans('menu_users') ?>
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
@@ -184,7 +212,7 @@
                                         class="nav-link  <?php echo current_nav() == 'user_group' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="fas fa-users nav-icon text-sm"></i>
-                                        <p><?= trans('menu_user_group') ?></p>
+                                        <p><?php echo trans('menu_user_group') ?></p>
 
                                     </a>
                                 </li>
@@ -195,7 +223,7 @@
                                         class="nav-link  <?php echo current_nav() == 'user' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="fas fa-user nav-icon text-sm"></i>
-                                        <p><?= trans('menu_user') ?></p>
+                                        <p><?php echo trans('menu_user') ?></p>
 
                                     </a>
                                 </li>
@@ -206,7 +234,7 @@
                                         class="nav-link  <?php echo current_nav() == 'password' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="fas fa-key nav-icon text-sm"></i>
-                                        <p><?= trans('menu_change_password') ?></p>
+                                        <p><?php echo trans('menu_password') ?></p>
 
                                     </a>
                                 </li>
@@ -221,7 +249,7 @@
                         class="nav-item  <?php echo current_nav() == 'store' || current_nav() == 'receipt_template' || current_nav() == 'store_setting' || current_nav() == 'currency' || current_nav() == 'language' || current_nav() == 'pmethod' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-toolbox text-sm"></i>
-                            <p><?= trans('menu_system') ?>
+                            <p><?php echo trans('menu_system') ?>
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
@@ -231,7 +259,7 @@
                                 <a href="#" class="nav-link">
                                     <span class="line "><i class="fas fa-minus"></i></span>
                                     <i class="nav-icon fas fa-store-alt text-sm"></i>
-                                    <p><?= trans('menu_stores') ?>
+                                    <p><?php echo trans('menu_stores') ?>
                                         <i class="right fas fa-angle-left"></i>
                                     </p>
                                 </a>
@@ -242,7 +270,7 @@
                                                 class="nav-link <?php echo current_nav() == 'store' ? ' active' : null; ?>">
                                                 <span class="line"><i class="fas fa-minus"></i></span>
                                                 <i class="fas fa-store nav-icon text-xs"></i>
-                                                <p><?= trans('menu_stores') ?></p>
+                                                <p><?php echo trans('menu_stores') ?></p>
                                             </a>
                                         </li>
                                     <?php endif; ?>
@@ -253,7 +281,7 @@
                                                 class="nav-link  <?php echo current_nav() == 'store_setting' ? ' active' : null; ?>">
                                                 <span class="line"><i class="fas fa-minus"></i></span>
                                                 <i class="fas fa-tools nav-icon text-xs"></i>
-                                                <p><?= trans('menu_store_settings') ?></p>
+                                                <p><?php echo trans('menu_store_settings') ?></p>
 
                                             </a>
                                         </li>
@@ -278,7 +306,7 @@
                                     class="nav-link  <?php echo current_nav() == 'currency' ? ' active' : null; ?>">
                                     <span class="line"><i class="fas fa-minus"></i></span>
                                     <i class="fas fa-money-bill nav-icon text-sm"></i>
-                                    <p><?= trans('menu_currency') ?></p>
+                                    <p><?php echo trans('menu_currency') ?></p>
 
                                 </a>
                             </li>
@@ -321,51 +349,62 @@
                     </a>
                 </li>
                 <!-- // order  -->
-                <?php if (user_group_id() == 1 || has_permission('access', 'read_order') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
+                <!-- <?php // if (user_group_id() == 1 || has_permission('access', 'read_order') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
                     <li
-                        class="nav-item  <?php echo current_nav() == 'order' || current_nav() == 'order_group' || current_nav() == 'password' ? ' menu-open' : null; ?>">
+                        class="nav-item  <?php // echo current_nav() == 'order' || current_nav() == 'order_group' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-shopping-cart text-sm"></i>
-                            <p><?= trans('menu_orders') ?>
+                            <p><?php // echo trans('menu_orders') ?>
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
 
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_order')): ?>
+                            <?php // if (user_group_id() == 1 || has_permission('access', 'read_order')): ?>
                                 <li class="nav-item">
                                     <a href="order.php"
                                         class="nav-link  <?php echo current_nav() == 'order' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-plus text-sm"></i>
-                                        <p><?= trans('menu_order') ?></p>
+                                        <p><?php // echo trans('menu_order') ?></p>
 
                                     </a>
                                 </li>
-                            <?php endif; ?>
-
+                            <?php // endif; ?>
                         </ul>
                     </li>
+                <?php //  endif; ?> -->
+                <?php if (user_group_id() == 1 || has_permission('access', 'read_order') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
+                    <li class="nav-item ">
+                        <a href="customer.php"
+                            class="nav-link <?php echo current_nav() == 'order' || current_nav() == 'order_group' ? ' menu-open' : null; ?>">
+                            <i class="nav-icon fas fa-shopping-cart text-sm"></i>
+                            <p><?= trans('menu_order') ?></p>
+                        </a>
+                    </li>
                 <?php endif; ?>
+
+
+                
                 <!-- // sales  -->
-                <?php if (user_group_id() == 1 || has_permission('access', 'read_sales') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
+                <?php if (user_group_id() == 1 || has_permission('access', 'read_sales') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password') || has_permission('access', 'read_sales_list')): ?>
                     <li
-                        class="nav-item  <?php echo current_nav() == 'sales_list' || current_nav() == 'sales_summary' ? ' menu-open' : null; ?>">
+                        class="nav-item  <?php echo current_nav() == 'sales_list' || current_nav() == 'sales_summary' || current_nav() == 'sale' || current_nav() == 'ac_bill' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-chart-line text-sm"></i>
-                            <p><?= trans('menu_sales') ?>
+                            <p><?php echo trans('menu_sales') ?>
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
 
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_pos')): ?>
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_sales')): ?>
                                 <li class="nav-item">
-                                    <a href="pos.php"
-                                        class="nav-link  <?php echo current_nav() == 'pos' ? ' active' : null; ?>">
+                                    <a href="sale.php"
+                                        class="nav-link  <?php echo current_nav() == 'sale' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-cash-register text-sm"></i>
-                                        <p><?= trans('menu_pos') ?></p>
+                                        <p><?php echo trans('menu_sale') ?></p>
 
                                     </a>
                                 </li>
@@ -377,38 +416,35 @@
                                         class="nav-link  <?php echo current_nav() == 'sales_list' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-list text-sm"></i>
-                                        <p><?= trans('menu_sales_list') ?></p>
+                                        <p><?php echo trans('menu_sales_list') ?></p>
 
                                     </a>
                                 </li>
                             <?php endif; ?>
 
-                            <!-- <?php // if (user_group_id() == 1 || has_permission('access', 'read_sales_return')): 
-                                    ?>
+                            <?php if (user_group_id() == 1 || has_permission('access', 'read_ac_bill')):
+                            ?>
                                 <li class="nav-item">
-                                    <a href="sales_return.php"
-                                        class="nav-link  <?php // echo current_nav() == 'sales_return' ? ' active' : null; 
-                                                            ?>">
+                                    <a href="ac_bill.php"
+                                        class="nav-link  <?php echo current_nav() == 'ac_bill' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
-                                        <i class="nav-icon fas fa-undo text-sm"></i>
-                                        <p><?php // echo trans('menu_sales_return') 
-                                            ?></p>
-
+                                        <i class="nav-icon fas fa-receipt text-sm"></i>
+                                        <p><?php echo trans('menu_AC_bill') ?></p>
                                     </a>
                                 </li>
-                            <?php // endif; 
-                            ?> -->
+                            <?php endif;
+                            ?>
 
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_sales_summary')): ?>
+                            <!-- <?php // if (user_group_id() == 1 || has_permission('access', 'read_sales_summary')): ?>
                                 <li class="nav-item">
                                     <a href="sales_summary.php"
-                                        class="nav-link  <?php echo current_nav() == 'sales_summary' ? ' active' : null; ?>">
+                                        class="nav-link  <?php // echo current_nav() == 'sales_summary' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-chart-pie text-sm"></i>
-                                        <p><?= trans('menu_sales_summary') ?></p>
+                                        <p><?php // echo trans('menu_sales_summary') ?></p>
                                     </a>
                                 </li>
-                            <?php endif; ?>
+                            <?php // endif; ?> -->
                         </ul>
                     </li>
                 <?php endif; ?>
@@ -416,10 +452,10 @@
                 <!-- // report  -->
                 <?php if (user_group_id() == 1 || has_permission('access', 'read_report') || has_permission('access', 'read_role') || has_permission('access', 'read_department') || has_permission('access', 'change_password')): ?>
                     <li
-                        class="nav-item  <?php echo current_nav() == 'orders_reports' || current_nav() == 'due_reports' || current_nav() == 'stock_reports' || current_nav() == 'missing_reports' || current_nav() == 'cash_book' ? ' menu-open' : null; ?>">
+                        class="nav-item  <?php echo current_nav() == 'orders_reports' || current_nav() == 'due_reports' || current_nav() == 'stock_reports' || current_nav() == 'missing_reports' ? ' menu-open' : null; ?>">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-file-alt text-sm"></i>
-                            <p><?= trans('menu_report') ?>
+                            <p><?php echo trans('menu_report') ?>
                                 <i class="right fas fa-angle-left"></i>
                             </p>
                         </a>
@@ -431,7 +467,7 @@
                                         class="nav-link  <?php echo current_nav() == 'orders_reports' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-file-invoice text-sm"></i>
-                                        <p><?= trans('menu_orders_reports') ?></p>
+                                        <p><?php echo trans('menu_orders_reports') ?></p>
 
                                     </a>
                                 </li>
@@ -443,7 +479,7 @@
                                         class="nav-link  <?php echo current_nav() == 'due_reports' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-hourglass-half text-sm"></i>
-                                        <p><?= trans('menu_due_reports') ?></p>
+                                        <p><?php echo trans('menu_due_reports') ?></p>
                                     </a>
                                 </li>
                             <?php endif; ?>
@@ -454,32 +490,40 @@
                                         class="nav-link  <?php echo current_nav() == 'stock_reports' ? ' active' : null; ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-boxes text-sm"></i>
-                                        <p><?= trans('menu_stock_reports') ?></p>
+                                        <p><?php echo trans('menu_stock_reports') ?></p>
                                     </a>
                                 </li>
                             <?php endif; ?>
 
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_missing_reports')): ?>
+                            <!-- <?php // if (user_group_id() == 1 || has_permission('access', 'read_missing_reports')): 
+                                    ?>
                                 <li class="nav-item">
                                     <a href="missing_reports.php"
-                                        class="nav-link  <?php echo current_nav() == 'missing_reports' ? ' active' : null; ?>">
+                                        class="nav-link  <?php // echo current_nav() == 'missing_reports' ? ' active' : null; 
+                                                            ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-exclamation-circle text-sm"></i>
-                                        <p><?= trans('menu_missing_reports') ?></p>
+                                        <p><?php // echo trans('menu_missing_reports') 
+                                            ?></p>
                                     </a>
                                 </li>
-                            <?php endif; ?>
+                            <?php // endif; 
+                            ?> -->
 
-                            <?php if (user_group_id() == 1 || has_permission('access', 'read_cash_book')): ?>
+                            <!-- <?php // if (user_group_id() == 1 || has_permission('access', 'read_cash_book')): 
+                                    ?>
                                 <li class="nav-item">
                                     <a href="cash_book.php"
-                                        class="nav-link  <?php echo current_nav() == 'cash_book' ? ' active' : null; ?>">
+                                        class="nav-link  <?php // echo current_nav() == 'cash_book' ? ' active' : null; 
+                                                            ?>">
                                         <span class="line"><i class="fas fa-minus"></i></span>
                                         <i class="nav-icon fas fa-money-bill-wave text-sm"></i>
-                                        <p><?= trans('menu_cash_book') ?></p>
+                                        <p><?php // echo trans('menu_cash_book') 
+                                            ?></p>
                                     </a>
                                 </li>
-                            <?php endif; ?>
+                            <?php // endif; 
+                            ?> -->
                         </ul>
                     </li>
                 <?php endif; ?>

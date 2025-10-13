@@ -1,6 +1,6 @@
 <div class="card-body p-2">
     <div class="table-responsive">
-        <table class="table table-sm">
+        <table class="table ">
             <thead>
                 <tr>
                     <th class="col-6 pl-2 py-2 border-bottom"><?php echo trans("label_name") ?></th>
@@ -29,6 +29,10 @@
                 <tr>
                     <th class="col-6 pl-2 py-2 border-bottom"><?php echo trans("label_cost") ?></th>
                     <th class="col-6 text-right pr-2 py-2 border-bottom">Rs. <?php echo number_format($product['cost'], 2) ?></th>
+                </tr>
+                <tr>
+                    <th class="col-6 pl-2 py-2 border-bottom"><?php echo trans("label_note") ?></th>
+                    <th class="col-6 text-right pr-2 py-2 border-bottom"><?php echo $product['note'] ?  $product['note'] : '-' ?></th>
                 </tr>
                 <tr>
                     <th class="col-6 pl-2 py-2 border-bottom" style="vertical-align: middle;"><?php echo trans("label_created_at") ?></th>

@@ -37,6 +37,10 @@ include('src/_top.php');
             grid-column: auto;
         }
     }
+
+    tbody tr {
+        padding: 0 4px !important;
+    }
 </style>
 
 <div class="card bg-light">
@@ -51,7 +55,7 @@ include('src/_top.php');
 
 <div class="card card-outline card-primary">
     <div class="card-header">
-        <h3 class="card-title">
+        <h3 class="card-title text-lg font-weight-bold">
             <?php echo trans('text_stock_report'); ?>
         </h3>
         <div class="card-tools">
@@ -71,21 +75,22 @@ include('src/_top.php');
         }
         ?>
         <div class="table-responsive">
-            <table id="stock-report" class="table table-sm table-bordered table-striped" data-hide-colums="<?php echo $hide_colums; ?>">
+            <table id="stock-report" class="table  table-bordered table-striped table-hover" data-hide-colums="<?php echo $hide_colums; ?>">
                 <thead class="bg-primary">
                     <tr>
                         <th><?php echo trans("label_#") ?></th>
                         <th><?php echo trans("label_barcode") ?></th>
+                        <th><?php echo trans("label_bill_no") ?></th>
                         <th><?php echo trans("label_name") ?></th>
                         <th><?php echo trans("label_material") ?></th>
                         <th><?php echo trans("label_karate") ?></th>
                         <th><?php echo trans("label_category") ?></th>
-                        <th><?php echo trans("label_supplier") ?></th>
+                        <!-- <th><?php // echo trans("label_supplier") ?></th> -->
                         <th><?php echo trans("label_cost") ?></th>
                         <th><?php echo trans("label_weight") ?></th>
-                        <th><?php echo trans("label_quantity") ?></th>
+                        <!-- <th><?php // echo trans("label_quantity") ?></th> -->
                         <th><?php echo trans("label_status") ?></th>
-                        <th><?php echo trans("label_view") ?></th>
+                        <!-- <th><?php // echo trans("label_view") ?></th> -->
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -93,16 +98,17 @@ include('src/_top.php');
                     <tr>
                         <th><?php echo trans("label_#") ?></th>
                         <th><?php echo trans("label_barcode") ?></th>
+                        <th><?php echo trans("label_bill_no") ?></th>
                         <th><?php echo trans("label_name") ?></th>
                         <th><?php echo trans("label_material") ?></th>
                         <th><?php echo trans("label_karate") ?></th>
                         <th><?php echo trans("label_category") ?></th>
-                        <th><?php echo trans("label_supplier") ?></th>
+                        <!-- <th><?php // echo trans("label_supplier") ?></th> -->
                         <th><?php echo trans("label_cost") ?></th>
                         <th><?php echo trans("label_weight") ?></th>
-                        <th><?php echo trans("label_quantity") ?></th>
+                        <!-- <th><?php // echo trans("label_quantity") ?></th> -->
                         <th><?php echo trans("label_status") ?></th>
-                        <th><?php echo trans("label_view") ?></th>
+                        <!-- <th><?php // echo trans("label_view") ?></th> -->
                     </tr>
                 </tfoot>
             </table>

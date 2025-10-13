@@ -76,13 +76,15 @@ function set_category_tree_to_sidebar($categories)
 
     foreach ($categories as $category) {
         $hasChildren = !empty($category['children']);
-        $border = $category['p_id'] == 0 ? ' style="border-bottom: #3882ed solid 1px !important; border-left: #3882ed solid 1px !important;"' : '';
+        $border = 'style="';
+        $border = $category['p_id'] == 0 ? 'border-bottom: #3882ed solid 1px !important; border-left: #3882ed solid 1px !important;"' : '';
+        $border .= '"';
         //$ng_click = $category['p_id'] == 0 ? ' style="border-bottom: #3882ed solid 1px !important; border-left: #3882ed solid 1px !important;"' : '';
 
-        $html .= '<li class="nav-item pl-1 border-bottom border-left "' . $border . ' >';
+        $html .= '<li class="nav-item pl-1 border-left "' . $border . '>';
 
         // parent link
-        $html .= '<a href="#" class="nav-link category-select" data-cid="' . $category['id'] . '">';
+        $html .= '<a href="#" class="nav-link text-primary category-select" style=" background-color: #3882ed33;" data-cid="' . $category['id'] . '">';
         // $html .= '<i class="nav-icon fas fa-circle"></i>';
         $html .= '<p class="pl-0">' . htmlspecialchars($category['c_name']);
 

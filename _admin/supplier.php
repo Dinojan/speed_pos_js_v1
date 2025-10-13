@@ -12,9 +12,9 @@ $document->setController('SupplierController');
     <div class="col-lg-12">
         <div class="card card-primary card-outline" style="height: auto; width: auto; transition: 0.15s;">
             <div class="card-header">
-                <h3 class="card-title"><?= trans('title_suppliers') ?></h3>
+                <h3 class="card-title text-lg font-weight-bold"><?= trans('title_suppliers') ?></h3>
                 <div class="card-tools">
-                    <button type="button" class="btn btn-tool" ng-click="openAddSupplierModal()">
+                    <button type="button" class="btn btn-lg" ng-click="openAddSupplierModal()">
                         <i class="fas fa-plus"></i> <?= trans('button_add_supplier') ?>
                     </button>
                 </div>

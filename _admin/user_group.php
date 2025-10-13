@@ -12,9 +12,9 @@ $document->setController('UserGroupController');
     <div class="col-lg-12">
         <div class="card card-outline card-primary" style="height: auto; width: auto; transition: 0.15s;">
             <div class="card-header">
-                <h3 class="card-title"><?= trans('title_user_groups') ?></h3>
+                <h3 class="card-title text-lg font-weight-bold"><?= trans('title_user_groups') ?></h3>
                 <div class="card-tools">
-                    <button type="button" class="btn btn-tool" ng-click="openAddMobileModal()">
+                    <button type="button" class="btn btn-lg" ng-click="openAddMobileModal()">
                         <i class="fas fa-plus"></i> <?= trans('button_add_user_group') ?>
                     </button>
                 </div>

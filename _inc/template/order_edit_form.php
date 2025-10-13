@@ -1,13 +1,13 @@
 <form id="update-order-form" class="form-horizontal" onsubmit="return false" method="post"
     enctype="multipart/form-data">
     <input type="hidden" id="action_type" name="action_type" value="UPDATE">
-    <input type="hidden" name="id" value="<?= $order['id']?>">
+    <input type="hidden" name="id" value="<?= $order['id'] ?>">
     <div class="form-group">
         <label for="s_id"><?= trans('label_customer'); ?> <i class="text-danger">*</i></label>
         <select class="form-control select2" id="c_id" name="c_id" required>
             <option value="">-- Select Customer --</option>
             <?php foreach (get_all_customers(1) as $cus) { ?>
-                <option value="<?= $cus['id'] ?>" <?= $order['cus_id'] == $cus['id'] ? 'selected':''?>><?= $cus['c_name'] ?> (<?= $cus['c_mobile'] ?>)</option>
+                <option value="<?= $cus['id'] ?>" <?= $order['cus_id'] == $cus['id'] ? 'selected' : '' ?>><?= $cus['c_name'] ?> (<?= $cus['c_mobile'] ?>)</option>
             <?php } ?>
         </select>
     </div>
@@ -28,12 +28,17 @@
         <input type="text" class="form-control" id="cus_address" name="cus_address" placeholder="Address"
             value="<?= $order['cus_address'] ?>" required>
     </div>
+
+
+    <div class="form-group <?php echo $type == 0 ? 'd-none' : '' ?>">
+        <label for="bill_no"><?= trans('label_bill_no'); ?> <i class="text-danger">*</i></label>
+        <input type="text" class="form-control" id="bill_no" name="bill_no" placeholder="Bill No" value="<?= $order['bill_no'] ?>" required>
+    </div>
     <div class="form-group">
         <label for="order_details"><?= trans('label_description'); ?> <i class="text-danger">*</i></label>
         <textarea class="form-control" id="order_details" name="order_details" placeholder="Description"
-             required><?= $order['order_details'] ?> </textarea>
+            required><?= $order['order_details'] ?> </textarea>
     </div>
-
     <div class="form-group">
         <label for="total_amt"><?= trans('label_total_amount'); ?> <i class="text-danger">*</i></label>
         <input type="text" class="form-control" id="total_amt" name="total_amt" placeholder="Total_Amount"

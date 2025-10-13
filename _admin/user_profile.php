@@ -9,14 +9,14 @@ if (user_group_id() != 1 && !has_permission('access', 'read_user')) {
 }
 $document->setTitle(trans('title_users'));
 $document->setController('UserProfileController');
-if (isset($request->get['id']) && $request->get['id'] != null) {
-    $the_user = get_the_user($request->get['id']);
+if (isset($request->get['user']) && $request->get['user'] != null) {
+    $the_user = get_the_user($request->get['user']);
     if (!$the_user) {
         redirect(root_url() . '/' . ADMINDIRNAME . '/user.php');
     }
     $p_count = 0;
     $statement = db()->prepare("SELECT * FROM `product` WHERE `s_id` = ?");
-    $statement->execute([$request->get['id']]);
+    $statement->execute([$request->get['user']]);
     $p_count = $statement->rowCount();
 } else {
     redirect(root_url() . '/' . ADMINDIRNAME . '/user.php');
@@ -40,7 +40,7 @@ include('src/_top.php');
                 <h3 class="profile-username text-center"><?php echo $the_user['username'] ?></h3>
 
                 <p class="text-muted text-center"><?php echo trans('text_since'); ?>:
-                    <?php echo $the_user['created_at'] ?>
+                    <?php echo date('d M, Y', strtotime($the_user['created_at'])) ?>
                 </p>
 
                 <ul class="list-group list-group-unbordered mb-3">
@@ -53,10 +53,30 @@ include('src/_top.php');
                         <b> <?php echo trans('label_email'); ?></b> <a
                             class="float-right"><?php echo $the_user['email'] ?></a>
                     </li>
-                    <li class="list-group-item">
-                        <b> <?php echo trans('label_due_limit'); ?></b> <a class="float-right">0</a>
-                    </li>
+                    <!-- <li class="list-group-item">
+                        <b> <?php // echo trans('label_due_limit'); ?></b> <a class="float-right">0</a>
+                    </li> -->
 
+                    <li class="list-group-item">
+                        <b><?php echo trans('text_total_invoice'); ?></b> <a class="float-right">
+                            0</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b><?php echo trans('text_total_invoice'); ?></b> <a class="float-right">
+                            0</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b><?php echo trans('text_total_invoice'); ?></b> <a class="float-right">
+                            0</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b><?php echo trans('text_total_invoice'); ?></b> <a class="float-right">
+                            0</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b><?php echo trans('text_total_invoice'); ?></b> <a class="float-right">
+                            0</a>
+                    </li>
                     <li class="list-group-item">
                         <b><?php echo trans('text_total_invoice'); ?></b> <a class="float-right">
                             0</a>
@@ -110,7 +130,7 @@ include('src/_top.php');
             <div class="col-12">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">
+                        <h3 class="card-title text-lg font-weight-bold">
                             <?php echo trans('text_invoice_list'); ?>
                         </h3>
                         <div class="card-tools">
@@ -131,7 +151,7 @@ include('src/_top.php');
                         ?>
                         <div class="table-responsive">
                             <!-- Invoice List Start-->
-                            <table id="invoice-invoice-list" class="table table-sm table-bordered table-striped"
+                            <table id="invoice-invoice-list" class="table  table-bordered table-striped"
                                 data-id="" data-hide-colums="<?php echo $hide_colums; ?>">
                                 <thead class="bg-primary">
                                     <tr>

@@ -210,19 +210,19 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
                 $row['total_paid'] =  $total_paid;
             }
 
-            // $row['view'] = '<button id="view-supplier" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-eye"></i></button>';
-            $row['view'] = '<a href="supplier_profile.php?supplier=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+            // $row['view'] = '<button id="view-supplier" class="btn btn-outline-info btn-lg view-btn"  title="View"><i class="fas fa-eye"></i></button>';
+            $row['view'] = '<a href="supplier_profile.php?supplier=' . $row['id'] . '" class="btn btn-outline-info btn-lg" title="View">
                     <i class="fas fa-eye"></i>
                  </a>';
             //if ($row['id'] != 1) {
-            $row['edit'] = '<button id="edit-supplier" class="btn btn-outline-success btn-sm edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
+            $row['edit'] = '<button id="edit-supplier" class="btn btn-outline-success btn-lg edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
             // } else {
-            //     $row['edit'] = '<button id="edit-supplier" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
+            //     $row['edit'] = '<button id="edit-supplier" class="btn btn-outline-success btn-lg edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
             // }
             if ($row['id'] != 1) {
-                $row['delete'] = '<button id="delete-supplier" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+                $row['delete'] = '<button id="delete-supplier" class="btn btn-outline-danger btn-lg delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
             } else {
-                $row['delete'] = '<button class="btn btn-outline-danger btn-sm delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
+                $row['delete'] = '<button class="btn btn-outline-danger btn-lg delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
             }
         }
         // Return data as JSON

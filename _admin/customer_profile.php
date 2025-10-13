@@ -50,7 +50,7 @@ include('src/_top.php');
                 <h3 class="profile-username text-center"><?php echo $the_customer['c_name'] ?></h3>
 
                 <p class="text-muted text-center"><?php echo trans('text_since'); ?>:
-                    <?php echo date("M d, Y", strtotime($the_customer['created_at'])) ?>
+                    <?php echo date("d M, Y", strtotime($the_customer['created_at'])) ?>
                 </p>
 
                 <ul class="list-group list-group-unbordered mb-3">
@@ -104,7 +104,7 @@ include('src/_top.php');
             <div class="col-12">
                 <div class="card card-outline card-primary" id="order-list-container">
                     <div class="card-header">
-                        <h3 class="card-title">
+                        <h3 class="card-title text-lg font-weight-bold">
                             <?php echo trans('text_order_list'); ?>
                         </h3>
                         <div class="card-tools">
@@ -125,7 +125,7 @@ include('src/_top.php');
                         ?>
                         <div class="table-responsive">
                             <!-- Invoice List Start-->
-                            <table id="customer-order-list" class="table table-sm table-bordered table-striped"
+                            <table id="customer-order-list" class="table  table-bordered table-striped"
                                 data-id="" data-hide-colums="<?php echo $hide_colums; ?>">
                                 <thead class="bg-primary">
                                     <tr>
@@ -162,7 +162,7 @@ include('src/_top.php');
 
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">
+                        <h3 class="card-title text-lg font-weight-bold">
                             <?php echo trans('text_payment_list'); ?>
                         </h3>
                         <div class="card-tools">
@@ -183,7 +183,7 @@ include('src/_top.php');
                         ?>
                         <div class="table-responsive">
                             <!-- Invoice List Start-->
-                            <table id="customer-payment-list" class="table table-sm table-bordered table-striped"
+                            <table id="customer-payment-list" class="table  table-bordered table-striped"
                                 data-id="" data-hide-colums="<?php echo $hide_colums; ?>">
                                 <thead class="bg-primary">
                                     <tr>

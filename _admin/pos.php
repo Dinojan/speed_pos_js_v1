@@ -1,9 +1,10 @@
 <?php
 ob_start();
 include realpath(__DIR__ . '/../') . '/_init.php';
-if (!is_loggedin()) {
-    redirect(root_url() . '/index.php?redirect_to=' . url());
-}
+redirect(root_url() . '/_admin/sale.php');
+// if (!is_loggedin()) {
+//     redirect(root_url() . '/index.php?redirect_to=' . url());
+// }
 $document->setTitle(trans('title_pos'));
 $document->setController('PosController');
 $document->setBodyClass('sidebar-collapse');

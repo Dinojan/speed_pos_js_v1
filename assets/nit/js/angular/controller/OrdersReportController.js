@@ -42,7 +42,8 @@ angularApp.controller("OrdersReportController", [
                 data: {
                     action_type: "GET_TABLE_DATA",
                     from: $scope.from,
-                    to: $scope.to
+                    to: $scope.to,
+                    type: '0'
                 },
                 dataSrc: "data"
             },
@@ -64,11 +65,11 @@ angularApp.controller("OrdersReportController", [
             ],
 
             drawCallback: function () {
-                $('.buttons-print').removeClass('btn-secondary').addClass('btn-outline-primary btn-sm');
-                $('.buttons-copy').removeClass('btn-secondary').addClass('btn-outline-dark btn-sm');
-                $('.buttons-excel').removeClass('btn-secondary').addClass('btn-outline-success btn-sm');
-                $('.buttons-csv').removeClass('btn-secondary').addClass('btn-outline-success btn-sm');
-                $('.buttons-pdf').removeClass('btn-secondary').addClass('btn-outline-danger btn-sm');
+                $('.buttons-print').removeClass('btn-secondary').addClass('btn-outline-primary btn-lg');
+                $('.buttons-copy').removeClass('btn-secondary').addClass('btn-outline-dark btn-lg');
+                $('.buttons-excel').removeClass('btn-secondary').addClass('btn-outline-success btn-lg');
+                $('.buttons-csv').removeClass('btn-secondary').addClass('btn-outline-success btn-lg');
+                $('.buttons-pdf').removeClass('btn-secondary').addClass('btn-outline-danger btn-lg');
             }
         });
         $(document).delegate("#pay-order", "click", function (e) {
