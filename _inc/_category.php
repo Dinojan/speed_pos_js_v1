@@ -196,8 +196,8 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
                 $row['wgt'] = (float)$productData['total_wgt'];
                 $row['pcs'] = (int)$productData['total_pcs'];
                 $row['view'] = '';
-                $row['edit'] = '<a href="#" class="btn btn-success btn-edit btn-sm"  data-id="' . $row['id'] . '"><i class="fas fa-edit"></i> </a>';
-                $row['delete'] = '<a href="#" class="btn btn-danger btn-del btn-sm" data-id="' . $row['id'] . '"><i class="fas fa-trash"></i> </a>';
+                $row['edit'] = '<a href="#" class="btn btn-success btn-edit btn-lg"  data-id="' . $row['id'] . '"><i class="fas fa-edit"></i> </a>';
+                $row['delete'] = '<a href="#" class="btn btn-danger btn-del btn-lg" data-id="' . $row['id'] . '"><i class="fas fa-trash"></i> </a>';
 
                 // 2️⃣ Recursively get children categories
                 $children = getCategoryTree($row['id'], $rowNumber);
@@ -271,10 +271,10 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
                 $fullPathJs = json_encode($fullPath);
 
 
-                $row['add_new_item'] = '<button type="button" class="btn btn-sm font-weight-bold text-primary" ng-click="openAddCategoryModal(' . htmlspecialchars(json_encode($row)) . ')"> <i class="fas fa-plus"></i> ' . trans("button_add_category") . '</button>';
+                $row['add_new_item'] = '<button type="button" class="btn btn-lg font-weight-bold text-lg" ng-click="openAddCategoryModal(' . htmlspecialchars(json_encode($row)) . ')"> <i class="fas fa-plus"></i> ' . trans("button_add_category") . '</button>';
                 // Only leaf categories get Add Product button
                 if (empty($children)) {
-                    $row['add_new_cat'] = '<button type="button" class="btn btn-sm font-weight-bold text-primary" ng-click=\'openAddProductModal('
+                    $row['add_new_cat'] = '<button type="button" class="btn btn-lg font-weight-bold text-lg" ng-click=\'openAddProductModal('
                         . htmlspecialchars(json_encode($row)) . ', '
                         . $fullPathJs . ', '
                         . $material . ')\'>'
@@ -296,20 +296,20 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
                     $prod['category'] = get_the_category($prod['c_id'])['c_name'];
                     $prod['supplier'] = get_the_supplier($prod['s_id'])['s_name'] . " (" . format_mobile(get_the_supplier($prod['s_id'])['s_mobile']) . ")";
 
-                    $prod['view'] = '<button class="btn btn-outline-info btn-sm view-btn" title="View" data-id="' . $prod['id'] . '"><i class="fas fa-eye"></i></button>';
+                    $prod['view'] = '<button class="btn btn-outline-info btn-lg view-btn" title="View" data-id="' . $prod['id'] . '"><i class="fas fa-eye"></i></button>';
 
                     if ($prod['status'] == 2 || $prod['status'] == 3) {
-                        $prod['edit'] = '<button class="btn btn-outline-success btn-sm edit-btn" title="Edit" disabled><i class="fas fa-edit"></i></button>';
+                        $prod['edit'] = '<button class="btn btn-outline-success btn-lg edit-btn" title="Edit" disabled><i class="fas fa-edit"></i></button>';
                     } else {
-                        $prod['edit'] = '<button class="btn btn-outline-success btn-sm edit-btn" title="Edit"><i class="fas fa-edit"></i></button>';
+                        $prod['edit'] = '<button class="btn btn-outline-success btn-lg edit-btn" title="Edit"><i class="fas fa-edit"></i></button>';
                     }
 
                     if ($prod['status'] == 3) {
-                        $prod['delete'] = '<button id="delete-product" class="btn btn-sm delete-btn delete-product" title="Delete"  data-id="'. $prod['id'] .'" disabled><i class="fas fa-trash-alt"></i></button>';
+                        $prod['delete'] = '<button id="delete-product" class="btn btn-lg delete-btn delete-product" title="Delete"  data-id="'. $prod['id'] .'" disabled><i class="fas fa-trash-alt"></i></button>';
                     } else if ($prod['status'] == 2) {
-                        $prod['delete'] = '<button id="delete-product" class="btn btn-sm delete-btn text-anger delete-product disabled"  data-id="'. $prod['id'] .'" title="Delete"><i class="fas fa-undo"></i></button>';
+                        $prod['delete'] = '<button id="delete-product" class="btn btn-lg delete-btn text-anger delete-product disabled"  data-id="'. $prod['id'] .'" title="Delete"><i class="fas fa-undo"></i></button>';
                     } else {
-                        $prod['delete'] = '<button id="delete-product" class="btn btn-sm delete-btn text-danger delete-product"  data-id="'. $prod['id'] .'" title="Delete"><i class="fas fa-trash-alt"></i></button>';
+                        $prod['delete'] = '<button id="delete-product" class="btn btn-lg delete-btn text-danger delete-product"  data-id="'. $prod['id'] .'" title="Delete"><i class="fas fa-trash-alt"></i></button>';
                     }
 
                     // Status badge
@@ -321,15 +321,15 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
 
                 $row['products'] = $products;
 
-                $row['edit'] = '<a href="#" class="btn btn-edit btn-sm font-weight-bold text-success" ng-click="cat_edit('.$row['id'].')"   data-id="' . $row['id'] . '"><i class="fas fa-edit"></i> </a>';
+                $row['edit'] = '<a href="#" class="btn btn-edit font-weight-bold text-success btn-lg" ng-click="cat_edit('.$row['id'].')"   data-id="' . $row['id'] . '"><i class="fas fa-edit"></i> </a>';
                 // Check if this category has children or products
                 $hasChildren = !empty($children);
                 $hasProducts = !empty($products);
 
                 if ($hasChildren || $hasProducts) {
-                    $row['delete'] = '<a href="javascript:void(0)" class="btn cat-del btn-sm font-weight-bold text-danger disabled" data-id="' . $row['id'] . '" onclick="javascript:void(0)"><i class="fas fa-trash"></i> </a>';
+                    $row['delete'] = '<a href="javascript:void(0)" class="btn cat-del btn-lg font-weight-bold text-danger disabled" data-id="' . $row['id'] . '" onclick="javascript:void(0)"><i class="fas fa-trash"></i> </a>';
                 } else {
-                    $row['delete'] = '<a href="javascript:void(0)" ng-click="cat_del('.$row['id'].')" class="btn cat-del btn-sm font-weight-bold text-danger" data-id="' . $row['id'] . '"><i class="fas fa-trash"></i> </a>';
+                    $row['delete'] = '<a href="javascript:void(0)" ng-click="cat_del('.$row['id'].')" class="btn cat-del btn-lg font-weight-bold text-danger" data-id="' . $row['id'] . '"><i class="fas fa-trash"></i> </a>';
                 }
 
                 // 2️⃣ Recursively get children categories
@@ -382,9 +382,9 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
 //                 $row['sl'] = $rowNumber; 
 //                 $row['wgt'] = 0;
 //                 $row['pcs'] = 0;
-//                 $row['view'] = '';//<a href="#" class="btn btn-primary  btn-view  btn-sm" data-id="'.$row['id'].'"><i class="fas fa-eye"></i> </a>';
-//                 $row['edit'] = '<a href="#" class="btn btn-success btn-edit btn-sm"  data-id="'.$row['id'].'"><i class="fas fa-edit"></i> </a>';
-//                 $row['delete'] = '<a href="#" class="btn btn-danger btn-del btn-sm" data-id="'.$row['id'].'"><i class="fas fa-trash"></i> </a>';
+//                 $row['view'] = '';//<a href="#" class="btn btn-primary  btn-view  btn-lg" data-id="'.$row['id'].'"><i class="fas fa-eye"></i> </a>';
+//                 $row['edit'] = '<a href="#" class="btn btn-success btn-edit btn-lg"  data-id="'.$row['id'].'"><i class="fas fa-edit"></i> </a>';
+//                 $row['delete'] = '<a href="#" class="btn btn-danger btn-del btn-lg" data-id="'.$row['id'].'"><i class="fas fa-trash"></i> </a>';
 
 //                 // Recursively get children, passing the new prefix
 //                 $children = getCategoryTree($row['id'], $rowNumber);

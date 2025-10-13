@@ -13,9 +13,9 @@ $document->setController('CategoryController');
     <div class="col-lg-12">
         <div class="card card-primary card-outline" style="height: auto; width: auto; transition: 0.15s;">
             <div class="card-header">
-                <h3 class="card-title"><?= trans('title_categorys') ?></h3>
+                <h3 class="card-title text-lg font-weight-bold"><?= trans('title_categorys') ?></h3>
                 <div class="card-tools">
-                    <button type="button" class="btn btn-tool" ng-click="openAddCategoryModal()">
+                    <button type="button" class="btn btn-lg" ng-click="openAddCategoryModal()">
                         <i class="fas fa-plus"></i> <?= trans('button_add_category') ?>
                     </button>
                 </div>
@@ -39,9 +39,9 @@ $document->setController('CategoryController');
                                             <div class="col-lg-4">C name</div>
                                             <div class="col-lg-2">0g</div>
                                             <div class="col-lg-4 text-right">
-                                                <a href="#" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> View</a>
-                                                <a href="#" class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</a>
-                                                <a href="#" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</a>
+                                                <a href="#" class="btn btn-primary btn-lg"><i class="fas fa-eye"></i> View</a>
+                                                <a href="#" class="btn btn-success btn-lg"><i class="fas fa-edit"></i> Edit</a>
+                                                <a href="#" class="btn btn-danger btn-lg"><i class="fas fa-trash"></i> Delete</a>
                                             </div>
                                         </div>
                                     </td>

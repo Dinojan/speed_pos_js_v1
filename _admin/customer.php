@@ -12,24 +12,24 @@ $document->setController('CustomerController');
     <div class="col-lg-12">
         <div class="card card-primary card-outline" style="height: auto; width: auto; transition: 0.15s;">
             <div class="card-header">
-                <h3 class="card-title"><?= trans('title_customers') ?>
+                <h3 class="card-title text-lg font-weight-bold"><?= trans('title_customers') ?>
                     <?php if (isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2) {
                         echo "( <i class ='fas fa-trash text-danger'> Bin</i>  )";
                     } ?>
                 </h3>
                 <div class="card-tools">
-                    <button type="button" class="btn btn-tool" ng-click="openAddCustomerModal()">
+                    <button type="button" class="btn btn-lg" ng-click="openAddCustomerModal()">
                         <i class="fas fa-plus"></i> <?= trans('button_add_customer') ?>
                     </button>
                     <?php if (isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2) {
                     ?>
-                        <a href="customer.php" type="button" class="btn btn-outline-info btn-sm">
+                        <a href="customer.php" type="button" class="btn btn-outline-info btn-lg">
                             <i class="fas fa-list"></i> </a>
 
                     <?php
                     } else {
                     ?>
-                        <a href="?isdeleted=2" type="button" class="btn btn-outline-danger btn-sm">
+                        <a href="?isdeleted=2" type="button" class="btn btn-outline-danger btn-lg">
                             <i class="fas fa-trash"></i>
                         </a>
                     <?php

@@ -43,7 +43,7 @@ angularApp.controller("CategoryController", [
                 $td.html(`
             <div class="row w-100 align-items-center">
                 <div class="col-lg-6"><b>${data.sl}</b> 
-                    <span class="btn btn-sm btn-outline-primary expandable-table-caret">
+                    <span class="btn btn-lg btn-outline-primary expandable-table-caret">
                         <i class="fas fa-caret-right fa-fw"></i>
                     </span>
                     ${data.c_name}

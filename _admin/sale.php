@@ -144,9 +144,9 @@ include('src/_top.php');
                 </div>
                 <div class="card-body position-relative" style="max-height: calc(93vh-27.2vh); overflow-y:auto;">
                     <div id="invoice-item-list" class="table-responsive position-relative">
-                        <table class="table table-hover rounded" id="product-table">
+                        <table class="table table-hover rounded table-sm" id="product-table">
                             <thead style="background: #e7e7e766;">
-                                <tr style="font-size: 12px;">
+                                <tr>
                                     <th style="min-width: 150px"><?= trans("label_order") ?></th>
                                     <th class="text-center"><?= trans("label_sold_price") ?></th>
                                     <th class="text-center"><?= trans("label_wgt_(g)") ?></th>
@@ -187,7 +187,7 @@ include('src/_top.php');
                                 <td class="border-right border-light d-flex flex-row justify-content-between">
                                     <span class="col-4 col-lg-8"><?= trans("label_total_items:") ?> {{ getTotalItems() }} of ({{ cart.length }})</span>
                                     <span class="col-8 col-lg-4 d-flex justify-content-between">
-                                        <span class="col-4"><?= trans("label_final:") ?></span>
+                                        <!-- <span class="col-4"><?php // echo trans("label_final:") ?></span> -->
                                         <span class="col-8 text-right">{{ getTotal() | number:2 }}</span></span>
                                 </td>
                             </tr>
@@ -272,12 +272,12 @@ include('src/_top.php');
                                     popovertarget="item-data"
                                     popovertargetaction="show"
                                     ng-click="showPopover($event)">
-                                    <div class="card custom-card col-12 p-0" style="background-color: #3882ed22; backdrop-filter: blur(16px);">
+                                    <div class="card custom-card col-12 p-0 m-0" style="background-color: #3882ed22; backdrop-filter: blur(16px);">
                                         <div class="card-body p-3">
-                                            <p class="text-center font-weight-bold m-1" style="font-size: 15px;">{{ product.p_name }}</p>
-                                            <!-- <p class="text-primary text-center font-weight-bold m-1" style="font-size: 15px;">
-                                                LKR. {{ product.material_price | number:2 }} (per 8g)
-                                            </p> -->
+                                            <p class="text-center font-weight-bold m-1" >{{ product.p_name }}</p>
+                                            <p class="text-primary text-center font-weight-bold m-1" >
+                                                {{ product.p_code }}
+                                            </p>
                                         </div>
                                     </div>
                                 </button>
@@ -359,7 +359,7 @@ include('src/_top.php');
                                                 ng-keypress="handlePriceKey($event)">
                                             <div class="row">
                                                 <button type="button" ng-click="addToCart(popoverData)"
-                                                    class="btn btn-primary btn-sm col-6 mx-auto mt-2"
+                                                    class="btn btn-primary btn-lg col-6 mx-auto mt-2"
                                                     popovertarget="item-data" popovertargetaction="toggle">
                                                     <i class="fas fa-plus"></i> Add
                                                 </button>

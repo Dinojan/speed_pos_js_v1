@@ -4,7 +4,7 @@ class _system{
         $config = [
             // "AppInfo"=> [
             "AppName"=>"Speed POS",
-            "Version"=> "1.0.0",
+            "Version"=> "1.2.0",
             "Copyrights"=> "Northern IT Hub",
             "CopyrightsUrl"=> "https://www.northernithub.com/",
             "logo"=> "1_logo.png",

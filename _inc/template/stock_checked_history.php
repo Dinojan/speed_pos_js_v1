@@ -1,6 +1,6 @@
 <div class="card-body p-2">
     <div class="table-resposive">
-        <table class="table table-sm table-bordered table-striped">
+        <table class="table  table-bordered table-striped">
             <thead>
                 <tr>
                     <th class="col-3 pl-3 py-2" style="border-bottom: none;"><?php echo trans("label_jewelry_code") ?></th>
@@ -41,7 +41,7 @@
     <div class="card-body p-0" style="max-height: 50vh;">
         <div class="table responsive">
             <?php if (!empty($history)) { ?>
-                <table id="stock-checking-history" class="table table-sm table-bordered table-striped">
+                <table id="stock-checking-history" class="table  table-bordered table-striped">
                     <thead>
                         <tr class="bg-primary">
                             <th class="text-center py-1 px-0"><?php echo trans("label_no.") ?></th>

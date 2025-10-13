@@ -2,7 +2,7 @@
     <!-- Brand Logo -->
     <a href="dashboard.php" class="brand-link <?php echo style_class('brandLogo') ?>">
         <img src="../assets/nit/img/icon.png" alt="logo" class="brand-image elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light font-weight-bold">SPEED POS <Small>v.1.0.0</Small></span>
+        <span class="brand-text font-weight-light font-weight-bold">SPEED POS <Small>V <?php echo $appConfig['Version'] ?></Small></span>
     </a>
 
     <!-- Sidebar -->

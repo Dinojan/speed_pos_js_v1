@@ -20,16 +20,16 @@
                         <div class="row">
                             <div class="col-md-2"></div>
                             <div class="col-md-2 p-2">
-                                <a href="<?php echo relative_url(); ?><?php echo $query_string ? $query_string . '&' : '?'; ?>ftype=today&from=<?php echo date('Y-m-d'); ?>&to=<?php echo date('Y-m-d'); ?>" class="btn btn-primary btn-sm btn-block rounded" <?php echo isset($ftype) && $ftype == 'today' ? 'style="border:3px solid blue;"' : ''; ?>><?php echo trans('button_today'); ?></a>
+                                <a href="<?php echo relative_url(); ?><?php echo $query_string ? $query_string . '&' : '?'; ?>ftype=today&from=<?php echo date('Y-m-d'); ?>&to=<?php echo date('Y-m-d'); ?>" class="btn btn-primary btn-lg btn-block rounded" <?php echo isset($ftype) && $ftype == 'today' ? 'style="border:3px solid blue;"' : ''; ?>><?php echo trans('button_today'); ?></a>
                             </div>
                             <div class="col-md-2 p-2">
-                                <a href="<?php echo relative_url(); ?><?php echo $query_string ? $query_string . '&' : '?'; ?>ftype=week&from=<?php echo date('Y-m-d', strtotime("-7 days", time())); ?>&to=<?php echo date('Y-m-d'); ?>" class="btn btn-success btn-sm btn-block rounded" <?php echo isset($ftype) && $ftype == 'week' ? 'style="border:3px solid green;"' : ''; ?>><?php echo trans('button_last_7_days'); ?></a>
+                                <a href="<?php echo relative_url(); ?><?php echo $query_string ? $query_string . '&' : '?'; ?>ftype=week&from=<?php echo date('Y-m-d', strtotime("-7 days", time())); ?>&to=<?php echo date('Y-m-d'); ?>" class="btn btn-success btn-lg btn-block rounded" <?php echo isset($ftype) && $ftype == 'week' ? 'style="border:3px solid green;"' : ''; ?>><?php echo trans('button_last_7_days'); ?></a>
                             </div>
                             <div class="col-md-2 p-2">
-                                <a href="<?php echo relative_url(); ?><?php echo $query_string ? $query_string . '&' : '?'; ?>ftype=month&from=<?php echo date('Y-m-d', strtotime("-30 days", time())); ?>&to=<?php echo date('Y-m-d'); ?>" class="btn btn-warning btn-sm btn-block rounded" <?php echo isset($ftype) && $ftype == 'month' ? 'style="border:3px solid yellow;"' : ''; ?>><?php echo trans('button_last_30_days'); ?></a>
+                                <a href="<?php echo relative_url(); ?><?php echo $query_string ? $query_string . '&' : '?'; ?>ftype=month&from=<?php echo date('Y-m-d', strtotime("-30 days", time())); ?>&to=<?php echo date('Y-m-d'); ?>" class="btn btn-warning btn-lg btn-block rounded" <?php echo isset($ftype) && $ftype == 'month' ? 'style="border:3px solid yellow;"' : ''; ?>><?php echo trans('button_last_30_days'); ?></a>
                             </div>
                             <div class="col-md-2 p-2">
-                                <a href="<?php echo relative_url(); ?><?php echo $query_string ? $query_string . '&' : '?'; ?>ftype=year&from=<?php echo date('Y-m-d', strtotime("-365 days", time())); ?>&to=<?php echo date('Y-m-d'); ?>" class="btn btn-info btn-sm  btn-block rounded" <?php echo isset($ftype) && $ftype == 'year' ? 'style="border:3px solid blue;"' : ''; ?>><?php echo trans('button_last_365_days'); ?></a>
+                                <a href="<?php echo relative_url(); ?><?php echo $query_string ? $query_string . '&' : '?'; ?>ftype=year&from=<?php echo date('Y-m-d', strtotime("-365 days", time())); ?>&to=<?php echo date('Y-m-d'); ?>" class="btn btn-info btn-lg  btn-block rounded" <?php echo isset($ftype) && $ftype == 'year' ? 'style="border:3px solid blue;"' : ''; ?>><?php echo trans('button_last_365_days'); ?></a>
                             </div>
                         </div>
                     </div>

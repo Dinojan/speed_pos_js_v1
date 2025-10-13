@@ -35,7 +35,7 @@ include('src/_top.php');
     }
     ?>
     <div class="table-responsive">
-      <table id="missing-stocks-list" class="table table-sm table-bordered table-striped">
+      <table id="missing-stocks-list" class="table  table-bordered table-striped">
         <thead>
           <tr class="bg-primary">
             <th><?php echo trans("label_No.") ?></th>

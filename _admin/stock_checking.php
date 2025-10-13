@@ -245,7 +245,7 @@ $document->setController('StockCheckingController');
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="slectedItems" class="table table-sm table-bordered table-striped">
+                <table id="slectedItems" class="table  table-bordered table-striped">
                     <thead class="bg-primary">
                         <tr>
                             <td><?php echo trans("label_no.") ?></td>
@@ -283,7 +283,7 @@ $document->setController('StockCheckingController');
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="checkedItems" class="table table-sm table-bordered table-striped">
+                <table id="checkedItems" class="table  table-bordered table-striped">
                     <thead class="bg-primary">
                         <tr>
                             <td><?php echo trans("label_no.") ?></td>

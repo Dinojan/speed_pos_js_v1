@@ -1,6 +1,6 @@
 <div class="card-body p-2">
     <div class="table-responsive">
-        <table class="table table-sm">
+        <table class="table ">
             <thead>
                 <tr>
                     <th class="col-6 pl-2 py-2 border-bottom"><?php echo trans("label_name") ?></th>

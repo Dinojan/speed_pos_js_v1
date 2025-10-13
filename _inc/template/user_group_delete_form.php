@@ -31,7 +31,7 @@
   </div>
 
   <div class="col-12 text-center mt-3">
-    <button id="ugroup-delete" class="btn btn-danger btn-sm" data-loading-text="Deleting...">
+    <button id="ugroup-delete" class="btn btn-danger btn-lg" data-loading-text="Deleting...">
       <span class="fa fa-fw fa-trash"></span>
       <?php echo trans('button_delete'); ?>
     </button>

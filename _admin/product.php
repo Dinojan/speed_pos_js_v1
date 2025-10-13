@@ -47,17 +47,17 @@ $document->setController('ProductController');
     <div class="col-lg-12">
         <div class="card card-primary card-outline" style="height: auto; width: auto; transition: 0.15s;">
             <div class="card-header">
-                <h3 class="card-title"><?= trans('title_products') ?>
+                <h3 class="card-title text-lg font-weight-bold"><?= trans('title_products') ?>
                     <?php if (isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2) {
-                        echo "( <i class ='fas fa-trash text-danger'> Bin</i>  )";
+                        echo "( <i class ='fas fa-trash text-danger text-lg'> Bin</i>  )";
                     } ?>
                 </h3>
                 <div class="card-tools">
-                    <!-- <button type="button" class="btn btn-tool" ng-click="openAddProductModal()">
+                    <!-- <button type="button" class="btn btn-lg" ng-click="openAddProductModal()">
                         <i class="fas fa-plus"></i> <?php // echo trans('button_add_product') 
                                                     ?>
                     </button> -->
-                    <a type="button" class="btn btn-tool" href="add_product.php">
+                    <a type="button" class="btn btn-lg" href="add_product.php">
                         <?php if (!isset($request->get['isdeleted'])) { ?>
                             <i class="fas fa-plus"></i>
                             <?php echo trans('button_add_product'); ?>
@@ -65,15 +65,15 @@ $document->setController('ProductController');
                     </a>
                     <?php if (isset($request->get['isdeleted']) && $request->get['isdeleted'] == 2) {
                     ?>
-                        <a href="product.php" type="button" class="btn btn-outline-info btn-sm">
+                        <a href="product.php" type="button" class="btn btn-outline-info btn-lg">
                             <i class="fas fa-list"></i>
                         </a>
-                        <button ng-click="openDeletePopover()" class="btn btn-outline-danger btn-sm"><i class="fas fa-trash"></i></button>
+                        <button ng-click="openDeletePopover()" class="btn btn-outline-danger btn-lg"><i class="fas fa-trash"></i></button>
 
                     <?php
                     } else {
                     ?>
-                        <a href="?isdeleted=2" type="button" class="btn btn-outline-danger btn-sm">
+                        <a href="?isdeleted=2" type="button" class="btn btn-outline-danger btn-lg">
                             <i class="fas fa-trash-alt"></i>
                         </a>
                     <?php

@@ -5,7 +5,7 @@ if (from()) :
 ?>
 
     <div class="apply-filter">
-        <a href="<?php echo relative_url() . $query_string; ?>" class="btn btn-sm btn-outline-primary rounded" style="font-size: 12px !important; height: 100%; padding-top: 6px !important;" title="Remove this filter">
+        <a href="<?php echo relative_url() . $query_string; ?>" class="btn btn-lg btn-outline-primary rounded" style="font-size: 12px !important; height: 100%; padding-top: 6px !important;" title="Remove this filter">
             <?php
             $ftype = '';
             if (isset($request->get['ftype'])): ?>

@@ -94,7 +94,7 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && isset($request->get['action_t
                     $row['payment_date'] = date("d F, Y / h:i A", strtotime($row['payment_date']));
                 }
 
-                $row['view'] = '<a href="customer_profile.php?customer=' . $row['id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+                $row['view'] = '<a href="customer_profile.php?customer=' . $row['id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-lg" title="View">
                     <i class="fas fa-eye"></i>
                  </a>';
             }
@@ -118,11 +118,11 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && isset($request->get['action_t
                 $row['total_paid'] = $total_paid;
 
                 if ($outstanding > 0) {
-                    $row['pay'] = '<button id="pay-order-profile-table-btn" class="btn btn-outline-primary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
+                    $row['pay'] = '<button id="pay-order-profile-table-btn" class="btn btn-outline-primary btn-lg pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
                 } else {
-                    $row['pay'] = '<button  class="btn btn-outline-secondary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
+                    $row['pay'] = '<button  class="btn btn-outline-secondary btn-lg pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
                 }
-                $row['view'] = '<a href="customer_profile.php?customer=' . $row['cus_id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+                $row['view'] = '<a href="customer_profile.php?customer=' . $row['cus_id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-lg" title="View">
                     <i class="fas fa-eye"></i>
                  </a>';
             }

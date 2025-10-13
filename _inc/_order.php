@@ -320,29 +320,29 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $row['customer'] = $row['cus_name'] . " (" . format_mobile($row['cus_mobile']) . ")";
 
             if ($totalDue > 0) {
-                $row['pay'] = '<button id="pay-order" class="btn btn-outline-primary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
+                $row['pay'] = '<button id="pay-order" class="btn btn-outline-primary btn-lg pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
             } else {
-                $row['pay'] = '<button  class="btn btn-outline-secondary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
+                $row['pay'] = '<button  class="btn btn-outline-secondary btn-lg pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
             }
-            // $row['view'] = '<button id="view-order" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-eye"></i></button>';
-            $row['view'] = '<a href="customer_profile.php?customer=' . $row['cus_id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+            // $row['view'] = '<button id="view-order" class="btn btn-outline-info btn-lg view-btn"  title="View"><i class="fas fa-eye"></i></button>';
+            $row['view'] = '<a href="customer_profile.php?customer=' . $row['cus_id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-lg" title="View">
                     <i class="fas fa-eye"></i>
                  </a>';
             //if ($row['id'] != 1) {
-            $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-sm edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
+            $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-lg edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
             // } else {
-            //     $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
+            //     $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-lg edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
             // }
             if ($row['order_status'] == 2) {
-                $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
+                $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-lg delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
             } else if ($row['order_status'] == 0) {
-                $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+                $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-lg delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
             } else {
-                $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete" disabled><i class="fas fa-trash-alt"></i></button>';
+                $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-lg delete-btn"  title="Delete" disabled><i class="fas fa-trash-alt"></i></button>';
             }
 
             //  }
-            //     $row['delete'] = '<button class="btn btn-outline-danger btn-sm delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
+            //     $row['delete'] = '<button class="btn btn-outline-danger btn-lg delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
             // }
             //    if($row['status'] == 0){
             //     $row['sts'] = 'Active';
@@ -400,26 +400,26 @@ if ($request->server['REQUEST_METHOD'] == 'GET' && $request->get['action_type'] 
             $row['customer'] = $row['cus_name'] . " (" . format_mobile($row['cus_mobile']) . ")";
 
             if ($totalDue > 0) {
-                $row['pay'] = '<button id="pay-order" class="btn btn-outline-primary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
+                $row['pay'] = '<button id="pay-order" class="btn btn-outline-primary btn-lg pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
             } else {
-                $row['pay'] = '<button  class="btn btn-outline-secondary btn-sm pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
+                $row['pay'] = '<button  class="btn btn-outline-secondary btn-lg pay-btn"  title="View"><i class="fas fa-money-bill"></i></button>';
             }
-            // $row['view'] = '<button id="view-order" class="btn btn-outline-info btn-sm view-btn"  title="View"><i class="fas fa-eye"></i></button>';
-            $row['view'] = '<a href="customer_profile.php?customer=' . $row['cus_id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-sm" title="View">
+            // $row['view'] = '<button id="view-order" class="btn btn-outline-info btn-lg view-btn"  title="View"><i class="fas fa-eye"></i></button>';
+            $row['view'] = '<a href="customer_profile.php?customer=' . $row['cus_id'] . '&order=' . $row['id'] . '" class="btn btn-outline-info btn-lg" title="View">
                     <i class="fas fa-eye"></i>
                  </a>';
             //if ($row['id'] != 1) {
-            $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-sm edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
+            $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-lg edit-btn"  title="Edit"><i class="fas fa-edit"></i></button>';
             // } else {
-            //     $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-sm edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
+            //     $row['edit'] = '<button id="edit-order" class="btn btn-outline-success btn-lg edit-btn" disabled  title="Edit"><i class="fas fa-edit"></i></button>';
             // }
             // if ($row['status'] == 2) {
-            //  $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
+            //  $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-lg delete-btn"  title="Delete"><i class="fas fa-undo"></i></button>';
             //  } else {
-            $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-sm delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
+            $row['delete'] = '<button id="delete-order" class="btn btn-outline-danger btn-lg delete-btn"  title="Delete"><i class="fas fa-trash-alt"></i></button>';
 
             //  }
-            //     $row['delete'] = '<button class="btn btn-outline-danger btn-sm delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
+            //     $row['delete'] = '<button class="btn btn-outline-danger btn-lg delete-btn" disabled title="Delete"><i class="fas fa-trash-alt"></i></button>';
             // }
             //    if($row['status'] == 0){
             //     $row['sts'] = 'Active';

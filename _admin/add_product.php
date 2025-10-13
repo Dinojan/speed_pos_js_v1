@@ -14,8 +14,8 @@ $document->setController('AddProductController');
             <div class="card-header">
                 <h2 class="card-title text-lg font-weight-bold"><?= trans('title_categories') ?></h2>
                 <div class="card-tools">
-                    <button id="filterBtn" class="btn btn-outline-primary btn-sm" ng-click="toggleFilter()"><?php echo trans("text_newly_added") ?></button>
-                    <button type="button" class="btn btn-tool" ng-click="openAddCategoryModal()">
+                    <button id="filterBtn" class="btn btn-outline-primary btn-lg" ng-click="toggleFilter()"><?php echo trans("text_newly_added") ?></button>
+                    <button type="button" class="btn btn-lg" ng-click="openAddCategoryModal()">
                         <i class="fas fa-plus"></i> <?= trans('button_add_main_category') ?>
                     </button>
                 </div>

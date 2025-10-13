@@ -234,7 +234,7 @@ angularApp.controller("StockAssigningController", [
                     style="min-width: ${isMobile ? '280px' : '350px'}; max-width: ${isMobile ? '95vw' : ''};">
                     
                     <!-- Close Button - Mobile Optimized -->
-                    <button class="btn btn-sm text-danger position-absolute" 
+                    <button class="btn btn-lg text-danger position-absolute" 
                             style="top:5px; right:5px; z-index:10;"
                             onclick="angular.element(this).scope().closePopover()">
                         <i class="fas fa-times"></i>
@@ -322,7 +322,7 @@ angularApp.controller("StockAssigningController", [
                                     <i class="fas fa-cubes mr-1"></i>
                                     Jewelries (${products.length})
                                 </h6>
-                                <button id="assignToCheck" class="btn btn-primary btn-sm py-1"><i class="fas fa-arrow-alt-circle-right mr-2"></i>Assign</button> 
+                                <button id="assignToCheck" class="btn btn-primary btn-lg py-1"><i class="fas fa-arrow-alt-circle-right mr-2"></i>Assign</button> 
                             </div>
                             <div class="products-list" style="max-height: ${isMobile ? '280px' : '580px'}; overflow-y: auto;">
                                 ${products.length > 0 ? products.map(product => `
@@ -354,7 +354,7 @@ angularApp.controller("StockAssigningController", [
                     <!-- Action Buttons - Mobile Optimized -->
                     <!-- <div class="mt-3 pt-2 border-top ${isMobile ? 'text-center' : 'text-right'}">
                         ${selectedCategoryId ? `
-                            <button class="btn btn-sm btn-secondary ${isMobile ? 'btn-block' : 'mr-2'} mb-1" 
+                            <button class="btn btn-lg btn-secondary ${isMobile ? 'btn-block' : 'mr-2'} mb-1" 
                                     onclick="angular.element(this).scope().goBack()">
                                 <i class="fas fa-arrow-left mr-1"></i> Back
                             </button>

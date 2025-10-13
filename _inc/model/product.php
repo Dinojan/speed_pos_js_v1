@@ -172,8 +172,9 @@ class ModelProduct extends Model
 		$products = [];
 
 		if ($barcode != null && $name_or_barcode == null) {
-			$where = "WHERE p_code = ? AND status = ?";
-			$execute = [$barcode, $sts];
+			$where = "WHERE  status = ?";
+			$where .= " AND p_code LIKE  '%".$barcode."%'";
+			$execute = [$sts];
 		} else {
 			$where = "WHERE (p_name LIKE ? OR p_code LIKE ?) AND status = ?";
 			$searchTerm = "%$name_or_barcode%";

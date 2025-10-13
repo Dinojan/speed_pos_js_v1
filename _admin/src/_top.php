@@ -103,7 +103,20 @@ $hide_layout = (current_nav() == 'sale' || current_nav() == 'return' || current_
     var hide_layout = <?php echo $hide_layout ? 'true' : 'false'; ?>;
   </script>
 
-<!-- QR/Barcode scanner libraries -->
+  <style>
+    .content-wrapper {
+      font-size: 20px;
+    }
+    .table tbody tr {
+      font-size: 20px !important;
+    }
+    .table thead tr,
+    .table tfoot tr {
+      font-size: 1rem !important;
+    }
+  </style>
+
+  <!-- QR/Barcode scanner libraries -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 
@@ -148,7 +161,7 @@ $hide_layout = (current_nav() == 'sale' || current_nav() == 'return' || current_
                 <?php if (user_group_id() == 1 || has_permission('access', 'filtering')): ?>
 
                   <!-- Date filter -->
-                  <a class="btn btn-primary btn-sm" href="#dateFilterModal" data-toggle="modal" data-target="#dateFilterModal" role="button"><i class="far fa-calendar-alt mr-1"></i> Date Filter</a>
+                  <a class="btn btn-primary btn-lg" href="#dateFilterModal" data-toggle="modal" data-target="#dateFilterModal" role="button"><i class="far fa-calendar-alt mr-1"></i> Date Filter</a>
                 <?php endif; ?>
               <?php endif; ?>
             </div>
